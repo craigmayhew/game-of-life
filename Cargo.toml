@@ -4,4 +4,6 @@ version = "0.1.0"
 authors = ["Craig Mayhew <craig@mayhew.io>"]
 edition = "2018"
 
-[dependencies]
+[dependencies.amethyst]
+version = "0.13"
+features = ["vulkan"]
