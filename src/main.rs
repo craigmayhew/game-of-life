@@ -11,15 +11,13 @@ use amethyst::{
 };
 
 struct GameplayState {
-    /// The `State`-local data. Usually you will not have anything.
-    /// In this case, we have the number of players here.
-    player_count: u8,
+    lifeforms: u8,
 }
 
 //GameData is the internal shared data between states
-impl State<GameData<'static, 'static>, ()> for GameplayState {
+impl SimpleState for GameplayState {
     fn on_start(&mut self, _data: StateData<'_, GameData<'_, '_>>) {
-        println!("Number of players: {}", self.player_count);
+        println!("Number of lifeforms: {}", self.lifeforms);
     }
 }
 
@@ -28,6 +26,13 @@ fn main() -> amethyst::Result<()> {
     
     let app_root = application_root_dir()?;
     let display_config_path = app_root.join("config").join("display.ron");
+
+    let game_data = GameDataBuilder::default();
+
+    let assets_dir = app_root.join("assets");
+    let mut world = World::new();
+    let mut game = Application::new(assets_dir, GameplayState{lifeforms: 0}, game_data)?;
+    game.run();
 
     Ok(())
 }
