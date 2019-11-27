@@ -1,9 +1,10 @@
 extern crate amethyst;
 use amethyst::{
     assets::{AssetStorage, Loader, Handle},
+    core::ArcThreadPool,
     core::transform::{Transform, TransformBundle},
     //Component is used to attach structs to entities in the game
-    ecs::prelude::{Component, DenseVecStorage},
+    ecs::prelude::{Component, DenseVecStorage, Dispatcher},
     prelude::*,
     //renderer is used to display a window
     renderer::{
@@ -15,11 +16,13 @@ use amethyst::{
         types::DefaultBackend,
         RenderingBundle,
     },
+    shred::{DispatcherBuilder},
     //needed for application_root_dir() etc
     utils::application_root_dir,
 };
 
 mod systems;
+use crate::systems::camera_movement;
 
 pub const ARENA_HEIGHT: f32 = 1000.0;
 pub const ARENA_WIDTH: f32 = 1000.0;
@@ -99,6 +102,7 @@ fn load_sprite_sheet(world: &mut World) -> Handle<SpriteSheet> {
 }
 
 struct GameplayState {
+    pub dispatcher: Dispatcher<'static, 'static>,
     lifeforms: u8,
 }
 
@@ -119,7 +123,7 @@ fn initialise_camera(world: &mut World) {
 impl SimpleState for GameplayState {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         println!("Number of lifeforms: {}", self.lifeforms);
-        let world = data.world;
+        let mut world = data.world;
 
         // Load the spritesheet necessary to render the graphics.
         let sprite_sheet_handle = load_sprite_sheet(world);
@@ -128,6 +132,19 @@ impl SimpleState for GameplayState {
         initialise_lifeforms(world, sprite_sheet_handle);
 
         initialise_camera(world);
+
+        let dispatcher = DispatcherBuilder::new()
+        .with_pool((*world.read_resource::<ArcThreadPool>()).clone())
+        .with(
+            camera_movement::CameraMovementSystem::default(),
+            "camera_movement",
+            &[],
+        )
+        .build();
+
+        self.dispatcher = dispatcher;
+
+        self.dispatcher.setup(&mut world);
     }
 }
 
@@ -154,7 +171,8 @@ fn main() -> amethyst::Result<()> {
     .with_bundle(TransformBundle::new())?;
 
     let assets_dir = app_root.join("assets");
-    let mut game = Application::new(assets_dir, GameplayState{lifeforms: 0}, game_data)?;
+    let game_play_start = GameplayState{dispatcher: DispatcherBuilder::new().build(), lifeforms: 0};
+    let mut game = Application::new(assets_dir, game_play_start, game_data)?;
     game.run();
 
     Ok(())
