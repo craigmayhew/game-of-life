@@ -1,6 +1,6 @@
 extern crate amethyst;
 use amethyst::{
-    core::transform::Transform,
+    core::transform::{Transform, TransformBundle},
     //Component is used to attach structs to entities in the game
     ecs::prelude::{Component, DenseVecStorage},
     prelude::*,
@@ -103,7 +103,11 @@ fn main() -> amethyst::Result<()> {
             )
             // RenderFlat2D plugin is used to render entities with a `SpriteRender` component.
             .with_plugin(RenderFlat2D::default()),
-    )?;
+    )?
+    // Add the transform bundle which handles tracking entity positions
+    // TODO: The manual says to add this instead of running world.register::<LifeForm>(); inside impl SimpleState for GameplayState
+    // However this doesnt seem to work as described, maybe try removing it?
+    .with_bundle(TransformBundle::new())?;
 
     let assets_dir = app_root.join("assets");
     let mut game = Application::new(assets_dir, GameplayState{lifeforms: 0}, game_data)?;
