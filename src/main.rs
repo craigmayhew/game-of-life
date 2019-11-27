@@ -46,16 +46,23 @@ impl Component for LifeForm {
     type Storage = DenseVecStorage<Self>;
 }
 
-fn initialise_lifeforms(world: &mut World) {
+fn initialise_lifeforms(world: &mut World, sprite_sheet: Handle<SpriteSheet>) {
     let mut transform = Transform::default();
 
     // Correctly position the life form.
     let y = ARENA_HEIGHT / 2.0;
     transform.set_translation_xyz(LIFEFORM_WIDTH * 0.5, y, 0.0);
 
+    // Assign the sprites for the lifeform
+    let sprite_render = SpriteRender {
+        sprite_sheet: sprite_sheet.clone(),
+        sprite_number: 0, // paddle is the first sprite in the sprite_sheet
+    };
+
     // Create a life form entity.
     world
         .create_entity()
+        .with(sprite_render.clone())
         .with(LifeForm::new())
         .with(transform)
         .build();
@@ -111,8 +118,11 @@ impl SimpleState for GameplayState {
         println!("Number of lifeforms: {}", self.lifeforms);
         let world = data.world;
 
+        // Load the spritesheet necessary to render the graphics.
+        let sprite_sheet_handle = load_sprite_sheet(world);
+
         world.register::<LifeForm>();
-        initialise_lifeforms(world);
+        initialise_lifeforms(world, sprite_sheet_handle);
 
         initialise_camera(world);
     }
