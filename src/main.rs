@@ -5,6 +5,7 @@ use amethyst::{
     core::transform::{Transform, TransformBundle},
     //Component is used to attach structs to entities in the game
     ecs::prelude::{Component, DenseVecStorage, Dispatcher},
+    input::{InputBundle, StringBindings},
     prelude::*,
     //renderer is used to display a window
     renderer::{
@@ -114,6 +115,7 @@ fn initialise_camera(world: &mut World) {
 
     world
         .create_entity()
+        .named("Main camera")
         .with(Camera::standard_3d(ARENA_WIDTH, ARENA_HEIGHT))
         .with(transform)
         .build();
@@ -146,6 +148,16 @@ impl SimpleState for GameplayState {
 
         self.dispatcher.setup(&mut world);
     }
+
+    fn update(&mut self, data: &mut StateData<GameData>) -> SimpleTrans {
+        println!("update SimpleState");
+
+        self.dispatcher.dispatch(&data.world);
+        
+        //data.data.update(&data.world);
+        
+        Trans::None
+    }
 }
 
 fn main() -> amethyst::Result<()> {
@@ -153,6 +165,10 @@ fn main() -> amethyst::Result<()> {
     
     let app_root = application_root_dir()?;
     let display_config_path = app_root.join("config").join("display.ron");
+
+    let binding_path = app_root.join("config").join("keybindings.ron");
+    let input_bundle = InputBundle::<StringBindings>::new()
+    .with_bindings_from_file(binding_path)?;
 
     let game_data = GameDataBuilder::default()
     .with_bundle(
@@ -165,6 +181,7 @@ fn main() -> amethyst::Result<()> {
             // RenderFlat2D plugin is used to render entities with a `SpriteRender` component.
             .with_plugin(RenderFlat2D::default()),
     )?
+    .with_bundle(input_bundle)?
     // Add the transform bundle which handles tracking entity positions
     // TODO: The manual says to add this instead of running world.register::<LifeForm>(); inside impl SimpleState for GameplayState
     // However this doesnt seem to work as described, maybe try removing it?
