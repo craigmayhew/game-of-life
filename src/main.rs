@@ -23,6 +23,7 @@ struct GameplayState {
 fn initialise_camera(world: &mut World) {
     // Setup camera in a way that our screen covers whole arena and (0, 0) is in the bottom left. 
     let mut transform = Transform::default();
+    //initial camera position
     transform.set_translation_xyz(ARENA_WIDTH * 0.5, ARENA_HEIGHT * 0.5, 1.0);
 
     world
@@ -34,8 +35,11 @@ fn initialise_camera(world: &mut World) {
 
 //GameData is the internal shared data between states
 impl SimpleState for GameplayState {
-    fn on_start(&mut self, _data: StateData<'_, GameData<'_, '_>>) {
+    fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         println!("Number of lifeforms: {}", self.lifeforms);
+        let world = data.world;
+
+        initialise_camera(world);
     }
 }
 
