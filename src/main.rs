@@ -80,6 +80,9 @@ impl SimpleState for GameplayState {
         println!("Number of lifeforms: {}", self.lifeforms);
         let world = data.world;
 
+        world.register::<LifeForm>();
+        initialise_lifeforms(world);
+
         initialise_camera(world);
     }
 }
