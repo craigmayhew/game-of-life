@@ -42,6 +42,21 @@ impl Component for LifeForm {
     type Storage = DenseVecStorage<Self>;
 }
 
+fn initialise_lifeforms(world: &mut World) {
+    let mut transform = Transform::default();
+
+    // Correctly position the life form.
+    let y = ARENA_HEIGHT / 2.0;
+    transform.set_translation_xyz(LIFEFORM_WIDTH * 0.5, y, 0.0);
+
+    // Create a life form entity.
+    world
+        .create_entity()
+        .with(LifeForm::new())
+        .with(transform)
+        .build();
+}
+
 struct GameplayState {
     lifeforms: u8,
 }
