@@ -103,7 +103,6 @@ fn main() -> amethyst::Result<()> {
     )?;
 
     let assets_dir = app_root.join("assets");
-    let mut world = World::new();
     let mut game = Application::new(assets_dir, GameplayState{lifeforms: 0}, game_data)?;
     game.run();
 
