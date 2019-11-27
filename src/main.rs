@@ -52,7 +52,7 @@ fn initialise_lifeforms(world: &mut World, sprite_sheet: Handle<SpriteSheet>) {
     // Correctly position the life form.
     let x = ARENA_WIDTH / 2.0;
     let y = ARENA_HEIGHT / 2.0;
-    transform.set_translation_xyz(x, y, -1500.0);
+    transform.set_translation_xyz(x, y, -100.0);
 
     // Assign the sprites for the lifeform
     let sprite_render = SpriteRender {
@@ -108,7 +108,7 @@ fn initialise_camera(world: &mut World) {
 
     world
         .create_entity()
-        .with(Camera::standard_2d(ARENA_WIDTH, ARENA_HEIGHT))
+        .with(Camera::standard_3d(ARENA_WIDTH, ARENA_HEIGHT))
         .with(transform)
         .build();
 }
