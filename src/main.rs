@@ -1,5 +1,14 @@
 extern crate amethyst;
-use amethyst::prelude::*;
+use amethyst::{
+    prelude::*,
+    /*renderer::{
+        plugins::{RenderFlat2D, RenderToWindow},
+        types::DefaultBackend,
+        RenderingBundle,
+    },*/
+    //needed for application_root_dir() etc
+    utils::application_root_dir,
+};
 
 struct GameplayState {
     /// The `State`-local data. Usually you will not have anything.
@@ -14,6 +23,11 @@ impl State<GameData<'static, 'static>, ()> for GameplayState {
     }
 }
 
-fn main() {
-    println!("Hello, world!");
+fn main() -> amethyst::Result<()> {
+    //amethyst::start_logger(Default::default());
+    
+    let app_root = application_root_dir()?;
+    let display_config_path = app_root.join("config").join("display.ron");
+
+    Ok(())
 }
