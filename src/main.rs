@@ -19,11 +19,11 @@ use amethyst::{
     utils::application_root_dir,
 };
 
-pub const ARENA_HEIGHT: f32 = 100.0;
-pub const ARENA_WIDTH: f32 = 100.0;
+pub const ARENA_HEIGHT: f32 = 1000.0;
+pub const ARENA_WIDTH: f32 = 1000.0;
 
-pub const LIFEFORM_HEIGHT: f32 = 16.0;
-pub const LIFEFORM_WIDTH: f32 = 4.0;
+pub const LIFEFORM_HEIGHT: f32 = 1.0;
+pub const LIFEFORM_WIDTH: f32 = 1.0;
 
 struct LifeForm {
     pub x: f32,
@@ -34,9 +34,9 @@ struct LifeForm {
 impl LifeForm {
     fn new() -> LifeForm {
         LifeForm {
-            x: 50.0,
-            y: 50.0,
-            z: 50.0,
+            x: 5.0,
+            y: 5.0,
+            z: 5.0,
         }
     }
 }
@@ -50,8 +50,9 @@ fn initialise_lifeforms(world: &mut World, sprite_sheet: Handle<SpriteSheet>) {
     let mut transform = Transform::default();
 
     // Correctly position the life form.
+    let x = ARENA_WIDTH / 2.0;
     let y = ARENA_HEIGHT / 2.0;
-    transform.set_translation_xyz(LIFEFORM_WIDTH * 0.5, y, 0.0);
+    transform.set_translation_xyz(x, y, -1500.0);
 
     // Assign the sprites for the lifeform
     let sprite_render = SpriteRender {
@@ -103,7 +104,7 @@ fn initialise_camera(world: &mut World) {
     // Setup camera in a way that our screen covers whole arena and (0, 0) is in the bottom left. 
     let mut transform = Transform::default();
     //initial camera position
-    transform.set_translation_xyz(ARENA_WIDTH * 0.5, ARENA_HEIGHT * 0.5, 1.0);
+    transform.set_translation_xyz(ARENA_WIDTH * 0.5, ARENA_HEIGHT * 0.5, 200.0);
 
     world
         .create_entity()
