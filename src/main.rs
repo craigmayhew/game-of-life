@@ -1,5 +1,6 @@
 extern crate amethyst;
 use amethyst::{
+    assets::{AssetStorage, Loader, Handle},
     core::transform::{Transform, TransformBundle},
     //Component is used to attach structs to entities in the game
     ecs::prelude::{Component, DenseVecStorage},
@@ -7,6 +8,9 @@ use amethyst::{
     //renderer is used to display a window
     renderer::{
         Camera,
+        //needed for sprites
+        ImageFormat, SpriteRender, SpriteSheet, SpriteSheetFormat, Texture,
+        //
         plugins::{RenderFlat2D, RenderToWindow},
         types::DefaultBackend,
         RenderingBundle,
@@ -55,6 +59,33 @@ fn initialise_lifeforms(world: &mut World) {
         .with(LifeForm::new())
         .with(transform)
         .build();
+}
+
+fn load_sprite_sheet(world: &mut World) -> Handle<SpriteSheet> {
+    // Load the sprite sheet necessary to render the graphics.
+    // The texture is the pixel data
+    // `texture_handle` is a cloneable reference to the texture
+    let texture_handle = {
+        // loader is a resource
+        let loader = world.read_resource::<Loader>();
+        //texture storage is a resource
+        let texture_storage = world.read_resource::<AssetStorage<Texture>>();
+        loader.load(
+            "texture/lifeform_sprite.png",
+            ImageFormat::default(),
+            (),
+            &texture_storage,
+        )
+    };
+
+    let loader = world.read_resource::<Loader>();
+    let sprite_sheet_store = world.read_resource::<AssetStorage<SpriteSheet>>();
+    loader.load(
+        "texture/lifeform_sprite.ron", // Here we load the associated ron file
+        SpriteSheetFormat(texture_handle),
+        (),
+        &sprite_sheet_store,
+    )
 }
 
 struct GameplayState {
