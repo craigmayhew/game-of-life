@@ -16,10 +16,16 @@
         [Key(Right)]
     ],
     "CameraMoveForward": [
-        [Key(LShift)]
+        [Key(W)]
     ],
     "CameraMoveBackward": [
-        [Key(RShift)]
+        [Key(S)]
+    ],
+    "CameraLookLeft": [
+        [Key(A)]
+    ],
+    "CameraLookRight": [
+        [Key(D)]
     ],
   },
 )
