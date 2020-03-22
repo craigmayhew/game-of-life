@@ -18,12 +18,12 @@ impl<'s> System<'s> for CameraMovementSystem {
     );
 
     fn run(&mut self, (cameras, names, mut transforms, input_handler, time): Self::SystemData) {
-        println!("run CameraMovementSystem System");
+        //println!("run CameraMovementSystem System");
         //delta_real_seconds() allows us to move at a consistent speed, irrespective of the frame rate
         let delta_time = time.delta_real_seconds();
         let move_factor = 10.0 * delta_time;
         for (_, name, transform) in (&cameras, &names, &mut transforms).join() {
-            println!("camera: {}", name.name);
+            //println!("camera: {}", name.name);
             
             if name.name == "Main camera" {
                 // move up / down

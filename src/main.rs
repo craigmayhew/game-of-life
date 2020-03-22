@@ -150,7 +150,7 @@ impl SimpleState for GameplayState {
     }
 
     fn update(&mut self, data: &mut StateData<GameData>) -> SimpleTrans {
-        println!("update SimpleState");
+        //println!("update SimpleState");
 
         self.dispatcher.dispatch(&data.world);
         
