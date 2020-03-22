@@ -22,7 +22,9 @@ use amethyst::{
             mesh::{Normal, Position, Tangent, TexCoord},
             texture::palette::load_from_linear_rgba,
         },
-        Mesh
+        Material,
+        MaterialDefaults,
+        Mesh,
     },
     shred::{DispatcherBuilder},
     //needed for application_root_dir() etc
@@ -72,6 +74,19 @@ fn initialise_lifeforms(world: &mut World, sprite_sheet: Handle<SpriteSheet>) {
     let albedo = world.exec(|loader: AssetLoaderSystemData<Texture> | {
         loader.load_from_data(
             load_from_linear_rgba(LinSrgba::new(1.0, 1.0, 0.0, 1.0)).into(),
+            (),
+        )
+    });
+
+    //load material
+    let default_material = world.read_resource::<MaterialDefaults>().0.clone();
+
+    let mat = world.exec(|loader: AssetLoaderSystemData<Material> | {
+        loader.load_from_data(
+            Material {
+                albedo,
+                ..default_material.clone()
+            },
             (),
         )
     });
