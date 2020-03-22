@@ -1,6 +1,6 @@
 extern crate amethyst;
 use amethyst::{
-    assets::{AssetStorage, Loader, Handle},
+    assets::{AssetLoaderSystemData, AssetStorage, Loader, Handle},
     core::ArcThreadPool,
     core::transform::{Transform, TransformBundle},
     //Component is used to attach structs to entities in the game
@@ -10,12 +10,17 @@ use amethyst::{
     //renderer is used to display a window
     renderer::{
         Camera,
+        formats::mesh::ObjFormat,
         //needed for sprites
         ImageFormat, SpriteRender, SpriteSheet, SpriteSheetFormat, Texture,
         //
-        plugins::{RenderFlat2D, RenderToWindow},
+        plugins::{RenderFlat2D, RenderFlat3D, RenderToWindow},
         types::DefaultBackend,
         RenderingBundle,
+        rendy::{
+            mesh::{Normal, Position, Tangent, TexCoord}
+        },
+        Mesh
     },
     shred::{DispatcherBuilder},
     //needed for application_root_dir() etc
@@ -54,6 +59,14 @@ impl Component for LifeForm {
 }
 
 fn initialise_lifeforms(world: &mut World, sprite_sheet: Handle<SpriteSheet>) {
+    //// 3d tetra
+     
+    //loading tetra mesh 
+    let meshTetra = world.exec(|loader: AssetLoaderSystemData<'_, Mesh> | {
+        loader.load("mesh/tetra.obj", ObjFormat, ())
+    });
+
+    //// 2d square
     let mut transform = Transform::default();
 
     // Correctly position the life form.
@@ -183,7 +196,9 @@ fn main() -> amethyst::Result<()> {
                     .with_clear([0.0, 0.0, 0.0, 1.0]),
             )
             // RenderFlat2D plugin is used to render entities with a `SpriteRender` component.
-            .with_plugin(RenderFlat2D::default()),
+            .with_plugin(RenderFlat2D::default())
+            // RenderFlat3D plugin is used to render entities with a `SpriteRender` component.
+            .with_plugin(RenderFlat3D::default()),
     )?
     .with_bundle(input_bundle)?
     // Add the transform bundle which handles tracking entity positions
