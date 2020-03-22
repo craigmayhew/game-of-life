@@ -2,6 +2,7 @@ extern crate amethyst;
 use amethyst::{
     assets::{AssetLoaderSystemData, AssetStorage, Loader, Handle},
     core::ArcThreadPool,
+    core::math::Vector3,
     core::transform::{Transform, TransformBundle},
     //Component is used to attach structs to entities in the game
     ecs::prelude::{Component, DenseVecStorage, Dispatcher},
@@ -90,6 +91,22 @@ fn initialise_lifeforms(world: &mut World, sprite_sheet: Handle<SpriteSheet>) {
             (),
         )
     });
+
+    //render some tetrahedrons!
+    let mut transform = Transform::default();
+    let scale = Vector3::new(150.0, 150.0, 150.0);
+    transform.set_scale(scale);
+
+
+    
+    // Create a life form entity.
+    world
+        .create_entity()
+        .with(meshTetra.clone())
+        .with(mat.clone())
+        .with(LifeForm::new())//todo this line maybe superflous
+        .with(transform)
+        .build();
 
     //// 2d square
     let mut transform = Transform::default();
