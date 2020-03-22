@@ -60,6 +60,9 @@ fn initialise_lifeforms(world: &mut World, sprite_sheet: Handle<SpriteSheet>) {
     let x = ARENA_WIDTH / 2.0;
     let y = ARENA_HEIGHT / 2.0;
     transform.set_translation_xyz(x, y, -100.0);
+    transform.set_rotation_x_axis(0.2);
+    transform.set_rotation_y_axis(0.2);
+    transform.set_rotation_z_axis(0.2);
 
     // Assign the sprites for the lifeform
     let sprite_render = SpriteRender {
