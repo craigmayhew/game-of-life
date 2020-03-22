@@ -16,9 +16,11 @@ use amethyst::{
         //
         plugins::{RenderFlat2D, RenderFlat3D, RenderToWindow},
         types::DefaultBackend,
+        palette::rgb::LinSrgba,
         RenderingBundle,
         rendy::{
-            mesh::{Normal, Position, Tangent, TexCoord}
+            mesh::{Normal, Position, Tangent, TexCoord},
+            texture::palette::load_from_linear_rgba,
         },
         Mesh
     },
@@ -64,6 +66,14 @@ fn initialise_lifeforms(world: &mut World, sprite_sheet: Handle<SpriteSheet>) {
     //loading tetra mesh 
     let meshTetra = world.exec(|loader: AssetLoaderSystemData<'_, Mesh> | {
         loader.load("mesh/tetra.obj", ObjFormat, ())
+    });
+
+    //creating a texture
+    let albedo = world.exec(|loader: AssetLoaderSystemData<Texture> | {
+        loader.load_from_data(
+            load_from_linear_rgba(LinSrgba::new(1.0, 1.0, 0.0, 1.0)).into(),
+            (),
+        )
     });
 
     //// 2d square
