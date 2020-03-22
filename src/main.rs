@@ -37,6 +37,7 @@ struct LifeForm {
     pub z: f32,
 }
 
+//todo: is this needed? looks like it was for x,y,z but do we need it now?!
 impl LifeForm {
     fn new() -> LifeForm {
         LifeForm {
@@ -70,7 +71,7 @@ fn initialise_lifeforms(world: &mut World, sprite_sheet: Handle<SpriteSheet>) {
     world
         .create_entity()
         .with(sprite_render.clone())
-        .with(LifeForm::new())
+        .with(LifeForm::new())//todo this line maybe superflous
         .with(transform)
         .build();
 }
