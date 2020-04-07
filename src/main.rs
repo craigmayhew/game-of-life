@@ -93,7 +93,7 @@ fn initialise_lifeforms(world: &mut World, sprite_sheet: Handle<SpriteSheet>) {
 
     //render some tetrahedrons!
     let mut transform = Transform::default();
-    let scale = Vector3::new(1500.0, 1500.0, 1500.0);
+    let scale = Vector3::new(150.0, 150.0, 150.0);
     transform.set_scale(scale);
 
     // Create a life form entity.
