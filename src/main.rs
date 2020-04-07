@@ -20,7 +20,6 @@ use amethyst::{
         palette::rgb::LinSrgba,
         RenderingBundle,
         rendy::{
-            mesh::{Normal, Position, Tangent, TexCoord},
             texture::palette::load_from_linear_rgba,
         },
         Material,
