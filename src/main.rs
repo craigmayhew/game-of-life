@@ -81,7 +81,7 @@ fn initialise_lifeforms(world: &mut World, sprite_sheet: Handle<SpriteSheet>) {
     //load material
     let default_material = world.read_resource::<MaterialDefaults>().0.clone();
 
-    let mat = world.exec(|loader: AssetLoaderSystemData<Material> | {
+    let mat_yellow = world.exec(|loader: AssetLoaderSystemData<Material> | {
         loader.load_from_data(
             Material {
                 albedo: yellow,
@@ -91,19 +91,28 @@ fn initialise_lifeforms(world: &mut World, sprite_sheet: Handle<SpriteSheet>) {
         )
     });
 
-    //render some tetrahedrons!
     let mut transform = Transform::default();
+
+    //set size of tetrahedrons
     let scale = Vector3::new(150.0, 150.0, 150.0);
     transform.set_scale(scale);
 
-    // Create a life form entity.
-    world
-        .create_entity()
-        .with(mat.clone())
-        .with(mesh_tetra.clone())
-        .with(LifeForm::new())//todo this line maybe superflous
-        .with(transform)
-        .build();
+    //render some tetrahedrons!
+    for x in 1..5 {
+        for y in 1..5 {
+            for z in 1..5 {
+                transform.set_translation_xyz(150.0 * x as f32, 150.0 * y as f32, 150.0 * z as f32);
+                // Create a life form entity.
+                world
+                    .create_entity()
+                    .with(mesh_tetra.clone())
+                    .with(mat_yellow.clone())
+                    .with(LifeForm::new())//todo this line maybe superflous
+                    .with(transform.clone())
+                    .build();
+            }
+        }
+    }
 
     //// 2d square
     let mut transform = Transform::default();
