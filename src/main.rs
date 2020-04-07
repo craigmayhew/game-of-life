@@ -66,7 +66,7 @@ fn initialise_lifeforms(world: &mut World, sprite_sheet: Handle<SpriteSheet>) {
     //// 3d tetra
      
     //loading tetra mesh 
-    let meshTetra = world.exec(|loader: AssetLoaderSystemData<'_, Mesh> | {
+    let mesh_tetra = world.exec(|loader: AssetLoaderSystemData<'_, Mesh> | {
         loader.load("mesh/tetra.obj", ObjFormat, ())
     });
 
@@ -99,8 +99,8 @@ fn initialise_lifeforms(world: &mut World, sprite_sheet: Handle<SpriteSheet>) {
     // Create a life form entity.
     world
         .create_entity()
-        .with(meshTetra.clone())
         .with(mat.clone())
+        .with(mesh_tetra.clone())
         .with(LifeForm::new())//todo this line maybe superflous
         .with(transform)
         .build();
