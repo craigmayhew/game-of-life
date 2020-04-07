@@ -71,7 +71,7 @@ fn initialise_lifeforms(world: &mut World, sprite_sheet: Handle<SpriteSheet>) {
     });
 
     //creating a texture
-    let albedo = world.exec(|loader: AssetLoaderSystemData<Texture> | {
+    let yellow = world.exec(|loader: AssetLoaderSystemData<Texture> | {
         loader.load_from_data(
             load_from_linear_rgba(LinSrgba::new(1.0, 1.0, 0.0, 1.0)).into(),
             (),
@@ -84,7 +84,7 @@ fn initialise_lifeforms(world: &mut World, sprite_sheet: Handle<SpriteSheet>) {
     let mat = world.exec(|loader: AssetLoaderSystemData<Material> | {
         loader.load_from_data(
             Material {
-                albedo,
+                albedo: yellow,
                 ..default_material.clone()
             },
             (),
