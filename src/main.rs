@@ -5,7 +5,7 @@ use amethyst::{
     core::math::Vector3,
     core::transform::{Transform, TransformBundle},
     //Component is used to attach structs to entities in the game
-    ecs::prelude::{Component, DenseVecStorage, Dispatcher},
+    ecs::prelude::{Dispatcher},
     input::{InputBundle, StringBindings},
     prelude::*,
     //renderer is used to display a window
@@ -36,28 +36,6 @@ use crate::systems::camera_movement;
 
 pub const ARENA_HEIGHT: f32 = 1000.0;
 pub const ARENA_WIDTH: f32 = 1000.0;
-
-struct LifeForm {
-    pub x: f32,
-    pub y: f32,
-    pub z: f32,
-}
-
-//todo: is this needed? looks like it was for x,y,z but do we need it now?!
-impl LifeForm {
-    fn new() -> LifeForm {
-        LifeForm {
-            x: 5.0,
-            y: 5.0,
-            z: 5.0,
-        }
-    }
-}
-
-// By implementing Component for the LifeForm struct, it can now be attached to entities in the game
-impl Component for LifeForm {
-    type Storage = DenseVecStorage<Self>;
-}
 
 fn initialise_lifeforms(world: &mut World, sprite_sheet: Handle<SpriteSheet>) {
     //// 3d tetra
@@ -104,7 +82,6 @@ fn initialise_lifeforms(world: &mut World, sprite_sheet: Handle<SpriteSheet>) {
                     .create_entity()
                     .with(mesh_tetra.clone())
                     .with(mat_yellow.clone())
-                    .with(LifeForm::new())//todo this line maybe superflous
                     .with(transform.clone())
                     .build();
             }
@@ -132,7 +109,6 @@ fn initialise_lifeforms(world: &mut World, sprite_sheet: Handle<SpriteSheet>) {
     world
         .create_entity()
         .with(sprite_render.clone())
-        .with(LifeForm::new())//todo this line maybe superflous
         .with(transform)
         .build();
 }
@@ -192,7 +168,6 @@ impl SimpleState for GameplayState {
         // Load the spritesheet necessary to render the graphics.
         let sprite_sheet_handle = load_sprite_sheet(world);
 
-        world.register::<LifeForm>();
         initialise_lifeforms(world, sprite_sheet_handle);
 
         initialise_camera(world);
