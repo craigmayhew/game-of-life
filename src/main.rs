@@ -37,7 +37,7 @@ use crate::systems::camera_movement;
 pub const ARENA_HEIGHT: f32 = 1000.0;
 pub const ARENA_WIDTH: f32 = 1000.0;
 
-fn initialise_lifeforms(world: &mut World, sprite_sheet: Handle<SpriteSheet>) {
+fn initialise_lifeforms(world: &mut World) {
     //// 3d tetra
      
     //loading tetra mesh 
@@ -88,7 +88,9 @@ fn initialise_lifeforms(world: &mut World, sprite_sheet: Handle<SpriteSheet>) {
             }
         }
     }
+}
 
+fn initialise_stars(world: &mut World, sprite_sheet: Handle<SpriteSheet>) {
     //// 2D square
     let mut transform = Transform::default();
 
@@ -170,7 +172,9 @@ impl SimpleState for GameplayState {
         // Load the spritesheet necessary to render the graphics.
         let sprite_sheet_handle = load_sprite_sheet(world);
 
-        initialise_lifeforms(world, sprite_sheet_handle);
+        initialise_lifeforms(world);
+
+        initialise_stars(world, sprite_sheet_handle);
 
         initialise_camera(world);
 
