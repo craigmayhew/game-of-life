@@ -89,10 +89,10 @@ fn initialise_lifeforms(world: &mut World, sprite_sheet: Handle<SpriteSheet>) {
         }
     }
 
-    //// 2d square
+    //// 2D square
     let mut transform = Transform::default();
 
-    // Correctly position the life form.
+    // Correctly position the 2D square
     let x = ARENA_WIDTH / 2.0;
     let y = ARENA_HEIGHT / 2.0;
     transform.set_translation_xyz(x, y, -100.0);
@@ -100,16 +100,16 @@ fn initialise_lifeforms(world: &mut World, sprite_sheet: Handle<SpriteSheet>) {
     transform.set_rotation_y_axis(0.2);
     transform.set_rotation_z_axis(0.2);
 
-    // Assign the sprites for the lifeform
+    // Assign the sprites for the 2D square
     let sprite_render = SpriteRender {
-        sprite_sheet: sprite_sheet.clone(),
-        sprite_number: 0, // lifeform is the first sprite in the sprite_sheet
+        sprite_sheet,
+        sprite_number: 0, // 0 means it's the first sprite in the sprite_sheet
     };
 
-    // Create a life form entity.
+    // Create a 2D square
     world
         .create_entity()
-        .with(sprite_render.clone())
+        .with(sprite_render)
         .with(transform)
         .build();
 }
