@@ -37,9 +37,6 @@ use crate::systems::camera_movement;
 pub const ARENA_HEIGHT: f32 = 1000.0;
 pub const ARENA_WIDTH: f32 = 1000.0;
 
-pub const LIFEFORM_HEIGHT: f32 = 1.0;
-pub const LIFEFORM_WIDTH: f32 = 1.0;
-
 struct LifeForm {
     pub x: f32,
     pub y: f32,
