@@ -69,14 +69,15 @@ fn initialise_lifeforms(world: &mut World, sprite_sheet: Handle<SpriteSheet>) {
     let mut transform = Transform::default();
 
     //set size of tetrahedrons
-    let scale = Vector3::new(150.0, 150.0, 150.0);
+    let life_form_size = 150.0;
+    let scale = Vector3::new(life_form_size, life_form_size, life_form_size);
     transform.set_scale(scale);
 
     //render some tetrahedrons!
     for x in 1..5 {
         for y in 1..5 {
             for z in 1..5 {
-                transform.set_translation_xyz(150.0 * x as f32, 150.0 * y as f32, 150.0 * z as f32);
+                transform.set_translation_xyz(life_form_size * x as f32, life_form_size * y as f32, life_form_size * z as f32);
                 // Create a life form entity.
                 world
                     .create_entity()
