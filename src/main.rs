@@ -221,7 +221,7 @@ fn main() -> amethyst::Result<()> {
             )
             // RenderFlat2D plugin is used to render entities with a `SpriteRender` component.
             .with_plugin(RenderFlat2D::default())
-            // RenderFlat3D plugin is used to render entities with a `SpriteRender` component.
+            // RenderFlat3D plugin is used to render meshes
             .with_plugin(RenderFlat3D::default()),
     )?
     .with_bundle(input_bundle)?
