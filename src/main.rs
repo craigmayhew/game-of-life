@@ -226,8 +226,6 @@ fn main() -> amethyst::Result<()> {
     )?
     .with_bundle(input_bundle)?
     // Add the transform bundle which handles tracking entity positions
-    // TODO: The manual says to add this instead of running world.register::<LifeForm>(); inside impl SimpleState for GameplayState
-    // However this doesnt seem to work as described, maybe try removing it?
     .with_bundle(TransformBundle::new())?;
 
     let assets_dir = app_root.join("assets");
