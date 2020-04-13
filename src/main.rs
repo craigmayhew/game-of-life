@@ -165,7 +165,6 @@ fn initialise_camera(world: &mut World) {
 //GameData is the internal shared data between states
 impl SimpleState for GameplayState {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
-        println!("Number of lifeforms: {}", self.lifeforms);
         let mut world = data.world;
 
         // Load the spritesheet necessary to render the graphics.
