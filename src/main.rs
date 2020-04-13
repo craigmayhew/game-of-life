@@ -144,6 +144,8 @@ fn load_sprite_sheet(world: &mut World) -> Handle<SpriteSheet> {
 struct GameplayState {
     pub dispatcher: Dispatcher<'static, 'static>,
     lifeforms: u8,
+    //todo: Should we have 3 dimensional array storing life form info?
+    //      for use in later life reproduction/stability/death calcs?
 }
 
 fn initialise_camera(world: &mut World) {
