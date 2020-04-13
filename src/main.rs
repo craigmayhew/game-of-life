@@ -124,7 +124,7 @@ fn load_sprite_sheet(world: &mut World) -> Handle<SpriteSheet> {
         //texture storage is a resource
         let texture_storage = world.read_resource::<AssetStorage<Texture>>();
         loader.load(
-            "texture/lifeform_sprite.png",
+            "texture/2d_square_sprite.png",
             ImageFormat::default(),
             (),
             &texture_storage,
@@ -134,7 +134,7 @@ fn load_sprite_sheet(world: &mut World) -> Handle<SpriteSheet> {
     let loader = world.read_resource::<Loader>();
     let sprite_sheet_store = world.read_resource::<AssetStorage<SpriteSheet>>();
     loader.load(
-        "texture/lifeform_sprite.ron", // Here we load the associated ron file
+        "texture/2d_square_sprite.ron", // Here we load the associated ron file
         SpriteSheetFormat(texture_handle),
         (),
         &sprite_sheet_store,
