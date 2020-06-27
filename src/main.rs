@@ -37,6 +37,7 @@ use crate::systems::life;
 
 pub const ARENA_HEIGHT: f32 = 1000.0;
 pub const ARENA_WIDTH: f32 = 1000.0;
+pub const LIFE_FORM_SIZE: f32 = 150.0;
 
 fn initialise_lifeforms(world: &mut World) {
     //// 3d tetra
@@ -70,15 +71,14 @@ fn initialise_lifeforms(world: &mut World) {
     let mut transform = Transform::default();
 
     //set size of tetrahedrons
-    let life_form_size = 150.0;
-    let scale = Vector3::new(life_form_size, life_form_size, life_form_size);
+    let scale = Vector3::new(LIFE_FORM_SIZE, LIFE_FORM_SIZE, LIFE_FORM_SIZE);
     transform.set_scale(scale);
 
     //render some tetrahedrons!
     for x in 1..5 {
         for y in 1..5 {
             for z in 1..5 {
-                transform.set_translation_xyz(life_form_size * x as f32, life_form_size * y as f32, life_form_size * z as f32);
+                transform.set_translation_xyz(LIFE_FORM_SIZE * x as f32, LIFE_FORM_SIZE * y as f32, LIFE_FORM_SIZE * z as f32);
                 let translation = transform.translation();
                 // Create a life form entity.
                 world

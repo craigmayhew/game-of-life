@@ -38,7 +38,7 @@ impl<'s> System<'s> for LifeSystem {
             if &name.name[..9] == "Life Form" && (entities_count < 2 || total_entities-entities_count<3) {
 
                 let mut transform_new_life = transform.clone();
-                transform_new_life.append_translation_xyz(0.0, 0.0, -15.0);
+                transform_new_life.append_translation_xyz(0.0, 0.0, -crate::LIFE_FORM_SIZE);
 
                 lazy_update.exec(move |world| {
                     //loading tetra mesh 
