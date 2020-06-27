@@ -33,6 +33,7 @@ use amethyst::{
 
 mod systems;
 use crate::systems::camera_movement;
+use crate::systems::life;
 
 pub const ARENA_HEIGHT: f32 = 1000.0;
 pub const ARENA_WIDTH: f32 = 1000.0;
@@ -78,9 +79,11 @@ fn initialise_lifeforms(world: &mut World) {
         for y in 1..5 {
             for z in 1..5 {
                 transform.set_translation_xyz(life_form_size * x as f32, life_form_size * y as f32, life_form_size * z as f32);
+                let translation = transform.translation();
                 // Create a life form entity.
                 world
                     .create_entity()
+                    .named(format!("Life Form {},{},{}", translation.x.to_string(),translation.to_string(),translation.z.to_string()))
                     .with(mesh_tetra.clone())
                     .with(mat_yellow.clone())
                     .with(transform.clone())
@@ -190,6 +193,11 @@ impl SimpleState for GameplayState {
         .with(
             camera_movement::CameraMovementSystem::default(),
             "camera_movement",
+            &[],
+        )
+        .with(
+            life::LifeSystem::default(),
+            "life",
             &[],
         )
         .build();
