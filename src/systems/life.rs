@@ -31,10 +31,6 @@ impl<'s> System<'s> for LifeSystem {
     fn run(&mut self, (entities, lazy_update, names, mesh_handles, mut transforms): Self::SystemData) {
         let total_entities:usize = (&entities).join().count();
         let mut entities_count:usize = 0;
-
-        println!("Total of mesh_handles: {}", (&mesh_handles).join().count().to_string());
-        println!("Total of names: {}", (&names).join().count().to_string());
-        println!("Total of transforms: {}", (&transforms).join().count().to_string());
         
         for (entity, mesh_handle, name, transform) in (&entities, &mesh_handles, &names, &mut transforms).join() {
             entities_count += 1;
