@@ -71,8 +71,8 @@ impl<'s> System<'s> for LifeSystem {
                     world
                         .create_entity()
                         .named(format!("Life Form {},{},{}", translation.x.to_string(),translation.to_string(),translation.z.to_string()))
-                        .with(mesh_tetra.clone())
-                        .with(colour.clone())
+                        .with(mesh_tetra)
+                        .with(colour)
                         .with(transform_new_life.clone())
                         .build();
                 });
