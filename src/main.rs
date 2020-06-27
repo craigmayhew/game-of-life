@@ -156,10 +156,17 @@ fn initialise_camera(world: &mut World) {
     //initial camera position
     transform.set_translation_xyz(ARENA_WIDTH * 0.5, ARENA_HEIGHT * 0.5, 200.0);
 
+    let camera = Camera::from(amethyst::renderer::camera::Projection::perspective(
+        ARENA_WIDTH / ARENA_HEIGHT,
+        std::f32::consts::FRAC_PI_3,
+        0.1,
+        20000.0,
+    ));
+
     world
         .create_entity()
         .named("Main camera")
-        .with(Camera::standard_3d(ARENA_WIDTH, ARENA_HEIGHT))
+        .with(camera)
         .with(transform)
         .build();
 }
