@@ -35,7 +35,7 @@ impl<'s> System<'s> for LifeSystem {
         for (entity, mesh_handle, name, transform) in (&entities, &mesh_handles, &names, &mut transforms).join() {
             entities_count += 1;
             
-            if name.name[..9] == "Life Form".to_owned() && (entities_count < 2 || total_entities-entities_count<3) {
+            if &name.name[..9] == "Life Form" && (entities_count < 2 || total_entities-entities_count<3) {
 
                 let mut transform_new_life = transform.clone();
                 transform_new_life.append_translation_xyz(0.0, 0.0, -15.0);
