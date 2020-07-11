@@ -44,12 +44,7 @@ fn initialise_lifeforms(world: &mut World) {
     let mesh_tetra = life::load_mesh(world, "mesh/tetra.obj");
 
     //creating a texture
-    let yellow = world.exec(|loader: AssetLoaderSystemData<Texture> | {
-        loader.load_from_data(
-            load_from_linear_rgba(LinSrgba::new(1.0, 1.0, 0.0, 1.0)).into(),
-            (),
-        )
-    });
+    let yellow = life::load_colour(world, 1.0, 1.0, 0.0, 1.0);
 
     //load material
     let default_material = world.read_resource::<MaterialDefaults>().0.clone();
