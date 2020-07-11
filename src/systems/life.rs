@@ -1,6 +1,6 @@
 use amethyst::{
     assets::{AssetLoaderSystemData, Handle},
-    core::{Named, Transform},
+    core::{Transform},
     ecs::*,
     prelude::WithNamed,//needed to allow the use of world.create_entity().named("something")
     renderer::{
@@ -57,16 +57,15 @@ impl<'s> System<'s> for LifeSystem {
     type SystemData = (
         Entities<'s>,
         Read<'s, LazyUpdate>,
-        ReadStorage<'s, Named>,
         ReadStorage<'s, LifeTag>,
         WriteStorage<'s, Transform>,
     );
 
-    fn run(&mut self, (entities, lazy_update, names, life_tag, mut transforms): Self::SystemData) {
+    fn run(&mut self, (entities, lazy_update, life_tag, mut transforms): Self::SystemData) {
         let total_entities:usize = (&entities).join().count();
         let mut entities_count:usize = 0;
         
-        for (entity, name, _life, transform) in (&entities, &names, &life_tag, &mut transforms).join() {
+        for (_life, transform) in (&life_tag, &mut transforms).join() {
             entities_count += 1;
             
             if entities_count < 2 || total_entities-entities_count<3 {
