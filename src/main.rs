@@ -1,6 +1,6 @@
 extern crate amethyst;
 use amethyst::{
-    assets::{AssetLoaderSystemData, AssetStorage, Loader, Handle},
+    assets::{AssetStorage, Loader, Handle},
     core::ArcThreadPool,
     core::math::Vector3,
     core::transform::{Transform, TransformBundle},
@@ -16,12 +16,7 @@ use amethyst::{
         //
         plugins::{RenderFlat2D, RenderFlat3D, RenderToWindow},
         types::DefaultBackend,
-        palette::rgb::LinSrgba,
         RenderingBundle,
-        rendy::{
-            texture::palette::load_from_linear_rgba,
-        },
-        Material,
         MaterialDefaults,
     },
     shred::{DispatcherBuilder},
