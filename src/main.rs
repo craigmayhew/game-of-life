@@ -11,7 +11,6 @@ use amethyst::{
     //renderer is used to display a window
     renderer::{
         Camera,
-        formats::mesh::ObjFormat,
         //needed for sprites
         ImageFormat, SpriteRender, SpriteSheet, SpriteSheetFormat, Texture,
         //
@@ -24,7 +23,6 @@ use amethyst::{
         },
         Material,
         MaterialDefaults,
-        Mesh,
     },
     shred::{DispatcherBuilder},
     //needed for application_root_dir() etc
