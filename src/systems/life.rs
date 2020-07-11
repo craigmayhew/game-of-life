@@ -58,14 +58,15 @@ impl<'s> System<'s> for LifeSystem {
         Entities<'s>,
         Read<'s, LazyUpdate>,
         ReadStorage<'s, Named>,
+        ReadStorage<'s, LifeTag>,
         WriteStorage<'s, Transform>,
     );
 
-    fn run(&mut self, (entities, lazy_update, names, mut transforms): Self::SystemData) {
+    fn run(&mut self, (entities, lazy_update, names, life_tag, mut transforms): Self::SystemData) {
         let total_entities:usize = (&entities).join().count();
         let mut entities_count:usize = 0;
         
-        for (entity, name, transform) in (&entities, &names, &mut transforms).join() {
+        for (entity, name, life, transform) in (&entities, &names, &life_tag, &mut transforms).join() {
             entities_count += 1;
             
             if &name.name[..9] == "Life Form" && (entities_count < 2 || total_entities-entities_count<3) {
@@ -90,6 +91,7 @@ impl<'s> System<'s> for LifeSystem {
                         .create_entity()
                         .named(format!("Life Form {},{},{}", translation.x.to_string(),translation.to_string(),translation.z.to_string()))
                         .with(mesh_tetra)
+                        .with(LifeTag)
                         .with(colour_material)
                         .with(transform_new_life.clone())
                         .build();

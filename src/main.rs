@@ -57,6 +57,9 @@ fn initialise_lifeforms(world: &mut World) {
     let scale = Vector3::new(LIFE_FORM_SIZE, LIFE_FORM_SIZE, LIFE_FORM_SIZE);
     transform.set_scale(scale);
 
+    //register our LifeTag component to avoid an error during run time
+    world.register::<life::LifeTag>();
+
     //render some tetrahedrons!
     for x in 1..5 {
         for y in 1..5 {
@@ -67,6 +70,7 @@ fn initialise_lifeforms(world: &mut World) {
                 world
                     .create_entity()
                     .named(format!("Life Form {},{},{}", translation.x.to_string(),translation.to_string(),translation.z.to_string()))
+                    .with(life::LifeTag)
                     .with(mesh_tetra.clone())
                     .with(mat_yellow.clone())
                     .with(transform.clone())
