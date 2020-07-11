@@ -16,7 +16,7 @@ use amethyst::{
     },
 };
 
-pub fn load_mesh(world: &mut World , mesh_obj_filename: &str) -> Handle<Mesh> {
+pub fn load_mesh(world: &mut World, mesh_obj_filename: &str) -> Handle<Mesh> {
     world.exec(|loader: AssetLoaderSystemData<'_, Mesh> | {
         loader.load(mesh_obj_filename, ObjFormat, ())
     })
@@ -69,7 +69,7 @@ impl<'s> System<'s> for LifeSystem {
         for (entity, name, life, transform) in (&entities, &names, &life_tag, &mut transforms).join() {
             entities_count += 1;
             
-            if (entities_count < 2 || total_entities-entities_count<3) {
+            if entities_count < 2 || total_entities-entities_count<3 {
 
                 let mut transform_new_life = transform.clone();
                 transform_new_life.append_translation_xyz(0.0, 0.0, -crate::LIFE_FORM_SIZE);
