@@ -72,7 +72,7 @@ impl<'s> System<'s> for LifeSystem {
         let mut entities_count:usize = 0;
 
         /*todo:
-          1) read session resource
+          1) [x] read session resource
           2) determine which new life to create + create it
           3) removed the need for the init life function in main?
           4) something to do wit hstoring a delta
@@ -108,9 +108,9 @@ impl<'s> System<'s> for LifeSystem {
 
             let colour_material = load_material_with_colour(world, red, default_material);
 
-            for (x, v1) in life_to_create.iter().enumerate() {
-                for (y, v2) in v1.iter().enumerate() {
-                    for (z, _v3) in v2.iter().enumerate() {
+            for (x, vec2) in life_to_create.iter().enumerate() {
+                for (y, vec3) in vec2.iter().enumerate() {
+                    for (z, _bool_life) in vec3.iter().enumerate() {
                         transform_new_life.set_translation_xyz(
                             x as f32 * LIFE_FORM_SIZE,
                             y as f32 * LIFE_FORM_SIZE,
