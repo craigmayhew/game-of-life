@@ -32,49 +32,6 @@ pub const ARENA_HEIGHT: f32 = 1000.0;
 pub const ARENA_WIDTH: f32 = 1000.0;
 pub const LIFE_FORM_SIZE: f32 = 150.0;
 
-fn initialise_lifeforms(world: &mut World) {
-    //// 3d tetra
-     
-    //loading tetra mesh 
-    let mesh_tetra = life::load_mesh(world, "mesh/tetra.obj");
-
-    //creating a texture
-    let yellow = life::load_colour_texture(world, 1.0, 1.0, 0.0, 1.0);
-
-    //load material
-    let default_material = world.read_resource::<MaterialDefaults>().0.clone();
-
-    let mat_yellow = life::load_material_with_colour(world, yellow, default_material);
-
-    let mut transform = Transform::default();
-
-    //set size of tetrahedrons
-    let scale = Vector3::new(LIFE_FORM_SIZE, LIFE_FORM_SIZE, LIFE_FORM_SIZE);
-    transform.set_scale(scale);
-
-    //register our LifeTag component to avoid an error during run time
-    world.register::<life::LifeTag>();
-
-    //render some tetrahedrons!
-    for x in 1..5 {
-        for y in 1..5 {
-            for z in 1..5 {
-                transform.set_translation_xyz(LIFE_FORM_SIZE * x as f32, LIFE_FORM_SIZE * y as f32, LIFE_FORM_SIZE * z as f32);
-                let translation = transform.translation();
-                // Create a life form entity.
-                world
-                    .create_entity()
-                    .named(format!("Life Form {},{},{}", translation.x.to_string(),translation.to_string(),translation.z.to_string()))
-                    .with(life::LifeTag)
-                    .with(mesh_tetra.clone())
-                    .with(mat_yellow.clone())
-                    .with(transform.clone())
-                    .build();
-            }
-        }
-    }
-}
-
 fn initialise_stars(world: &mut World, sprite_sheet: Handle<SpriteSheet>) {
     //// 2D square
     let mut transform = Transform::default();
@@ -163,8 +120,6 @@ impl SimpleState for GameplayState {
 
         // Load the spritesheet necessary to render the graphics.
         let sprite_sheet_handle = load_sprite_sheet(world);
-
-        initialise_lifeforms(world);
 
         initialise_stars(world, sprite_sheet_handle);
 
