@@ -2,7 +2,6 @@ extern crate amethyst;
 use amethyst::{
     assets::{AssetStorage, Loader, Handle},
     core::ArcThreadPool,
-    core::math::Vector3,
     core::transform::{Transform, TransformBundle},
     //Component is used to attach structs to entities in the game
     ecs::prelude::{Dispatcher},
@@ -17,7 +16,6 @@ use amethyst::{
         plugins::{RenderFlat2D, RenderFlat3D, RenderToWindow},
         types::DefaultBackend,
         RenderingBundle,
-        MaterialDefaults,
     },
     shred::{DispatcherBuilder},
     //needed for application_root_dir() etc
