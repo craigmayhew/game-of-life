@@ -43,9 +43,7 @@ fn initialise_lifeforms(world: &mut World) {
     //// 3d tetra
      
     //loading tetra mesh 
-    let mesh_tetra = world.exec(|loader: AssetLoaderSystemData<'_, Mesh> | {
-        loader.load("mesh/tetra.obj", ObjFormat, ())
-    });
+    let mesh_tetra = life::load_mesh(world, "mesh/tetra.obj");
 
     //creating a texture
     let yellow = world.exec(|loader: AssetLoaderSystemData<Texture> | {
