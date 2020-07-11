@@ -22,6 +22,15 @@ pub fn load_mesh(world: &mut World , mesh_obj_filename: &str) -> Handle<Mesh> {
     })
 }
 
+pub fn load_colour(world: &mut World, r: f32, g: f32, b: f32, a: f32) -> Handle<Texture>{
+    world.exec(|loader: AssetLoaderSystemData<Texture> | {
+        loader.load_from_data(
+            load_from_linear_rgba(LinSrgba::new(r, g, b, a)).into(),
+            (),
+        )
+    })
+}
+
 #[derive(Default)]
 pub struct LifeSystem {}
 
@@ -49,12 +58,7 @@ impl<'s> System<'s> for LifeSystem {
                     //loading tetra mesh 
                     let mesh_tetra = load_mesh(world, "mesh/tetra.obj");
                     
-                    let red = world.exec(|loader: AssetLoaderSystemData<Texture> | {
-                        loader.load_from_data(
-                            load_from_linear_rgba(LinSrgba::new(1.0, 0.0, 0.0, 1.0)).into(),
-                            (),
-                        )
-                    });
+                    let red = load_colour(world, 1.0, 0.0, 0.0, 1.0);
 
                     //load material
                     let default_material = world.read_resource::<MaterialDefaults>().0.clone();
