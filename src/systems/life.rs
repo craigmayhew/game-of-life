@@ -1,5 +1,5 @@
 use amethyst::{
-    assets::{AssetLoaderSystemData},
+    assets::{AssetLoaderSystemData, Handle},
     core::{Named, Transform},
     ecs::*,
     prelude::WithNamed,//needed to allow the use of world.create_entity().named("something")
@@ -15,6 +15,12 @@ use amethyst::{
         },
     },
 };
+
+pub fn load_mesh(world: &mut World , mesh_obj_filename: &str) -> Handle<Mesh> {
+    world.exec(|loader: AssetLoaderSystemData<'_, Mesh> | {
+        loader.load(mesh_obj_filename, ObjFormat, ())
+    })
+}
 
 #[derive(Default)]
 pub struct LifeSystem {}
@@ -41,9 +47,7 @@ impl<'s> System<'s> for LifeSystem {
 
                 lazy_update.exec(move |world| {
                     //loading tetra mesh 
-                    let mesh_tetra = world.exec(|loader: AssetLoaderSystemData<'_, Mesh> | {
-                        loader.load("mesh/tetra.obj", ObjFormat, ())
-                    });
+                    let mesh_tetra = load_mesh(world, "mesh/tetra.obj");
                     
                     let red = world.exec(|loader: AssetLoaderSystemData<Texture> | {
                         loader.load_from_data(
