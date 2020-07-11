@@ -1,5 +1,5 @@
 use amethyst::{
-    assets::{AssetLoaderSystemData, AssetStorage, Handle},
+    assets::{AssetLoaderSystemData},
     core::{Named, Transform},
     ecs::*,
     prelude::WithNamed,//needed to allow the use of world.create_entity().named("something")
@@ -24,15 +24,14 @@ impl<'s> System<'s> for LifeSystem {
         Entities<'s>,
         Read<'s, LazyUpdate>,
         ReadStorage<'s, Named>,
-        ReadStorage<'s, Handle<Mesh>>,
         WriteStorage<'s, Transform>,
     );
 
-    fn run(&mut self, (entities, lazy_update, names, mesh_handles, mut transforms): Self::SystemData) {
+    fn run(&mut self, (entities, lazy_update, names, mut transforms): Self::SystemData) {
         let total_entities:usize = (&entities).join().count();
         let mut entities_count:usize = 0;
         
-        for (entity, mesh_handle, name, transform) in (&entities, &mesh_handles, &names, &mut transforms).join() {
+        for (entity, name, transform) in (&entities, &names, &mut transforms).join() {
             entities_count += 1;
             
             if &name.name[..9] == "Life Form" && (entities_count < 2 || total_entities-entities_count<3) {
