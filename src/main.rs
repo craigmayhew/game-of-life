@@ -49,15 +49,7 @@ fn initialise_lifeforms(world: &mut World) {
     //load material
     let default_material = world.read_resource::<MaterialDefaults>().0.clone();
 
-    let mat_yellow = world.exec(|loader: AssetLoaderSystemData<Material> | {
-        loader.load_from_data(
-            Material {
-                albedo: yellow,
-                ..default_material.clone()
-            },
-            (),
-        )
-    });
+    let mat_yellow = life::load_material_with_colour(world, yellow, default_material);
 
     let mut transform = Transform::default();
 
