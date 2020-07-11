@@ -44,6 +44,13 @@ pub fn load_material_with_colour(world: &mut World, colour: Handle<Texture>, def
 }
 
 #[derive(Default)]
+pub struct LifeTag;
+
+impl Component for LifeTag {
+    type Storage = NullStorage<Self>;
+}
+
+#[derive(Default)]
 pub struct LifeSystem {}
 
 impl<'s> System<'s> for LifeSystem {
