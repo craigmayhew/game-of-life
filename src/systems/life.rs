@@ -31,6 +31,18 @@ pub fn load_colour_texture(world: &mut World, r: f32, g: f32, b: f32, a: f32) ->
     })
 }
 
+pub fn load_material_with_colour(world: &mut World, colour: Handle<Texture>, default_material: Material) -> Handle<Material>{
+    world.exec(|loader: AssetLoaderSystemData<Material> | {
+        loader.load_from_data(
+            Material {
+                albedo: colour,
+                ..default_material
+            },
+            (),
+        )
+    })
+}
+
 #[derive(Default)]
 pub struct LifeSystem {}
 
@@ -63,15 +75,7 @@ impl<'s> System<'s> for LifeSystem {
                     //load material
                     let default_material = world.read_resource::<MaterialDefaults>().0.clone();
 
-                    let colour = world.exec(|loader: AssetLoaderSystemData<Material> | {
-                        loader.load_from_data(
-                            Material {
-                                albedo: red,
-                                ..default_material.clone()
-                            },
-                            (),
-                        )
-                    });
+                    let colour = load_material_with_colour(world, red, default_material);
 
                     let translation = transform_new_life.translation();
 
