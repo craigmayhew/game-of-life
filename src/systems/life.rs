@@ -75,7 +75,7 @@ impl<'s> System<'s> for LifeSystem {
                     //load material
                     let default_material = world.read_resource::<MaterialDefaults>().0.clone();
 
-                    let colour = load_material_with_colour(world, red, default_material);
+                    let colour_material = load_material_with_colour(world, red, default_material);
 
                     let translation = transform_new_life.translation();
 
@@ -83,7 +83,7 @@ impl<'s> System<'s> for LifeSystem {
                         .create_entity()
                         .named(format!("Life Form {},{},{}", translation.x.to_string(),translation.to_string(),translation.z.to_string()))
                         .with(mesh_tetra)
-                        .with(colour)
+                        .with(colour_material)
                         .with(transform_new_life.clone())
                         .build();
                 });
