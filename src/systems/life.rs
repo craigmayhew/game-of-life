@@ -1,6 +1,7 @@
 use amethyst::{
     assets::{AssetLoaderSystemData, Handle},
     core::{Transform},
+    core::math::Vector3,
     ecs::*,
     prelude::WithNamed,//needed to allow the use of world.create_entity().named("something")
     renderer::{
@@ -69,39 +70,66 @@ impl<'s> System<'s> for LifeSystem {
     fn run(&mut self, (entities, lazy_update, life_tag, mut transforms): Self::SystemData) {
         let total_entities:usize = (&entities).join().count();
         let mut entities_count:usize = 0;
-        
-        for (_life, transform) in (&life_tag, &mut transforms).join() {
-            entities_count += 1;
-            
-            if entities_count < 2 || total_entities-entities_count<3 {
 
-                let mut transform_new_life = transform.clone();
-                transform_new_life.append_translation_xyz(0.0, 0.0, -crate::LIFE_FORM_SIZE);
+        /*todo:
+          1) read session resource
+          2) determine which new life to create + create it
+          3) removed the need for the init life function in main?
+          4) something to do wit hstoring a delta
+          5) delete life if necessary
+        */
 
-                lazy_update.exec(move |world| {
-                    //loading tetra mesh 
-                    let mesh_tetra = load_mesh(world, "mesh/tetra.obj");
-                    
-                    let red = load_colour_texture(world, 1.0, 0.0, 0.0, 1.0);
-
-                    //load material
-                    let default_material = world.read_resource::<MaterialDefaults>().0.clone();
-
-                    let colour_material = load_material_with_colour(world, red, default_material);
-
-                    let translation = transform_new_life.translation();
-
-                    world
-                        .create_entity()
-                        .named(format!("Life Form {},{},{}", translation.x.to_string(),translation.to_string(),translation.z.to_string()))
-                        .with(mesh_tetra)
-                        .with(LifeTag)
-                        .with(colour_material)
-                        .with(transform_new_life.clone())
-                        .build();
-                });
+        lazy_update.exec(move |world| {
+            let life_to_create: Vec<Vec<Vec<usize>>>;
+            {
+                let fetched = world.try_fetch_mut::<SessionResource>();
+                if let Some(fetched_something) = fetched {
+                    life_to_create = fetched_something.life.clone();
+                } else{
+                    //todo: something is horribly wrong if this line runs
+                    //      because we setup SessionResource in main
+                    //      must be a better way of dealing with this
+                    life_to_create = vec![vec![vec![0; 1]; 1]; 1];
+                }
             }
-        }
+
+            let mut transform_new_life = Transform::default();
+            //set size of tetrahedrons
+            let scale = Vector3::new(LIFE_FORM_SIZE, LIFE_FORM_SIZE, LIFE_FORM_SIZE);
+            transform_new_life.set_scale(scale);
+
+            //loading tetra mesh
+            let mesh_tetra = load_mesh(world, "mesh/tetra.obj");
+            
+            let red = load_colour_texture(world, 1.0, 0.0, 1.0, 1.0);
+
+            //load material
+            let default_material = world.read_resource::<MaterialDefaults>().0.clone();
+
+            let colour_material = load_material_with_colour(world, red, default_material);
+
+            for (x, v1) in life_to_create.iter().enumerate() {
+                for (y, v2) in v1.iter().enumerate() {
+                    for (z, _v3) in v2.iter().enumerate() {
+                        transform_new_life.set_translation_xyz(
+                            x as f32 * LIFE_FORM_SIZE,
+                            y as f32 * LIFE_FORM_SIZE,
+                            z as f32 * LIFE_FORM_SIZE
+                        );
+                        let translation = transform_new_life.translation();
+
+                        world
+                            .create_entity()
+                            .named(format!("Life Form {},{},{}", translation.x.to_string(),translation.to_string(),translation.z.to_string()))
+                            .with(mesh_tetra.clone())
+                            .with(LifeTag)
+                            .with(colour_material.clone())
+                            .with(transform_new_life.clone())
+                            .build();
+                    }
+                }
+            }
+        });
 
         println!("Total of lifeforms: {}", total_entities.to_string());
         println!("Number of lifeforms: {}", entities_count.to_string());
