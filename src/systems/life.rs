@@ -66,7 +66,7 @@ impl<'s> System<'s> for LifeSystem {
         let total_entities:usize = (&entities).join().count();
         let mut entities_count:usize = 0;
         
-        for (entity, name, life, transform) in (&entities, &names, &life_tag, &mut transforms).join() {
+        for (entity, name, _life, transform) in (&entities, &names, &life_tag, &mut transforms).join() {
             entities_count += 1;
             
             if entities_count < 2 || total_entities-entities_count<3 {
