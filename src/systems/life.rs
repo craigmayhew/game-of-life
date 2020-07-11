@@ -16,6 +16,11 @@ use amethyst::{
     },
 };
 
+use crate::{
+    LIFE_FORM_SIZE,
+    SessionResource,
+};
+
 pub fn load_mesh(world: &mut World, mesh_obj_filename: &str) -> Handle<Mesh> {
     world.exec(|loader: AssetLoaderSystemData<'_, Mesh> | {
         loader.load(mesh_obj_filename, ObjFormat, ())
