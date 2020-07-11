@@ -85,9 +85,11 @@ fn load_sprite_sheet(world: &mut World) -> Handle<SpriteSheet> {
 
 struct GameplayState {
     pub dispatcher: Dispatcher<'static, 'static>,
-    lifeforms: u8,
-    //todo: Should we have 3 dimensional array storing life form info?
-    //      for use in later life reproduction/stability/death calcs?
+}
+
+struct SessionResource {
+    //todo: should this be bool or usize?
+    pub life: Vec<Vec<Vec<usize>>>,
 }
 
 fn initialise_camera(world: &mut World) {
@@ -122,6 +124,12 @@ impl SimpleState for GameplayState {
         initialise_stars(world, sprite_sheet_handle);
 
         initialise_camera(world);
+
+        //setting up initial state of life throughout our 3d space
+        let session_resource = SessionResource {
+            life: vec![vec![vec![0; 5]; 5]; 5],
+        };
+        world.insert(session_resource);
 
         let dispatcher = DispatcherBuilder::new()
         .with_pool((*world.read_resource::<ArcThreadPool>()).clone())
@@ -179,7 +187,7 @@ fn main() -> amethyst::Result<()> {
     .with_bundle(TransformBundle::new())?;
 
     let assets_dir = app_root.join("assets");
-    let game_play_start = GameplayState{dispatcher: DispatcherBuilder::new().build(), lifeforms: 0};
+    let game_play_start = GameplayState{dispatcher: DispatcherBuilder::new().build()};
     let mut game = Application::new(assets_dir, game_play_start, game_data)?;
     game.run();
 
