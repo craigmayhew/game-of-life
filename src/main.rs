@@ -9,7 +9,6 @@ use amethyst::{
     prelude::*,
     //renderer is used to display a window
     renderer::{
-        Camera,
         //needed for sprites
         ImageFormat, SpriteRender, SpriteSheet, SpriteSheetFormat, Texture,
         //
@@ -98,12 +97,11 @@ fn initialise_camera(world: &mut World) {
     //initial camera position
     transform.set_translation_xyz(ARENA_WIDTH * 0.5, ARENA_HEIGHT * 0.5, 200.0);
 
-    let camera = Camera::from(amethyst::renderer::camera::Projection::perspective(
+    let camera = amethyst::renderer::camera::Camera::perspective(
         ARENA_WIDTH / ARENA_HEIGHT,
         std::f32::consts::FRAC_PI_3,
         0.1,
-        20000.0,
-    ));
+    );
 
     world
         .create_entity()

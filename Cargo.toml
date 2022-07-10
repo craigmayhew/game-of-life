@@ -5,5 +5,5 @@ authors = ["Craig Mayhew <craig@mayhew.io>"]
 edition = "2018"
 
 [dependencies.amethyst]
-version = "0.15.0"
+version = "0.15.3"
 features = ["vulkan"]
