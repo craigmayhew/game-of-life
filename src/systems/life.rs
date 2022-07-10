@@ -80,16 +80,18 @@ impl<'s> System<'s> for LifeSystem {
         */
 
         lazy_update.exec(move |world| {
-            let life_to_create: Vec<Vec<Vec<usize>>>;
+            let life_to_create: Vec<Vec<Vec<bool>>>;
             {
                 let fetched = world.try_fetch_mut::<SessionResource>();
                 if let Some(fetched_something) = fetched {
-                    life_to_create = fetched_something.life.clone();
+                    
+                    life_to_create = vec![vec![vec![false; 1]; 1]; 1];
+                    //life_to_create = fetched_something.life.clone();
                 } else{
                     //todo: something is horribly wrong if this line runs
                     //      because we setup SessionResource in main
                     //      must be a better way of dealing with this
-                    life_to_create = vec![vec![vec![0; 1]; 1]; 1];
+                    life_to_create = vec![vec![vec![false; 1]; 1]; 1];
                 }
             }
 
@@ -99,6 +101,7 @@ impl<'s> System<'s> for LifeSystem {
             transform_new_life.set_scale(scale);
 
             //loading tetra mesh
+            //todo: do we need to mesh every single frame?!
             let mesh_tetra = load_mesh(world, "mesh/tetra.obj");
             
             let red = load_colour_texture(world, 1.0, 0.0, 1.0, 1.0);
@@ -110,22 +113,24 @@ impl<'s> System<'s> for LifeSystem {
 
             for (x, vec2) in life_to_create.iter().enumerate() {
                 for (y, vec3) in vec2.iter().enumerate() {
-                    for (z, _bool_life) in vec3.iter().enumerate() {
-                        transform_new_life.set_translation_xyz(
-                            x as f32 * LIFE_FORM_SIZE,
-                            y as f32 * LIFE_FORM_SIZE,
-                            z as f32 * LIFE_FORM_SIZE
-                        );
-                        let translation = transform_new_life.translation();
+                    for (z, bool_life) in vec3.iter().enumerate() {
+                        if *bool_life {
+                            transform_new_life.set_translation_xyz(
+                                x as f32 * LIFE_FORM_SIZE,
+                                y as f32 * LIFE_FORM_SIZE,
+                                z as f32 * LIFE_FORM_SIZE
+                            );
+                            let translation = transform_new_life.translation();
 
-                        world
-                            .create_entity()
-                            .named(format!("Life Form {},{},{}", translation.x.to_string(),translation.to_string(),translation.z.to_string()))
-                            .with(mesh_tetra.clone())
-                            .with(LifeTag)
-                            .with(colour_material.clone())
-                            .with(transform_new_life.clone())
-                            .build();
+                            world
+                                .create_entity()
+                                .named(format!("Life Form {},{},{}", translation.x.to_string(),translation.to_string(),translation.z.to_string()))
+                                .with(mesh_tetra.clone())
+                                .with(LifeTag)
+                                .with(colour_material.clone())
+                                .with(transform_new_life.clone())
+                                .build();
+                        }
                     }
                 }
             }

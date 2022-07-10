@@ -1,0 +1,5 @@
+[target.x86_64-pc-windows-msvc]
+linker = "C:\\Program Files\\LLVM\\bin\\lld-link.exe"
+#linker = "rust-lld"
+#rustflags = ["--linker-flavor=lld-link"]
+rustflags = ["-C", "link-arg=-fuse-ld=lld"]

@@ -30,6 +30,23 @@ pub const ARENA_HEIGHT: f32 = 1000.0;
 pub const ARENA_WIDTH: f32 = 1000.0;
 pub const LIFE_FORM_SIZE: f32 = 150.0;
 
+fn initialise_life(world: &mut World){
+    //setting up initial state of life throughout our 3d space
+    let mut starting_life = vec![vec![vec![false; 5]; 5]; 5];
+    for (x, vec2) in starting_life.clone().iter().enumerate() {
+        for (y, vec3) in vec2.iter().enumerate() {
+            for (z, _) in vec3.iter().enumerate() {
+                starting_life[x][y][z] = rand::random();
+            }
+        }
+    }
+    let session_resource = SessionResource {
+        life_start: starting_life,
+        life_current: vec![vec![vec![false]]],
+    };
+    world.insert(session_resource);
+}
+
 fn initialise_stars(world: &mut World, sprite_sheet: Handle<SpriteSheet>) {
     //// 2D square
     let mut transform = Transform::default();
@@ -88,8 +105,8 @@ struct GameplayState {
 }
 
 struct SessionResource {
-    //todo: should this be bool or usize?
-    pub life: Vec<Vec<Vec<usize>>>,
+    pub life_start: Vec<Vec<Vec<bool>>>,
+    pub life_current: Vec<Vec<Vec<bool>>>,
 }
 
 fn initialise_camera(world: &mut World) {
@@ -125,11 +142,7 @@ impl SimpleState for GameplayState {
 
         initialise_camera(world);
 
-        //setting up initial state of life throughout our 3d space
-        let session_resource = SessionResource {
-            life: vec![vec![vec![0; 5]; 5]; 5],
-        };
-        world.insert(session_resource);
+        initialise_life(world);
 
         let dispatcher = DispatcherBuilder::new()
         .with_pool((*world.read_resource::<ArcThreadPool>()).clone())
