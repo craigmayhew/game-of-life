@@ -80,18 +80,7 @@ impl<'s> System<'s> for LifeSystem {
         // this if statement is hard coded to 3 because we currently have 2 entities at startup (maybe the camera and the sun?)
         if total_entities < 3 {
         lazy_update.exec(move |world| {
-            let life_to_create: Vec<Vec<Vec<usize>>>;
-            {
-                let fetched = world.try_fetch_mut::<SessionResource>();
-                if let Some(fetched_something) = fetched {
-                    life_to_create = fetched_something.life.clone();
-                } else{
-                    //todo: something is horribly wrong if this line runs
-                    //      because we setup SessionResource in main
-                    //      must be a better way of dealing with this
-                    life_to_create = vec![vec![vec![0; 1]; 1]; 1];
-                }
-            }
+        let life_to_create: Vec<Vec<Vec<usize>>> = world.fetch_mut::<SessionResource>().life.clone();
 
             let mut transform_new_life = Transform::default();
             //set size of tetrahedrons
@@ -115,6 +104,7 @@ impl<'s> System<'s> for LifeSystem {
                             y as f32 * LIFE_FORM_SIZE,
                             z as f32 * LIFE_FORM_SIZE
                         );
+                        } else {
                         let translation = transform_new_life.translation();
 
                         world
