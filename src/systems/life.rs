@@ -99,7 +99,6 @@ impl<'s> System<'s> for LifeSystem {
             transform_new_life.set_scale(scale);
 
             //loading tetra mesh
-            let mesh_tetra = load_mesh(world, "mesh/tetra.obj");
             
             let red = load_colour_texture(world, 1.0, 0.0, 1.0, 1.0);
 
@@ -126,6 +125,7 @@ impl<'s> System<'s> for LifeSystem {
                             .with(colour_material.clone())
                             .with(transform_new_life.clone())
                             .build();
+            let mesh_tetra = load_mesh(world, "mesh/sommerville-hill-tetrahedron.obj");
                     }
                 }
             }
