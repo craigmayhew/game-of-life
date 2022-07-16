@@ -79,47 +79,104 @@ impl<'s> System<'s> for LifeSystem {
         */
         // this if statement is hard coded to 3 because we currently have 2 entities at startup (maybe the camera and the sun?)
         if total_entities < 3 {
-        lazy_update.exec(move |world| {
-        let life_to_create: Vec<Vec<Vec<usize>>> = world.fetch_mut::<SessionResource>().life.clone();
+            lazy_update.exec(move |world| {
+                let life_to_create: Vec<Vec<Vec<Vec<usize>>>> = world.fetch_mut::<SessionResource>().life.clone();
 
-            let mut transform_new_life = Transform::default();
-            //set size of tetrahedrons
-            let scale = Vector3::new(LIFE_FORM_SIZE, LIFE_FORM_SIZE, LIFE_FORM_SIZE);
-            transform_new_life.set_scale(scale);
+                let mut transform_new_life = Transform::default();
+                //set size of tetrahedrons
+                let scale = Vector3::new(LIFE_FORM_SIZE, LIFE_FORM_SIZE, LIFE_FORM_SIZE);
+                transform_new_life.set_scale(scale);
 
-            //loading tetra mesh
-            
-            let red = load_colour_texture(world, 1.0, 0.0, 1.0, 1.0);
+                //loading tetra mesh
+                let mesh_tetra = load_mesh(world, "mesh/sommerville-hill-tetrahedron.obj");
 
-            //load material
-            let default_material = world.read_resource::<MaterialDefaults>().0.clone();
+                for (n, vec1) in life_to_create.iter().enumerate() {
+                    let mut red = 0.0;
+                    for (x, vec2) in vec1.iter().enumerate() {
+                        let mut green = 0.0;
+                        red+=1.0;
+                        for (y, vec3) in vec2.iter().enumerate() {
+                            let mut blue = 0.0;
+                            green+=1.0;
+                            for (z, _bool_life) in vec3.iter().enumerate() {
+                                blue+=1.0;
+                                
+                                let color;
+                                //rotate it if it's every third life form (todo: as this rotations only have 4 variants they could exist outside this loop!)
+                                if n == 1 {//red
+                                    color = load_colour_texture(world, 0.5, 0.0, 0.0, 1.0);
 
-            let colour_material = load_material_with_colour(world, red, default_material);
+                                    // position the life form in 3d space
+                                    transform_new_life.set_translation_xyz(
+                                        (x as f32 + std::f32::consts::SQRT_2) as f32 * LIFE_FORM_SIZE,
+                                        y as f32 * LIFE_FORM_SIZE,
+                                        (z as f32 + std::f32::consts::SQRT_2) as f32 * LIFE_FORM_SIZE
+                                    ); 
+                                    
+                                    transform_new_life.set_rotation_x_axis(std::f32::consts::FRAC_PI_2);
+                                    transform_new_life.set_rotation_y_axis(std::f32::consts::PI);
+                                    transform_new_life.set_rotation_z_axis(0.0);
+                                    
+                                } else if n == 2 { //terqouise to white DONE LEAVE IT
+                                    color = load_colour_texture(world, (1.0/red), 1.0, (1.0/blue) as f32, 1.0);
 
-            for (x, vec2) in life_to_create.iter().enumerate() {
-                for (y, vec3) in vec2.iter().enumerate() {
-                    for (z, _bool_life) in vec3.iter().enumerate() {
-                        transform_new_life.set_translation_xyz(
-                            x as f32 * LIFE_FORM_SIZE,
-                            y as f32 * LIFE_FORM_SIZE,
-                            z as f32 * LIFE_FORM_SIZE
-                        );
-                        } else {
-                        let translation = transform_new_life.translation();
+                                    // position the life form in 3d space
+                                    transform_new_life.set_translation_xyz(
+                                        (x as f32 + 1.0) as f32 * LIFE_FORM_SIZE,
+                                        y as f32 * LIFE_FORM_SIZE,
+                                        (z as f32 + std::f32::consts::SQRT_2) as f32 * LIFE_FORM_SIZE
+                                    ); 
+                                    
+                                    transform_new_life.set_rotation_x_axis(std::f32::consts::FRAC_PI_2);
+                                    transform_new_life.set_rotation_y_axis(std::f32::consts::PI);
+                                } else if n == 3 {//light grey
+                                    color = load_colour_texture(world, 0.5, 0.5, 0.5 as f32, 1.0);
 
-                        world
-                            .create_entity()
-                            .named(format!("Life Form {},{},{}", translation.x.to_string(),translation.to_string(),translation.z.to_string()))
-                            .with(mesh_tetra.clone())
-                            .with(LifeTag)
-                            .with(colour_material.clone())
-                            .with(transform_new_life.clone())
-                            .build();
-            let mesh_tetra = load_mesh(world, "mesh/sommerville-hill-tetrahedron.obj");
+                                    // position the life form in 3d space
+                                    transform_new_life.set_translation_xyz(
+                                        x as f32 * LIFE_FORM_SIZE,
+                                        (y as f32 + std::f32::consts::SQRT_2) as f32 * LIFE_FORM_SIZE,
+                                        (z as f32 + 1.0*std::f32::consts::SQRT_2) as f32 * LIFE_FORM_SIZE
+                                    );
+                                    
+                                    transform_new_life.set_rotation_x_axis(std::f32::consts::PI);
+                                    transform_new_life.set_rotation_y_axis(std::f32::consts::FRAC_PI_2);
+                                } else {//dark grey DONE DO NOT MOVE OR ROTATE!
+                                    color = load_colour_texture(world, 0.2, 0.2, 0.2, 1.0);
+
+                                    // position the life form in 3d space
+                                    transform_new_life.set_translation_xyz(
+                                        x as f32 * LIFE_FORM_SIZE,
+                                        y as f32 * LIFE_FORM_SIZE,
+                                        z as f32 * LIFE_FORM_SIZE
+                                    );
+
+                                    transform_new_life.set_rotation_x_axis(0.0);
+                                    transform_new_life.set_rotation_y_axis(0.0);
+                                }
+                                //transform_new_life.set_rotation_y_axis(0.2);
+                                //transform_new_life.set_rotation_z_axis(0.2);
+
+                                let translation = transform_new_life.translation();
+
+                                // give the life form a colour
+                                
+                                let default_material = world.read_resource::<MaterialDefaults>().0.clone();
+                                let colour_material = load_material_with_colour(world, color, default_material);
+
+                                // make the life form exist!
+                                world.create_entity()
+                                    .named(format!("Life Form {},{},{}", translation.x.to_string(),translation.y.to_string(),translation.z.to_string()))
+                                    .with(mesh_tetra.clone())
+                                    .with(LifeTag)
+                                    .with(colour_material.clone())
+                                    .with(transform_new_life.clone())
+                                    .build();
+                            }
+                        }
                     }
                 }
-            }
-        });
+            });
         }
 
         println!("Total of lifeforms: {}", total_entities.to_string());
