@@ -77,7 +77,8 @@ impl<'s> System<'s> for LifeSystem {
           4) something to do wit hstoring a delta
           5) delete life if necessary
         */
-
+        // this if statement is hard coded to 3 because we currently have 2 entities at startup (maybe the camera and the sun?)
+        if total_entities < 3 {
         lazy_update.exec(move |world| {
             let life_to_create: Vec<Vec<Vec<usize>>>;
             {
@@ -129,6 +130,7 @@ impl<'s> System<'s> for LifeSystem {
                 }
             }
         });
+        }
 
         println!("Total of lifeforms: {}", total_entities.to_string());
     }
