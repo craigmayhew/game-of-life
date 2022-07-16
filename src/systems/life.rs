@@ -69,7 +69,6 @@ impl<'s> System<'s> for LifeSystem {
 
     fn run(&mut self, (entities, lazy_update, life_tag, mut transforms): Self::SystemData) {
         let total_entities:usize = (&entities).join().count();
-        let mut entities_count:usize = 0;
 
         /*todo:
           1) [x] read session resource
@@ -132,6 +131,5 @@ impl<'s> System<'s> for LifeSystem {
         });
 
         println!("Total of lifeforms: {}", total_entities.to_string());
-        println!("Number of lifeforms: {}", entities_count.to_string());
     }
 }
