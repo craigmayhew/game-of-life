@@ -110,7 +110,7 @@ impl<'s> System<'s> for LifeSystem {
                                     // position the life form in 3d space
                                     transform_new_life.set_translation_xyz(
                                         (x as f32 + std::f32::consts::SQRT_2) as f32 * LIFE_FORM_SIZE,
-                                        y as f32 * LIFE_FORM_SIZE,
+                                        y as f32 * std::f32::consts::SQRT_2 * LIFE_FORM_SIZE,
                                         (z as f32 + std::f32::consts::SQRT_2) as f32 * LIFE_FORM_SIZE
                                     ); 
                                     
@@ -124,7 +124,7 @@ impl<'s> System<'s> for LifeSystem {
                                     // position the life form in 3d space
                                     transform_new_life.set_translation_xyz(
                                         (x as f32 + 1.0) as f32 * LIFE_FORM_SIZE,
-                                        y as f32 * LIFE_FORM_SIZE,
+                                        y as f32 * std::f32::consts::SQRT_2 * LIFE_FORM_SIZE,
                                         (z as f32 + std::f32::consts::SQRT_2) as f32 * LIFE_FORM_SIZE
                                     ); 
                                     
@@ -136,7 +136,7 @@ impl<'s> System<'s> for LifeSystem {
                                     // position the life form in 3d space
                                     transform_new_life.set_translation_xyz(
                                         (x as f32 + 1.0) * LIFE_FORM_SIZE,
-                                        (y as f32 + 1.0*std::f32::consts::SQRT_2) * LIFE_FORM_SIZE,
+                                        ((y as f32 * std::f32::consts::SQRT_2) + 1.0*std::f32::consts::SQRT_2) * LIFE_FORM_SIZE,
                                         (z as f32) * LIFE_FORM_SIZE
                                     );
                                     
@@ -149,15 +149,13 @@ impl<'s> System<'s> for LifeSystem {
                                     // position the life form in 3d space
                                     transform_new_life.set_translation_xyz(
                                         x as f32 * LIFE_FORM_SIZE,
-                                        y as f32 * LIFE_FORM_SIZE,
+                                        y as f32 * std::f32::consts::SQRT_2 * LIFE_FORM_SIZE,
                                         z as f32 * LIFE_FORM_SIZE
                                     );
 
                                     transform_new_life.set_rotation_x_axis(0.0);
                                     transform_new_life.set_rotation_y_axis(0.0);
                                 }
-                                //transform_new_life.set_rotation_y_axis(0.2);
-                                //transform_new_life.set_rotation_z_axis(0.2);
 
                                 let translation = transform_new_life.translation();
 
