@@ -82,10 +82,8 @@ impl<'s> System<'s> for LifeSystem {
             lazy_update.exec(move |world| {
                 let life_to_create: Vec<Vec<Vec<Vec<usize>>>> = world.fetch_mut::<SessionResource>().life.clone();
 
-                let mut transform_new_life = Transform::default();
                 //set size of tetrahedrons
                 let scale = Vector3::new(LIFE_FORM_SIZE, LIFE_FORM_SIZE, LIFE_FORM_SIZE);
-                transform_new_life.set_scale(scale);
 
                 //loading tetra mesh
                 let mesh_tetra = load_mesh(world, "mesh/sommerville-hill-tetrahedron.obj");
@@ -100,6 +98,9 @@ impl<'s> System<'s> for LifeSystem {
                             green+=1.0;
                             for (z, _bool_life) in vec3.iter().enumerate() {
                                 blue+=1.0;
+
+                                let mut transform_new_life = Transform::default();
+                                transform_new_life.set_scale(scale);
                                 
                                 let color;
                                 //rotate it if it's every third life form (todo: as this rotations only have 4 variants they could exist outside this loop!)
@@ -114,10 +115,10 @@ impl<'s> System<'s> for LifeSystem {
                                     ); 
                                     
                                     transform_new_life.set_rotation_x_axis(std::f32::consts::FRAC_PI_2);
-                                    transform_new_life.set_rotation_y_axis(std::f32::consts::PI);
-                                    transform_new_life.set_rotation_z_axis(0.0);
+                                    transform_new_life.set_rotation_y_axis(3.0*std::f32::consts::FRAC_PI_2);
+                                    transform_new_life.set_rotation_z_axis(std::f32::consts::PI);
                                     
-                                } else if n == 2 { //terqouise to white DONE LEAVE IT
+                                } else if n == 2 { //terqouise to white DONE
                                     color = load_colour_texture(world, (1.0/red), 1.0, (1.0/blue) as f32, 1.0);
 
                                     // position the life form in 3d space
@@ -129,18 +130,19 @@ impl<'s> System<'s> for LifeSystem {
                                     
                                     transform_new_life.set_rotation_x_axis(std::f32::consts::FRAC_PI_2);
                                     transform_new_life.set_rotation_y_axis(std::f32::consts::PI);
-                                } else if n == 3 {//light grey
+                                } else if n == 3 {//light grey DONE
                                     color = load_colour_texture(world, 0.5, 0.5, 0.5 as f32, 1.0);
 
                                     // position the life form in 3d space
                                     transform_new_life.set_translation_xyz(
-                                        x as f32 * LIFE_FORM_SIZE,
-                                        (y as f32 + std::f32::consts::SQRT_2) as f32 * LIFE_FORM_SIZE,
-                                        (z as f32 + 1.0*std::f32::consts::SQRT_2) as f32 * LIFE_FORM_SIZE
+                                        (x as f32 + 1.0) * LIFE_FORM_SIZE,
+                                        (y as f32 + 1.0*std::f32::consts::SQRT_2) * LIFE_FORM_SIZE,
+                                        (z as f32) * LIFE_FORM_SIZE
                                     );
                                     
-                                    transform_new_life.set_rotation_x_axis(std::f32::consts::PI);
+                                    transform_new_life.set_rotation_x_axis(std::f32::consts::FRAC_PI_2);
                                     transform_new_life.set_rotation_y_axis(std::f32::consts::FRAC_PI_2);
+                                    transform_new_life.set_rotation_z_axis(std::f32::consts::PI);
                                 } else {//dark grey DONE DO NOT MOVE OR ROTATE!
                                     color = load_colour_texture(world, 0.2, 0.2, 0.2, 1.0);
 
