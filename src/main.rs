@@ -125,7 +125,7 @@ impl SimpleState for GameplayState {
 
         //setting up initial state of life throughout our 3d space
         let session_resource = SessionResource {
-            life: vec![vec![vec![vec![0; 1]; 5]; 5]; 4],
+            life: vec![vec![vec![vec![0; 1]; 5]; 5]; 6],
         };
         world.insert(session_resource);
 

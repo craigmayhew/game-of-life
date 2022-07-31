@@ -90,49 +90,65 @@ impl<'s> System<'s> for LifeSystem {
                 let mesh_tetra_mirror = load_mesh(world, "mesh/hill-tetrahedron-mirrored.obj");
 
                 for (n, vec1) in life_to_create.iter().enumerate() {
-                    let mut red = 0.0;
                     for (x, vec2) in vec1.iter().enumerate() {
-                        let mut green = 0.0;
-                        red+=1.0;
                         for (y, vec3) in vec2.iter().enumerate() {
-                            let mut blue = 0.0;
-                            green+=1.0;
                             for (z, _bool_life) in vec3.iter().enumerate() {
-                                blue+=1.0;
-
                                 let mut transform_new_life = Transform::default();
                                 transform_new_life.set_scale(scale);
                                 
                                 let color;
                                 let mesh;
                                 //rotate it if it's every third life form (todo: as this rotations only have 4 variants they could exist outside this loop!)
-                                if n == 1 {//red
-                                    color = load_colour_texture(world, 0.5, 0.0, 0.0, 1.0);
+                                if n == 5 {//light grey DONE DO NOT MOVE OR ROTATE!
+                                    color = load_colour_texture(world, 1.0, 1.0, 1.0, 1.0);
 
                                     // position the life form in 3d space
                                     transform_new_life.set_translation_xyz(
-                                        (x as f32 + std::f32::consts::SQRT_2) as f32 * LIFE_FORM_SIZE,
-                                        y as f32 * std::f32::consts::SQRT_2 * LIFE_FORM_SIZE,
-                                        (z as f32 + std::f32::consts::SQRT_2) as f32 * LIFE_FORM_SIZE
-                                    ); 
+                                        (x as f32-1.0) * LIFE_FORM_SIZE,
+                                        (y as f32+1.0) * LIFE_FORM_SIZE,
+                                        (z as f32+2.0) * LIFE_FORM_SIZE
+                                    );
                                     
-                                    transform_new_life.set_rotation_x_axis(std::f32::consts::FRAC_PI_2);
-                                    transform_new_life.set_rotation_y_axis(2.0*std::f32::consts::FRAC_PI_2);
-                                    transform_new_life.set_rotation_z_axis(std::f32::consts::PI);
+                                    transform_new_life.set_rotation_euler(std::f32::consts::PI*0.75, std::f32::consts::FRAC_PI_2, 0.0);
+
+                                    mesh = mesh_tetra_mirror.clone();
+                                } else if n == 4 {//dark grey DONE DO NOT MOVE OR ROTATE!
+                                    color = load_colour_texture(world, 0.6, 0.2, 0.2, 1.0);
+
+                                    // position the life form in 3d space
+                                    transform_new_life.set_translation_xyz(
+                                        (x as f32-1.0) * LIFE_FORM_SIZE,
+                                        (y as f32+1.0) * LIFE_FORM_SIZE,
+                                        (z as f32+2.0) * LIFE_FORM_SIZE
+                                    );
+
+                                    transform_new_life.set_rotation_euler(std::f32::consts::PI*0.75, std::f32::consts::FRAC_PI_2, 0.0);
 
                                     mesh = mesh_tetra.clone();
-                                } else if n == 2 { //terqouise to white DONE
-                                    color = load_colour_texture(world, (1.0/red), 1.0, (1.0/blue) as f32, 1.0);
+                                } else if n == 1 {//light blue DONE DO NOT MOVE OR ROTATE!
+                                    color = load_colour_texture(world, 0.5, 0.5, 1.0, 1.0);
 
                                     // position the life form in 3d space
                                     transform_new_life.set_translation_xyz(
-                                        (x as f32 + 1.0) as f32 * LIFE_FORM_SIZE,
-                                        y as f32 * std::f32::consts::SQRT_2 * LIFE_FORM_SIZE,
-                                        (z as f32 + std::f32::consts::SQRT_2) as f32 * LIFE_FORM_SIZE
-                                    ); 
+                                        (x as f32-1.0) * LIFE_FORM_SIZE,
+                                        (y as f32+1.0) * LIFE_FORM_SIZE,
+                                        (z as f32-1.0) * LIFE_FORM_SIZE
+                                    );
                                     
-                                    transform_new_life.set_rotation_x_axis(std::f32::consts::FRAC_PI_2);
-                                    transform_new_life.set_rotation_y_axis(std::f32::consts::PI);
+                                    transform_new_life.set_rotation_euler(std::f32::consts::PI*0.75, 0.0, 0.0);
+
+                                    mesh = mesh_tetra_mirror.clone();
+                                } else if n == 2 {//dark blue DONE DO NOT MOVE OR ROTATE!
+                                    color = load_colour_texture(world, 0.2, 0.2, 0.7, 1.0);
+
+                                    // position the life form in 3d space
+                                    transform_new_life.set_translation_xyz(
+                                        (x as f32-1.0) * LIFE_FORM_SIZE,
+                                        (y as f32+1.0) * LIFE_FORM_SIZE,
+                                        (z as f32-1.0) as f32 * LIFE_FORM_SIZE
+                                    );
+
+                                    transform_new_life.set_rotation_euler(std::f32::consts::PI*0.75, 0.0, 0.0);
 
                                     mesh = mesh_tetra.clone();
                                 } else if n == 3 {//light grey DONE DO NOT MOVE OR ROTATE!
