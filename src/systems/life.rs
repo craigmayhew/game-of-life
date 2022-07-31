@@ -115,7 +115,7 @@ impl<'s> System<'s> for LifeSystem {
                                     ); 
                                     
                                     transform_new_life.set_rotation_x_axis(std::f32::consts::FRAC_PI_2);
-                                    transform_new_life.set_rotation_y_axis(3.0*std::f32::consts::FRAC_PI_2);
+                                    transform_new_life.set_rotation_y_axis(2.0*std::f32::consts::FRAC_PI_2);
                                     transform_new_life.set_rotation_z_axis(std::f32::consts::PI);
                                     
                                 } else if n == 2 { //terqouise to white DONE
