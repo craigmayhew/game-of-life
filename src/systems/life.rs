@@ -86,7 +86,7 @@ impl<'s> System<'s> for LifeSystem {
                 let scale = Vector3::new(LIFE_FORM_SIZE, LIFE_FORM_SIZE, LIFE_FORM_SIZE);
 
                 //loading tetra mesh
-                let mesh_tetra = load_mesh(world, "mesh/sommerville-hill-tetrahedron.obj");
+                let mesh_tetra = load_mesh(world, "mesh/hill-tetrahedron.obj");
 
                 for (n, vec1) in life_to_create.iter().enumerate() {
                     let mut red = 0.0;
