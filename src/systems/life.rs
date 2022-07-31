@@ -87,6 +87,7 @@ impl<'s> System<'s> for LifeSystem {
 
                 //loading tetra mesh
                 let mesh_tetra = load_mesh(world, "mesh/hill-tetrahedron.obj");
+                let mesh_tetra_mirror = load_mesh(world, "mesh/hill-tetrahedron-mirrored.obj");
 
                 for (n, vec1) in life_to_create.iter().enumerate() {
                     let mut red = 0.0;
@@ -103,6 +104,7 @@ impl<'s> System<'s> for LifeSystem {
                                 transform_new_life.set_scale(scale);
                                 
                                 let color;
+                                let mesh;
                                 //rotate it if it's every third life form (todo: as this rotations only have 4 variants they could exist outside this loop!)
                                 if n == 1 {//red
                                     color = load_colour_texture(world, 0.5, 0.0, 0.0, 1.0);
@@ -117,7 +119,8 @@ impl<'s> System<'s> for LifeSystem {
                                     transform_new_life.set_rotation_x_axis(std::f32::consts::FRAC_PI_2);
                                     transform_new_life.set_rotation_y_axis(2.0*std::f32::consts::FRAC_PI_2);
                                     transform_new_life.set_rotation_z_axis(std::f32::consts::PI);
-                                    
+
+                                    mesh = mesh_tetra.clone();
                                 } else if n == 2 { //terqouise to white DONE
                                     color = load_colour_texture(world, (1.0/red), 1.0, (1.0/blue) as f32, 1.0);
 
@@ -130,44 +133,46 @@ impl<'s> System<'s> for LifeSystem {
                                     
                                     transform_new_life.set_rotation_x_axis(std::f32::consts::FRAC_PI_2);
                                     transform_new_life.set_rotation_y_axis(std::f32::consts::PI);
-                                } else if n == 3 {//light grey DONE
+
+                                    mesh = mesh_tetra.clone();
+                                } else if n == 3 {//light grey DONE DO NOT MOVE OR ROTATE!
                                     color = load_colour_texture(world, 0.5, 0.5, 0.5 as f32, 1.0);
 
                                     // position the life form in 3d space
                                     transform_new_life.set_translation_xyz(
-                                        (x as f32 + 1.0) * LIFE_FORM_SIZE,
-                                        ((y as f32 * std::f32::consts::SQRT_2) + 1.0*std::f32::consts::SQRT_2) * LIFE_FORM_SIZE,
-                                        (z as f32) * LIFE_FORM_SIZE
+                                        x as f32 * LIFE_FORM_SIZE,
+                                        y as f32 * LIFE_FORM_SIZE,
+                                        z as f32 * LIFE_FORM_SIZE
                                     );
                                     
-                                    transform_new_life.set_rotation_x_axis(std::f32::consts::FRAC_PI_2);
-                                    transform_new_life.set_rotation_y_axis(std::f32::consts::FRAC_PI_2);
-                                    transform_new_life.set_rotation_z_axis(std::f32::consts::PI);
+                                    transform_new_life.set_rotation_euler(std::f32::consts::PI/4.0, std::f32::consts::PI, 0.0);
+
+                                    mesh = mesh_tetra_mirror.clone();
                                 } else {//dark grey DONE DO NOT MOVE OR ROTATE!
                                     color = load_colour_texture(world, 0.2, 0.2, 0.2, 1.0);
 
                                     // position the life form in 3d space
                                     transform_new_life.set_translation_xyz(
                                         x as f32 * LIFE_FORM_SIZE,
-                                        y as f32 * std::f32::consts::SQRT_2 * LIFE_FORM_SIZE,
+                                        y as f32 * LIFE_FORM_SIZE,
                                         z as f32 * LIFE_FORM_SIZE
                                     );
 
-                                    transform_new_life.set_rotation_x_axis(0.0);
-                                    transform_new_life.set_rotation_y_axis(0.0);
+                                    transform_new_life.set_rotation_euler(std::f32::consts::PI/4.0, std::f32::consts::PI, 0.0);
+
+                                    mesh = mesh_tetra.clone();
                                 }
 
-                                let translation = transform_new_life.translation();
-
                                 // give the life form a colour
-                                
                                 let default_material = world.read_resource::<MaterialDefaults>().0.clone();
                                 let colour_material = load_material_with_colour(world, color, default_material);
 
+                                let xyz = transform_new_life.translation();
+
                                 // make the life form exist!
                                 world.create_entity()
-                                    .named(format!("Life Form {},{},{}", translation.x.to_string(),translation.y.to_string(),translation.z.to_string()))
-                                    .with(mesh_tetra.clone())
+                                    .named(format!("Life Form {},{},{}", xyz.x.to_string(),xyz.y.to_string(),xyz.z.to_string()))
+                                    .with(mesh)
                                     .with(LifeTag)
                                     .with(colour_material.clone())
                                     .with(transform_new_life.clone())
