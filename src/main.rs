@@ -1,4 +1,5 @@
 extern crate amethyst;
+extern crate rand;
 use amethyst::{
     assets::{AssetStorage, Loader, Handle},
     core::ArcThreadPool,
@@ -28,6 +29,7 @@ use crate::systems::life;
 pub const ARENA_HEIGHT: f32 = 1000.0;
 pub const ARENA_WIDTH: f32 = 1000.0;
 pub const LIFE_FORM_SIZE: f32 = 150.0;
+pub const UNIVERSE_SIZE: usize = 30;
 
 fn initialise_stars(world: &mut World, sprite_sheet: Handle<SpriteSheet>) {
     //// 2D square
@@ -124,8 +126,20 @@ impl SimpleState for GameplayState {
         initialise_camera(world);
 
         //setting up initial state of life throughout our 3d space
+        let mut universe_life = vec![vec![vec![vec![false; UNIVERSE_SIZE]; UNIVERSE_SIZE]; UNIVERSE_SIZE]; 6];
+        
+        //TODO Could be used to load a "save"
+        for n in 0..5 {
+            for x in 0..(UNIVERSE_SIZE-1) {
+                for y in 0..(UNIVERSE_SIZE-1) {
+                    for z in 0..(UNIVERSE_SIZE-1) {
+                        universe_life[n][x][y][z] = rand::random::<bool>();
+                    }
+                }
+            }
+        }                    
         let session_resource = SessionResource {
-            life: vec![vec![vec![vec![true; 1]; 5]; 5]; 6],
+            life: universe_life,
             counter: 0,
         };
         world.insert(session_resource);

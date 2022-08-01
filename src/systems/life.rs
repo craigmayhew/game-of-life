@@ -96,7 +96,7 @@ impl<'s> System<'s> for LifeSystem {
                             // if bool_life is 1 then create a life form here.
                             //TODO Could be used to load a "save"
                             for (z, bool_life) in vec3.iter().enumerate() {
-                                if bool_life == &false {
+                                if !bool_life {
                                     //no life here
                                     continue;
                                 }
