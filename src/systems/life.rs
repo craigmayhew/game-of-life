@@ -104,25 +104,25 @@ impl<'s> System<'s> for LifeSystem {
 
                                     // position the life form in 3d space
                                     transform_new_life.set_translation_xyz(
-                                        (x as f32-1.0) * LIFE_FORM_SIZE,
-                                        (y as f32+1.0) * LIFE_FORM_SIZE,
-                                        (z as f32+2.0) * LIFE_FORM_SIZE
+                                        (x as f32) * LIFE_FORM_SIZE,
+                                        (y as f32) * LIFE_FORM_SIZE,
+                                        (z as f32) * LIFE_FORM_SIZE
                                     );
                                     
-                                    transform_new_life.set_rotation_euler(std::f32::consts::PI*0.75, std::f32::consts::FRAC_PI_2, 0.0);
+                                    transform_new_life.set_rotation_euler(std::f32::consts::PI*0.75, std::f32::consts::FRAC_PI_2, std::f32::consts::PI);
 
                                     mesh = mesh_tetra_mirror.clone();
-                                } else if n == 4 {//dark grey DONE DO NOT MOVE OR ROTATE!
+                                } else if n == 4 {//red DONE DO NOT MOVE OR ROTATE!
                                     color = load_colour_texture(world, 0.6, 0.2, 0.2, 1.0);
 
                                     // position the life form in 3d space
                                     transform_new_life.set_translation_xyz(
-                                        (x as f32-1.0) * LIFE_FORM_SIZE,
-                                        (y as f32+1.0) * LIFE_FORM_SIZE,
-                                        (z as f32+2.0) * LIFE_FORM_SIZE
+                                        (x as f32) * LIFE_FORM_SIZE,
+                                        (y as f32) * LIFE_FORM_SIZE,
+                                        (z as f32) * LIFE_FORM_SIZE
                                     );
 
-                                    transform_new_life.set_rotation_euler(std::f32::consts::PI*0.75, std::f32::consts::FRAC_PI_2, 0.0);
+                                    transform_new_life.set_rotation_euler(std::f32::consts::PI*1.75, 0.0, std::f32::consts::FRAC_PI_2);
 
                                     mesh = mesh_tetra.clone();
                                 } else if n == 1 {//light blue DONE DO NOT MOVE OR ROTATE!
@@ -152,7 +152,7 @@ impl<'s> System<'s> for LifeSystem {
 
                                     mesh = mesh_tetra.clone();
                                 } else if n == 3 {//light grey DONE DO NOT MOVE OR ROTATE!
-                                    color = load_colour_texture(world, 0.5, 0.5, 0.5 as f32, 1.0);
+                                    color = load_colour_texture(world, 0.5, 0.5, 0.5, 1.0);
 
                                     // position the life form in 3d space
                                     transform_new_life.set_translation_xyz(
