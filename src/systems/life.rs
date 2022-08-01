@@ -187,7 +187,7 @@ impl<'s> System<'s> for LifeSystem {
 
                                 // make the life form exist!
                                 world.create_entity()
-                                    .named(format!("Life Form {},{},{}", xyz.x.to_string(),xyz.y.to_string(),xyz.z.to_string()))
+                                    .named(format!("Life Form {},{},{} {}", xyz.x.to_string(),xyz.y.to_string(),xyz.z.to_string(),n.to_string()))
                                     .with(mesh)
                                     .with(LifeTag)
                                     .with(colour_material.clone())
