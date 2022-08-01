@@ -193,6 +193,9 @@ impl<'s> System<'s> for LifeSystem {
                                     .with(colour_material.clone())
                                     .with(transform_new_life.clone())
                                     .build();
+
+                                //increment life counter
+                                world.fetch_mut::<SessionResource>().counter += 1;
                             }
                         }
                     }
