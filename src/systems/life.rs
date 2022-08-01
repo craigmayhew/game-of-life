@@ -80,7 +80,7 @@ impl<'s> System<'s> for LifeSystem {
         // this if statement is hard coded to 3 because we currently have 2 entities at startup (maybe the camera and the sun?)
         if total_entities < 3 {
             lazy_update.exec(move |world| {
-                let life_to_create: Vec<Vec<Vec<Vec<usize>>>> = world.fetch_mut::<SessionResource>().life.clone();
+                let life_to_create: Vec<Vec<Vec<Vec<bool>>>> = world.fetch_mut::<SessionResource>().life.clone();
 
                 //set size of tetrahedrons
                 let scale = Vector3::new(LIFE_FORM_SIZE, LIFE_FORM_SIZE, LIFE_FORM_SIZE);
@@ -92,7 +92,14 @@ impl<'s> System<'s> for LifeSystem {
                 for (n, vec1) in life_to_create.iter().enumerate() {
                     for (x, vec2) in vec1.iter().enumerate() {
                         for (y, vec3) in vec2.iter().enumerate() {
-                            for (z, _bool_life) in vec3.iter().enumerate() {
+                            // if bool_life is 1 then create a life form here.
+                            //TODO Could be used to load a "save"
+                            for (z, bool_life) in vec3.iter().enumerate() {
+                                if bool_life == &false {
+                                    //no life here
+                                    continue;
+                                }
+                                
                                 let mut transform_new_life = Transform::default();
                                 transform_new_life.set_scale(scale);
                                 

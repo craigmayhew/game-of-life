@@ -87,8 +87,7 @@ struct GameplayState {
 }
 
 struct SessionResource {
-    //todo: should this be bool or usize?
-    pub life: Vec<Vec<Vec<Vec<usize>>>>,
+    pub life: Vec<Vec<Vec<Vec<bool>>>>,
     pub counter: i64,
 }
 
@@ -126,7 +125,7 @@ impl SimpleState for GameplayState {
 
         //setting up initial state of life throughout our 3d space
         let session_resource = SessionResource {
-            life: vec![vec![vec![vec![0; 1]; 5]; 5]; 6],
+            life: vec![vec![vec![vec![true; 1]; 5]; 5]; 6],
             counter: 0,
         };
         world.insert(session_resource);
