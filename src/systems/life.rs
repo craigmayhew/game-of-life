@@ -74,7 +74,7 @@ impl<'s> System<'s> for LifeSystem {
           1) [x] read session resource
           2) determine which new life to create + create it
           3) removed the need for the init life function in main?
-          4) something to do wit hstoring a delta
+          4) something to do with storing a delta
           5) delete life if necessary
         */
         // this if statement is hard coded to 3 because we currently have 2 entities at startup (maybe the camera and the sun?)
