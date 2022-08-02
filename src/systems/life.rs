@@ -65,10 +65,6 @@ fn create_life(n:usize,x:usize,y:usize,z:usize,world: &mut World) {
     //todo do this outside of this function, no need to run it every time we create an entity
     let scale = Vector3::new(LIFE_FORM_SIZE, LIFE_FORM_SIZE, LIFE_FORM_SIZE);
     transform_new_life.set_scale(scale);
-
-    //loading tetra mesh
-    let mesh_tetra = load_mesh(world, "mesh/hill-tetrahedron.obj");
-    let mesh_tetra_mirror = load_mesh(world, "mesh/hill-tetrahedron-mirrored.obj");
     
     let color;
     let mesh;
@@ -85,7 +81,7 @@ fn create_life(n:usize,x:usize,y:usize,z:usize,world: &mut World) {
         
         transform_new_life.set_rotation_euler(std::f32::consts::PI*0.75, std::f32::consts::FRAC_PI_2, std::f32::consts::PI);
 
-        mesh = mesh_tetra_mirror.clone();
+        mesh = load_mesh(world, "mesh/hill-tetrahedron-mirrored.obj");
     } else if n == 1 {//red DONE DO NOT MOVE OR ROTATE!
         color = load_colour_texture(world, 0.6, 0.2, 0.2, 1.0);
 
@@ -98,7 +94,7 @@ fn create_life(n:usize,x:usize,y:usize,z:usize,world: &mut World) {
 
         transform_new_life.set_rotation_euler(std::f32::consts::PI*1.75, 0.0, std::f32::consts::FRAC_PI_2);
 
-        mesh = mesh_tetra.clone();
+        mesh = load_mesh(world, "mesh/hill-tetrahedron.obj");
     } else if n == 2 {//light blue DONE DO NOT MOVE OR ROTATE!
         color = load_colour_texture(world, 0.5, 0.5, 1.0, 1.0);
 
@@ -111,7 +107,7 @@ fn create_life(n:usize,x:usize,y:usize,z:usize,world: &mut World) {
         
         transform_new_life.set_rotation_euler(std::f32::consts::PI*0.75, 0.0, 0.0);
 
-        mesh = mesh_tetra_mirror.clone();
+        mesh = load_mesh(world, "mesh/hill-tetrahedron-mirrored.obj");
     } else if n == 3 {//dark blue DONE DO NOT MOVE OR ROTATE!
         color = load_colour_texture(world, 0.2, 0.2, 0.7, 1.0);
 
@@ -124,7 +120,7 @@ fn create_life(n:usize,x:usize,y:usize,z:usize,world: &mut World) {
 
         transform_new_life.set_rotation_euler(std::f32::consts::PI*0.75, 0.0, 0.0);
 
-        mesh = mesh_tetra.clone();
+        mesh = load_mesh(world, "mesh/hill-tetrahedron.obj");
     } else if n == 4 {//light grey DONE DO NOT MOVE OR ROTATE!
         color = load_colour_texture(world, 0.5, 0.5, 0.5, 1.0);
 
@@ -137,7 +133,7 @@ fn create_life(n:usize,x:usize,y:usize,z:usize,world: &mut World) {
         
         transform_new_life.set_rotation_euler(std::f32::consts::PI/4.0, std::f32::consts::PI, 0.0);
 
-        mesh = mesh_tetra_mirror.clone();
+        mesh = load_mesh(world, "mesh/hill-tetrahedron-mirrored.obj");
     } else {//dark grey DONE DO NOT MOVE OR ROTATE!
         color = load_colour_texture(world, 0.2, 0.2, 0.2, 1.0);
 
@@ -150,7 +146,7 @@ fn create_life(n:usize,x:usize,y:usize,z:usize,world: &mut World) {
 
         transform_new_life.set_rotation_euler(std::f32::consts::PI/4.0, std::f32::consts::PI, 0.0);
 
-        mesh = mesh_tetra.clone();
+        mesh = load_mesh(world, "mesh/hill-tetrahedron.obj");
     }
 
     // give the life form a colour
