@@ -160,7 +160,7 @@ fn create_life(n:usize,x:usize,y:usize,z:usize,world: &mut World) {
         .named(format!("Life Form {},{},{} {}", xyz.x.to_string(),xyz.y.to_string(),xyz.z.to_string(),n.to_string()))
         .with(mesh)
         .with(LifeTag)
-        .with(colour_material.clone())
+        .with(colour_material)
         .with(transform_new_life.clone())
         .build();
 
