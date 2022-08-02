@@ -129,7 +129,7 @@ impl SimpleState for GameplayState {
         let mut universe_life = vec![vec![vec![vec![false; UNIVERSE_SIZE]; UNIVERSE_SIZE]; UNIVERSE_SIZE]; 6];
         
         //TODO Could be used to load a "save"
-        for n in 0..5 {
+        for n in 0..6 {
             for x in 0..(UNIVERSE_SIZE-1) {
                 for y in 0..(UNIVERSE_SIZE-1) {
                     for z in 0..(UNIVERSE_SIZE-1) {
