@@ -107,7 +107,7 @@ impl<'s> System<'s> for LifeSystem {
                                 let color;
                                 let mesh;
                                 //rotate it if it's every third life form (todo: as this rotations only have 4 variants they could exist outside this loop!)
-                                if n == 0 {//light grey DONE DO NOT MOVE OR ROTATE!
+                                if n == 0 {//white DONE DO NOT MOVE OR ROTATE!
                                     color = load_colour_texture(world, 1.0, 1.0, 1.0, 1.0);
 
                                     // position the life form in 3d space
