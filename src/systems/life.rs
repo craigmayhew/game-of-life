@@ -67,7 +67,7 @@ impl<'s> System<'s> for LifeSystem {
         WriteStorage<'s, Transform>,
     );
 
-    fn run(&mut self, (entities, lazy_update, life_tag, mut transforms): Self::SystemData) {
+    fn run(&mut self, (entities, lazy_update, life_tag, transforms): Self::SystemData) {
         let total_entities:usize = (&entities).join().count();
 
         /*todo:
