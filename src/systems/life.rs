@@ -3,7 +3,7 @@ use amethyst::{
     core::{Transform},
     core::math::Vector3,
     ecs::*,
-    prelude::WithNamed,//needed to allow the use of world.create_entity().named("something")
+    core::{Named, WithNamed},//needed to allow the read and writing of of world.create_entity().named("something")
     renderer::{
         formats::mesh::ObjFormat,
         Texture,
@@ -165,7 +165,7 @@ fn create_life(n:usize,x:usize,y:usize,z:usize,world: &mut World) {
         .build();
 
         
-    println!("Life Form {},{},{} {}", xyz.x.to_string(),xyz.y.to_string(),xyz.z.to_string(),n.to_string());
+    //println!("Life Form {},{},{} {}", xyz.x.to_string(),xyz.y.to_string(),xyz.z.to_string(),n.to_string());
 
     //increment life counter
     world.fetch_mut::<SessionResource>().counter += 1;
@@ -176,22 +176,23 @@ impl<'s> System<'s> for LifeSystem {
         Entities<'s>,
         Read<'s, LazyUpdate>,
         ReadStorage<'s, LifeTag>,
-        WriteStorage<'s, Transform>,
+        ReadStorage<'s, Named>,
     );
 
-    fn run(&mut self, (entities, lazy_update, life_tag, transforms): Self::SystemData) {
-        let total_entities:usize = (&entities).join().count();
-
-        /*todo:
-          1) [x] read session resource
-          2) determine which new life to create + create it
-          3) removed the need for the init life function in main?
-          4) something to do with storing a delta
-          5) delete life if necessary
-        */
-        // this if statement is hard coded to 3 because we currently have 2 entities at startup (maybe the camera and the sun?)
-        if total_entities < 3 {
-            lazy_update.exec(move |world| {
+    fn run(&mut self, (entities, lazy_update, life_tag, names): Self::SystemData) {
+        //: join::JoinIter<(&Read<Entities>, &Storage<'s, Named>)>
+        /*let joiner:join::JoinIter<(&Read<world::EntitiesRes>, &Storage<Named, amethyst::shred::Fetch<storage::MaskedStorage<Named>>>)> = (&entities, &names).join();
+        let entity: &Read<world::EntitiesRes>;
+                let name: &Storage<Named, amethyst::shred::Fetch<storage::MaskedStorage<Named>>>;
+                for (entity, name) in joiner {
+                    println!("Entity {:?} is named {}", entity, name.name);
+                    let index = entities_to_delete.iter().position(|&r| r == name.name);
+                    if None != index {
+                        crate::World::delete_entity(entity);
+                    }
+                }*/
+        lazy_update.exec(move |world| {
+            if false {
                 //TODO could this be fetch instead of fetch_mut?
                 let life_to_create: Vec<Vec<Vec<Vec<bool>>>> = world.fetch_mut::<SessionResource>().life.clone();
                 for (n, vec1) in life_to_create.iter().enumerate() {
@@ -210,9 +211,7 @@ impl<'s> System<'s> for LifeSystem {
                         }
                     }
                 }
-            });
-        } else {
-            lazy_update.exec(move |world| {
+            } else {
                 //TODO could this be fetch instead of fetch_mut?
                 let last_gen: Vec<Vec<Vec<Vec<bool>>>> = world.fetch_mut::<SessionResource>().life.clone();
                 let mut next_gen = vec![vec![vec![vec![false; crate::UNIVERSE_SIZE]; crate::UNIVERSE_SIZE]; crate::UNIVERSE_SIZE]; 6];
@@ -224,6 +223,7 @@ impl<'s> System<'s> for LifeSystem {
                 red touches light grey and light blue in same xyz and the dark grey in the y above
                 white touches dark blue and dark grey in the same xyz and light blue in the y below
                 */
+                let mut entities_to_delete = vec![];
                 
                 for (n, vec1) in last_gen.iter().enumerate() {
                     for (x, vec2) in vec1.iter().enumerate() {
@@ -237,6 +237,9 @@ impl<'s> System<'s> for LifeSystem {
                                     if y > 0 && last_gen[n][x][y-1][z  ] {neighbours += 1;}
                                     if z > 0 && last_gen[4][x][y  ][z-1] {neighbours += 1;}
                                 }
+
+                                //TODO the other 5 n
+                                //TODO destroy an entity!
                                 
                                 if !bool_life {//if not alive in last gen
                                     //if neighbours = 3 then become alive
@@ -249,6 +252,7 @@ impl<'s> System<'s> for LifeSystem {
                                 } else {//if alive in last gen
                                     if neighbours == 4 || neighbours == 0 {
                                         next_gen[n][x][y][z] = false;
+                                        entities_to_delete.push(format!("Life Form {},{},{} {}", x.to_string(),y.to_string(),z.to_string(),n.to_string()));
                                     } else {
                                         next_gen[n][x][y][z] = true;
                                         create_life(n,x,y,z,world);
@@ -259,11 +263,30 @@ impl<'s> System<'s> for LifeSystem {
                     }
                 }
 
+                /*for entity in entities.join() {
+                    //println!("Entity {:?} is named {}", entity, entity.name);
+                    //let index = entities_to_delete.iter().position(|&r| r == entity.name);
+                    /*if None != index {
+                        world.delete_entity(entity);
+                    }*/
+                }*/
+                //: join::JoinIter(<&Read<world::EntitiesRes>, &Storage<Named, amethyst::shred::Fetch<storage::MaskedStorage<Named>>>)
+                
+                /*let entity: &Read<world::EntitiesRes>;
+                let name: &Storage<Named, amethyst::shred::Fetch<storage::MaskedStorage<Named>>>;
+                for (entity, name) in joiner {
+                    println!("Entity {:?} is named {}", entity, name.name);
+                    let index = entities_to_delete.iter().position(|&r| r == name.name);
+                    if None != index {
+                        World::delete_entity(entity);
+                    }
+                }*/
+
                 world.fetch_mut::<SessionResource>().life = next_gen;
                 println!("Total of in theory: {}", world.fetch_mut::<SessionResource>().counter.to_string());
-            });
-        }
 
+            }
+        });
         //println!("Total of lifeform entitys: {}", total_entities.to_string());
     }
 }
