@@ -1,50 +1,37 @@
-use amethyst::{
-    core::{Time, Transform},
-    ecs::*,
-    input::{InputHandler, StringBindings},
-    renderer::camera::Camera,
+use bevy::{
+    prelude::*, //default bevy
+    input::{keyboard::KeyCode, Input},
+    render::camera::ScalingMode,
 };
 
-#[derive(Default)]
-pub struct CameraMovementSystem {}
-
-impl<'s> System<'s> for CameraMovementSystem {
-    type SystemData = (
-        ReadStorage<'s, Camera>,
-        WriteStorage<'s, Transform>,
-        Read<'s, InputHandler<StringBindings>>,
-        Read<'s, Time>,
-    );
-
-    fn run(&mut self, (cameras, mut transforms, input_handler, time): Self::SystemData) {
-        //delta_real_seconds() allows us to move at a consistent speed, irrespective of the frame rate
-        let delta_time = time.delta_real_seconds();
-        let move_factor = 1000.0 * delta_time;
-        for (_, transform) in (&cameras, &mut transforms).join() {
-            // move up / down
-            if input_handler.action_is_down("CameraMoveUp").unwrap_or(false) {
-                transform.move_up(move_factor);
-            } else if input_handler.action_is_down("CameraMoveDown").unwrap_or(false) {
-                transform.move_down(move_factor);
-            }
-            // move left /right
-            if input_handler.action_is_down("CameraMoveLeft").unwrap_or(false) {
-                transform.move_left(move_factor);
-            } else if input_handler.action_is_down("CameraMoveRight").unwrap_or(false) {
-                transform.move_right(move_factor);
-            }
-            // move forward / backward
-            if input_handler.action_is_down("CameraMoveForward").unwrap_or(false) {
-                transform.move_forward(move_factor);
-            } else if input_handler.action_is_down("CameraMoveBackward").unwrap_or(false) {
-                transform.move_backward(move_factor);
-            }
-            // look left / right
-            if input_handler.action_is_down("CameraLookLeft").unwrap_or(false) {
-                transform.append_rotation_y_axis(0.02);
-            } else if input_handler.action_is_down("CameraLookRight").unwrap_or(false) {
-                transform.append_rotation_y_axis(-0.02);
-            }
+pub fn setup(mut commands: Commands) {
+    commands.spawn_bundle(Camera3dBundle {
+        projection: OrthographicProjection {
+            scale: 3.0,
+            scaling_mode: ScalingMode::FixedVertical(2.0),
+            ..default()
         }
+        .into(),
+        transform: Transform::from_xyz(5.0, 5.0, 5.0).looking_at(Vec3::ZERO, Vec3::Y),
+        ..default()
+    });
+}
+
+pub fn move_camera_on_keyboard_input(
+    mut camera: Query<&mut Transform, With<Camera>>,
+    keys: Res<Input<KeyCode>>,
+) {
+    if keys.any_pressed([KeyCode::A, KeyCode::Left]) {
+        // moving left
+    } else if keys.any_pressed([KeyCode::D, KeyCode::Right]) {
+        // moving right
+    }
+    if keys.any_pressed([KeyCode::W, KeyCode::Up]) {
+        // moving up
+    } else if keys.any_pressed([KeyCode::S, KeyCode::Down]) {
+        // moving down
+    }
+    if keys.just_pressed(KeyCode::Space) {
+        // todo, place a life form?
     }
 }

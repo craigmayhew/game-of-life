@@ -2,11 +2,15 @@
 name = "game-of-life"
 version = "0.1.0"
 authors = ["Craig Mayhew <craig@mayhew.io>"]
-edition = "2018"
-
-[dependencies.amethyst]
-version = "0.15.3"
-features = ["vulkan","no-slow-safety-checks"]
+edition = "2021"
 
 [dependencies]
+bevy = "0.8"
+bevy_obj = "0.8" # used to load wavefront o.bj files into bevy
 rand = "0.8.5"
+
+[profile.dev]
+opt-level = 1
+
+[profile.dev.package."*"]
+opt-level = 3
