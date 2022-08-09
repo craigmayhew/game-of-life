@@ -31,8 +31,8 @@ fn setup(
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     // assets
-    let hill_tetrahrdon:bevy::prelude::Handle<Mesh> = asset_server.load("assets/hill-tetrahedron.obj");
-    let hill_tetrahrdon_mirorred:bevy::prelude::Handle<Mesh> = asset_server.load("assets/hill-tetrahedron-mirrored.obj");
+    let hill_tetrahrdon:bevy::prelude::Handle<Mesh> = asset_server.load("mesh/hill-tetrahedron.obj");
+    let hill_tetrahrdon_mirorred:bevy::prelude::Handle<Mesh> = asset_server.load("mesh/hill-tetrahedron-mirrored.obj");
 
     //setting up initial state of life throughout our 3d space
     let mut universe_life = vec![vec![vec![vec![false; UNIVERSE_SIZE]; UNIVERSE_SIZE]; UNIVERSE_SIZE]; 6];
