@@ -38,7 +38,7 @@ pub fn move_camera_on_keyboard_input(
         // forward / backward
         if keys.pressed(KeyCode::W) {
             // forward
-            transform.translation.z += move_factor;
+            transform.translation.z -= move_factor;
         } else if keys.pressed(KeyCode::S) {
             // backward
             transform.translation.z += move_factor;
