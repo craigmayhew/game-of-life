@@ -22,14 +22,18 @@ pub fn move_camera_on_keyboard_input(
     keys: Res<Input<KeyCode>>,
     timer: Res<Time>,
 ) {
-    let move_factor = 1000.0 * timer.delta_seconds();
+    let move_factor = 100.0 * timer.delta_seconds();
     //let rotation_factor = 500.0 * timer.delta_seconds();
     for mut transform in camera.iter_mut() {
         //rotation
         if keys.pressed(KeyCode::A) {
             // look left
+            let rot_y = transform.rotation.y;
+            transform.rotate_y(rot_y+0.02);
         } else if keys.pressed(KeyCode::D) {
             // look right
+            let rot_y = transform.rotation.y;
+            transform.rotate_y(rot_y-0.02);
         }
         // forward / backward
         if keys.pressed(KeyCode::W) {
@@ -37,7 +41,7 @@ pub fn move_camera_on_keyboard_input(
             transform.translation.z += move_factor;
         } else if keys.pressed(KeyCode::S) {
             // backward
-            transform.translation.z -= move_factor;
+            transform.translation.z += move_factor;
         }
         //movement
         if keys.pressed(KeyCode::Left) {
