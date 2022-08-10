@@ -22,15 +22,12 @@ fn create_life(
     z:usize,
     asset_server: &Res<AssetServer>,
     commands: &Commands,
-) -> (bevy::prelude::Transform, [f32; 3]) {
+) -> (bevy::prelude::Transform) {
     let mut transform_new_life: Transform;
     
-    let color;
     let mesh: bevy::prelude::Handle<Mesh>;
     //rotate it if it's every third life form (todo: as this rotations only have 4 variants they could exist outside this loop!)
     if n == 0 {//white DONE DO NOT MOVE OR ROTATE!
-        color = [1.0, 1.0, 1.0];
-
         // position the life form in 3d space
         transform_new_life = Transform::from_xyz(
             (x as f32) * LIFE_FORM_SIZE,
@@ -42,8 +39,6 @@ fn create_life(
         transform_new_life.rotate_y(std::f32::consts::FRAC_PI_2);
         transform_new_life.rotate_z(std::f32::consts::PI);
     } else if n == 1 {//red DONE DO NOT MOVE OR ROTATE!
-        color = [0.6, 0.2, 1.0];
-
         // position the life form in 3d space
         transform_new_life = Transform::from_xyz(
             (x as f32) * LIFE_FORM_SIZE,
@@ -54,9 +49,6 @@ fn create_life(
         transform_new_life.rotate_x(std::f32::consts::PI*1.75);
         transform_new_life.rotate_y(0.0);
         transform_new_life.rotate_z(std::f32::consts::FRAC_PI_2);
-    } else if n == 2 {//light blue DONE DO NOT MOVE OR ROTATE!
-        color = [0.5, 0.5, 1.0];
-
         // position the life form in 3d space
         transform_new_life = Transform::from_xyz(
             (x as f32-1.0) * LIFE_FORM_SIZE,
@@ -68,8 +60,6 @@ fn create_life(
         transform_new_life.rotate_y(0.0);
         transform_new_life.rotate_z(0.0);
     } else if n == 3 {//dark blue DONE DO NOT MOVE OR ROTATE!
-        color = [0.2, 0.2, 0.7];
-
         // position the life form in 3d space
         transform_new_life = Transform::from_xyz(
             (x as f32-1.0) * LIFE_FORM_SIZE,
@@ -81,8 +71,6 @@ fn create_life(
         transform_new_life.rotate_y(0.0);
         transform_new_life.rotate_z(0.0);
     } else if n == 4 {//light grey DONE DO NOT MOVE OR ROTATE!
-        color = [0.5, 0.5, 0.5];
-
         // position the life form in 3d space
         transform_new_life = Transform::from_xyz(
             x as f32 * LIFE_FORM_SIZE,
@@ -94,8 +82,6 @@ fn create_life(
         transform_new_life.rotate_y(std::f32::consts::PI);
         transform_new_life.rotate_z(0.0);
     } else {//dark grey DONE DO NOT MOVE OR ROTATE!
-        color = [0.2, 0.2, 0.2];
-
         // position the life form in 3d space
         transform_new_life = Transform::from_xyz(
             x as f32 * LIFE_FORM_SIZE,
@@ -111,7 +97,7 @@ fn create_life(
     //set size of tetrahedrons
     transform_new_life.with_scale(Vec3::new(LIFE_FORM_SIZE, LIFE_FORM_SIZE, LIFE_FORM_SIZE));
 
-    (transform_new_life,color)
+    (transform_new_life)
 }
 
 #[derive(Component)]
@@ -147,9 +133,8 @@ pub fn run(
                         }
 
                         let transform_new_life: bevy::prelude::Transform;
-                        let color: [f32; 3];
                         
-                        (transform_new_life,color) = create_life(n, x, y, z, &asset_server, &commands);
+                        (transform_new_life) = create_life(n, x, y, z, &asset_server, &commands);
                     
                         // make the life form exist!
                         commands.spawn_bundle(PbrBundle {
@@ -197,9 +182,8 @@ pub fn run(
                                 next_gen[n][x][y][z] = true;
 
                                 let transform_new_life: bevy::prelude::Transform;
-                                let color: [f32; 3];
                                 
-                                (transform_new_life,color) = create_life(n, x, y, z, &asset_server, &commands);
+                                (transform_new_life) = create_life(n, x, y, z, &asset_server, &commands);
                             
                                 // make the life form exist!
                                 commands.spawn_bundle(PbrBundle {
@@ -221,9 +205,8 @@ pub fn run(
                                 next_gen[n][x][y][z] = true;
                                 
                                 let transform_new_life: bevy::prelude::Transform;
-                                let color: [f32; 3];
                                 
-                                (transform_new_life,color) = create_life(n, x, y, z, &asset_server, &commands);
+                                (transform_new_life) = create_life(n, x, y, z, &asset_server, &commands);
 
                                 // make the life form exist!
                                 commands.spawn_bundle(PbrBundle {
