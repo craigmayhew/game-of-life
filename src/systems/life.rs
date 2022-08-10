@@ -1,8 +1,6 @@
 use bevy::{
     prelude::*, //default bevy
-    window::PresentMode // needed to specify window info
 };
-use bevy_obj::*; // immport wavefront obj files
 
 use crate::{
     LIFE_FORM_SIZE,
@@ -20,8 +18,6 @@ fn create_life_xyz(
     x:usize,
     y:usize,
     z:usize,
-    asset_server: &Res<AssetServer>,
-    commands: &Commands,
 ) -> bevy::prelude::Transform {
     let mut transform_new_life: Transform;
     
@@ -86,7 +82,6 @@ pub fn run(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut session: ResMut<SessionResource>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     /*todo:
         1) [x] read session resource
@@ -110,7 +105,7 @@ pub fn run(
                             continue;
                         }
 
-                        let transform_new_life: bevy::prelude::Transform = create_life_xyz(n, x, y, z, &asset_server, &commands);
+                        let transform_new_life: bevy::prelude::Transform = create_life_xyz(n, x, y, z);
                     
                         // make the life form exist!
                         commands.spawn_bundle(PbrBundle {
@@ -127,7 +122,6 @@ pub fn run(
             }
         }
     } else {
-        //TODO could this be fetch instead of fetch_mut?
         let last_gen: Vec<Vec<Vec<Vec<bool>>>> = session.life.clone();
         let mut next_gen = vec![vec![vec![vec![false; crate::UNIVERSE_SIZE]; crate::UNIVERSE_SIZE]; crate::UNIVERSE_SIZE]; 6];
         /*
@@ -157,7 +151,7 @@ pub fn run(
                             if neighbours == 3 {
                                 next_gen[n][x][y][z] = true;
 
-                                let transform_new_life: bevy::prelude::Transform = create_life_xyz(n, x, y, z, &asset_server, &commands);
+                                let transform_new_life: bevy::prelude::Transform = create_life_xyz(n, x, y, z);
                             
                                 // make the life form exist!
                                 commands.spawn_bundle(PbrBundle {
@@ -178,7 +172,7 @@ pub fn run(
                             } else {
                                 next_gen[n][x][y][z] = true;
                                 
-                                let transform_new_life: bevy::prelude::Transform = create_life_xyz(n, x, y, z, &asset_server, &commands);
+                                let transform_new_life: bevy::prelude::Transform = create_life_xyz(n, x, y, z);
 
                                 // make the life form exist!
                                 commands.spawn_bundle(PbrBundle {
