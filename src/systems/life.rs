@@ -27,7 +27,8 @@ fn create_life(
     
     let mesh: bevy::prelude::Handle<Mesh>;
     //rotate it if it's every third life form (todo: as this rotations only have 4 variants they could exist outside this loop!)
-    if n == 0 {//white DONE DO NOT MOVE OR ROTATE!
+    //TODO consider if n == 0 and n == 1 could/should actually be identical blocks
+    if n == 0 {//white
         // position the life form in 3d space
         transform_new_life = Transform::from_xyz(
             (x as f32) * LIFE_FORM_SIZE,
@@ -38,7 +39,7 @@ fn create_life(
         transform_new_life.rotate_x(std::f32::consts::PI*0.75);
         transform_new_life.rotate_y(std::f32::consts::FRAC_PI_2);
         transform_new_life.rotate_z(std::f32::consts::PI);
-    } else if n == 1 {//red DONE DO NOT MOVE OR ROTATE!
+    } else if n == 1 {//red
         // position the life form in 3d space
         transform_new_life = Transform::from_xyz(
             (x as f32) * LIFE_FORM_SIZE,
@@ -49,6 +50,7 @@ fn create_life(
         transform_new_life.rotate_x(std::f32::consts::PI*1.75);
         transform_new_life.rotate_y(0.0);
         transform_new_life.rotate_z(std::f32::consts::FRAC_PI_2);
+    } else if n == 2 || n == 3 {//light blue and dark blue
         // position the life form in 3d space
         transform_new_life = Transform::from_xyz(
             (x as f32-1.0) * LIFE_FORM_SIZE,
@@ -59,29 +61,7 @@ fn create_life(
         transform_new_life.rotate_x(std::f32::consts::PI*0.75);
         transform_new_life.rotate_y(0.0);
         transform_new_life.rotate_z(0.0);
-    } else if n == 3 {//dark blue DONE DO NOT MOVE OR ROTATE!
-        // position the life form in 3d space
-        transform_new_life = Transform::from_xyz(
-            (x as f32-1.0) * LIFE_FORM_SIZE,
-            (y as f32+1.0) * LIFE_FORM_SIZE,
-            (z as f32-1.0) as f32 * LIFE_FORM_SIZE
-        );
-
-        transform_new_life.rotate_x(std::f32::consts::PI*0.75);
-        transform_new_life.rotate_y(0.0);
-        transform_new_life.rotate_z(0.0);
-    } else if n == 4 {//light grey DONE DO NOT MOVE OR ROTATE!
-        // position the life form in 3d space
-        transform_new_life = Transform::from_xyz(
-            x as f32 * LIFE_FORM_SIZE,
-            y as f32 * LIFE_FORM_SIZE,
-            z as f32 * LIFE_FORM_SIZE
-        );
-        
-        transform_new_life.rotate_x(std::f32::consts::PI/4.0);
-        transform_new_life.rotate_y(std::f32::consts::PI);
-        transform_new_life.rotate_z(0.0);
-    } else {//dark grey DONE DO NOT MOVE OR ROTATE!
+    } else {//light grey and dark grey
         // position the life form in 3d space
         transform_new_life = Transform::from_xyz(
             x as f32 * LIFE_FORM_SIZE,
