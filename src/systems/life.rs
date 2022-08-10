@@ -88,28 +88,26 @@ pub fn run(
     */
     // this if statement is hard coded to 3 because we currently have 2 entities at startup (maybe the camera and the sun?)
     if session.generation == 1 {
-        //TODO could this be fetch instead of fetch_mut?
-        let life_to_create: Vec<Vec<Vec<Vec<bool>>>> = session.life.clone();
+        let life_to_create: Vec<Vec<Vec<Vec<bevy::prelude::Entity>>>> = session.life.clone();
         for (n, vec1) in life_to_create.iter().enumerate() {
             for (x, vec2) in vec1.iter().enumerate() {
                 for (y, vec3) in vec2.iter().enumerate() {
-                    // if bool_life is 1 then create a life form here.
-                    //TODO Could be used to load a "save"
-                    for (z, bool_life) in vec3.iter().enumerate() {
-                        if !bool_life {
-                            //no life here
+                    for (z, _empty_entity_id) in vec3.iter().enumerate() {
+                        //randomly generate initial life in the universe
+                        if rand::random::<bool>() {
+                            //create no life here
                             continue;
                         }
 
                         let transform_new_life: bevy::prelude::Transform = create_life_xyz(n, x, y, z);
                     
                         // make the life form exist!
-                        commands.spawn_bundle(PbrBundle {
+                        session.life[n][x][y][z] = commands.spawn_bundle(PbrBundle {
                             mesh: session.life_form_meshes[n%2].clone(),
                             material: session.life_form_materials[n].clone(),
                             transform: transform_new_life,
                             ..Default::default()
-                        }).insert(Life);
+                        }).insert(Life).id();
                         
                         //increment life counter
                         session.counter += 1;
@@ -117,9 +115,10 @@ pub fn run(
                 }
             }
         }
+        session.generation = 2;
     } else {
-        let last_gen: Vec<Vec<Vec<Vec<bool>>>> = session.life.clone();
-        let mut next_gen = vec![vec![vec![vec![false; crate::UNIVERSE_SIZE]; crate::UNIVERSE_SIZE]; crate::UNIVERSE_SIZE]; 6];
+        let last_gen: Vec<Vec<Vec<Vec<bevy::prelude::Entity>>>> = session.life.clone();
+        let mut next_gen = vec![vec![vec![vec![Entity::from_raw(0); crate::UNIVERSE_SIZE]; crate::UNIVERSE_SIZE]; crate::UNIVERSE_SIZE]; 6];
         /*
         dark blue touches light blue and white in same xyz and red and dark grey either side (need to check if thats x or z)
         light blue touches red and dark blue in the same xyz and white in the y above
@@ -132,54 +131,42 @@ pub fn run(
         for (n, vec1) in last_gen.iter().enumerate() {
             for (x, vec2) in vec1.iter().enumerate() {
                 for (y, vec3) in vec2.iter().enumerate() {
-                    for (z, bool_life) in vec3.iter().enumerate() {
+                    for (z, entity_life) in vec3.iter().enumerate() {
                         let mut neighbours: usize = 0;
                         if n == 0 {//white touches dark blue and dark grey in the same xyz and light blue in the y below
-                            if last_gen[3][x][y  ][z  ] {neighbours += 1;}
-                            if last_gen[5][x][y  ][z  ] {neighbours += 1;}
+                            if last_gen[3][x][y  ][z  ].id() > 0 {neighbours += 1;}
+                            if last_gen[5][x][y  ][z  ].id() > 0 {neighbours += 1;}
                             //the y >0 checks if we are the edge of the univ
-                            if y > 0 && last_gen[n][x][y-1][z  ] {neighbours += 1;}
-                            if z > 0 && last_gen[4][x][y  ][z-1] {neighbours += 1;}
+                            if y > 0 && last_gen[n][x][y-1][z  ].id() > 0 {neighbours += 1;}
+                            if z > 0 && last_gen[4][x][y  ][z-1].id() > 0 {neighbours += 1;}
                         }
                         
-                        if !bool_life {//if not alive in last gen
+                        if 0 == entity_life.id() {//if not alive in last gen
                             //if neighbours = 3 then become alive
                             if neighbours == 3 {
-                                next_gen[n][x][y][z] = true;
-
                                 let transform_new_life: bevy::prelude::Transform = create_life_xyz(n, x, y, z);
                             
                                 // make the life form exist!
-                                commands.spawn_bundle(PbrBundle {
+                                next_gen[n][x][y][z] = commands.spawn_bundle(PbrBundle {
                                     mesh: session.life_form_meshes[n%2].clone(),
                                     material: session.life_form_materials[n].clone(),
                                     transform: transform_new_life,
                                     ..Default::default()
-                                }).insert(Life);
+                                }).insert(Life).id();
                                 
                                 //increment life counter
                                 session.counter += 1;
                             } else {
-                                next_gen[n][x][y][z] = false;
+                                //continue to not be alive
                             }
                         } else {//if alive in last gen
                             if neighbours == 4 || neighbours == 0 {
-                                next_gen[n][x][y][z] = false;
-                            } else {
-                                next_gen[n][x][y][z] = true;
-                                
-                                let transform_new_life: bevy::prelude::Transform = create_life_xyz(n, x, y, z);
+                                commands.entity(entity_life.to_owned()).despawn();
+                                next_gen[n][x][y][z] = Entity::from_raw(0);
 
-                                // make the life form exist!
-                                commands.spawn_bundle(PbrBundle {
-                                    mesh: session.life_form_meshes[n%2].clone(),
-                                    material: session.life_form_materials[n].clone(),
-                                    transform: transform_new_life,
-                                    ..Default::default()
-                                }).insert(Life);
-                                
-                                //increment life counter
-                                session.counter += 1;
+                                session.counter -= 1;
+                            } else {
+                                //continue to be alive
                             }
                         }
                     }

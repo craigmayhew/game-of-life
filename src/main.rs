@@ -18,7 +18,7 @@ enum AppState {
 }
 
 pub struct SessionResource {
-    pub life: Vec<Vec<Vec<Vec<bool>>>>,
+    pub life: Vec<Vec<Vec<Vec<bevy::prelude::Entity>>>>,
     pub counter: i64,
     pub generation: i64,
     pub life_form_materials: [bevy::prelude::Handle<StandardMaterial>; 6], //stores handles to the 6 life form tetras
@@ -32,18 +32,8 @@ fn setup(
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     //setting up initial state of life throughout our 3d space
-    let mut universe_life = vec![vec![vec![vec![false; UNIVERSE_SIZE]; UNIVERSE_SIZE]; UNIVERSE_SIZE]; 6];
-        
-    //TODO Could be used to load a "save"
-    for n in 0..6 {
-        for x in 0..UNIVERSE_SIZE {
-            for y in 0..UNIVERSE_SIZE {
-                for z in 0..UNIVERSE_SIZE {
-                    universe_life[n][x][y][z] = rand::random::<bool>();
-                }
-            }
-        }
-    }    
+    let universe_life = vec![vec![vec![vec![Entity::from_raw(0); UNIVERSE_SIZE]; UNIVERSE_SIZE]; UNIVERSE_SIZE]; 6];
+    
     commands.insert_resource(SessionResource {
         life: universe_life,
         counter: 0,
