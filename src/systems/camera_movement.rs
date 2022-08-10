@@ -1,19 +1,19 @@
 use bevy::{
     prelude::*, //default bevy
     input::{keyboard::KeyCode, Input},
-    render::camera::ScalingMode,
 };
 
 pub fn setup(mut commands: Commands) {
     commands.spawn_bundle(Camera3dBundle {
-        projection: OrthographicProjection {
-            scale: 3.0,
-            scaling_mode: ScalingMode::FixedVertical(2.0),
-            ..default()
+        projection: PerspectiveProjection  {
+            near: 0.1,
+            far: 10000.0,
+            aspect_ratio: crate::ARENA_WIDTH / crate::ARENA_HEIGHT,
+            fov: std::f32::consts::FRAC_PI_3,
         }
         .into(),
-        transform: Transform::from_xyz(0.0, 0.0, -100.0).looking_at(Vec3::ZERO, Vec3::Y),
-        ..default()
+        transform: Transform::from_xyz(10.0, 10.0, 200.0).looking_at(Vec3::ZERO, Vec3::Y),
+        ..default()  
     });
 }
 
