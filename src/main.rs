@@ -1,6 +1,7 @@
 use bevy::{
     prelude::*, //default bevy
     window::PresentMode, // needed to specify window info
+    diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin},
 };
 use bevy_obj::*; // immport wavefront obj files
 
@@ -85,6 +86,8 @@ fn main() {
     })
     .add_plugins(DefaultPlugins)
     .add_plugin(ObjPlugin)
+    .add_plugin(LogDiagnosticsPlugin::default())
+    .add_plugin(FrameTimeDiagnosticsPlugin::default())
     .add_startup_system(setup)
     .add_system(systems::camera_movement::move_camera_on_keyboard_input)
     .add_system(systems::life::run)
