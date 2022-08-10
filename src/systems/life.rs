@@ -15,14 +15,14 @@ pub struct LifeTag;
 #[derive(Default)]
 pub struct LifeSystem {}
 
-fn create_life(
+fn create_life_xyz(
     n:usize,
     x:usize,
     y:usize,
     z:usize,
     asset_server: &Res<AssetServer>,
     commands: &Commands,
-) -> (bevy::prelude::Transform) {
+) -> bevy::prelude::Transform {
     let mut transform_new_life: Transform;
     
     let mesh: bevy::prelude::Handle<Mesh>;
@@ -74,10 +74,8 @@ fn create_life(
         transform_new_life.rotate_z(0.0);
     }
 
-    //set size of tetrahedrons
-    transform_new_life.with_scale(Vec3::new(LIFE_FORM_SIZE, LIFE_FORM_SIZE, LIFE_FORM_SIZE));
-
-    (transform_new_life)
+    //set size of tetrahedrons and return
+    transform_new_life.with_scale(Vec3::new(LIFE_FORM_SIZE, LIFE_FORM_SIZE, LIFE_FORM_SIZE))
 }
 
 #[derive(Component)]
@@ -112,9 +110,7 @@ pub fn run(
                             continue;
                         }
 
-                        let transform_new_life: bevy::prelude::Transform;
-                        
-                        (transform_new_life) = create_life(n, x, y, z, &asset_server, &commands);
+                        let transform_new_life: bevy::prelude::Transform = create_life_xyz(n, x, y, z, &asset_server, &commands);
                     
                         // make the life form exist!
                         commands.spawn_bundle(PbrBundle {
@@ -161,9 +157,7 @@ pub fn run(
                             if neighbours == 3 {
                                 next_gen[n][x][y][z] = true;
 
-                                let transform_new_life: bevy::prelude::Transform;
-                                
-                                (transform_new_life) = create_life(n, x, y, z, &asset_server, &commands);
+                                let transform_new_life: bevy::prelude::Transform = create_life_xyz(n, x, y, z, &asset_server, &commands);
                             
                                 // make the life form exist!
                                 commands.spawn_bundle(PbrBundle {
@@ -184,9 +178,7 @@ pub fn run(
                             } else {
                                 next_gen[n][x][y][z] = true;
                                 
-                                let transform_new_life: bevy::prelude::Transform;
-                                
-                                (transform_new_life) = create_life(n, x, y, z, &asset_server, &commands);
+                                let transform_new_life: bevy::prelude::Transform = create_life_xyz(n, x, y, z, &asset_server, &commands);
 
                                 // make the life form exist!
                                 commands.spawn_bundle(PbrBundle {
