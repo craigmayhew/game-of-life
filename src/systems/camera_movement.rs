@@ -12,7 +12,7 @@ pub fn setup(mut commands: Commands) {
             ..default()
         }
         .into(),
-        transform: Transform::from_xyz(5.0, 5.0, 5.0).looking_at(Vec3::ZERO, Vec3::Y),
+        transform: Transform::from_xyz(0.0, 0.0, -100.0).looking_at(Vec3::ZERO, Vec3::Y),
         ..default()
     });
 }
@@ -20,18 +20,45 @@ pub fn setup(mut commands: Commands) {
 pub fn move_camera_on_keyboard_input(
     mut camera: Query<&mut Transform, With<Camera>>,
     keys: Res<Input<KeyCode>>,
+    timer: Res<Time>,
 ) {
-    if keys.any_pressed([KeyCode::A, KeyCode::Left]) {
-        // moving left
-    } else if keys.any_pressed([KeyCode::D, KeyCode::Right]) {
-        // moving right
-    }
-    if keys.any_pressed([KeyCode::W, KeyCode::Up]) {
-        // moving up
-    } else if keys.any_pressed([KeyCode::S, KeyCode::Down]) {
-        // moving down
-    }
-    if keys.just_pressed(KeyCode::Space) {
-        // todo, place a life form?
+    let move_factor = 1000.0 * timer.delta_seconds();
+    //let rotation_factor = 500.0 * timer.delta_seconds();
+    for mut transform in camera.iter_mut() {
+        //rotation
+        if keys.pressed(KeyCode::A) {
+            // look left
+        } else if keys.pressed(KeyCode::D) {
+            // look right
+        }
+        // forward / backward
+        if keys.pressed(KeyCode::W) {
+            // forward
+            transform.translation.z += move_factor;
+        } else if keys.pressed(KeyCode::S) {
+            // backward
+            transform.translation.z -= move_factor;
+        }
+        //movement
+        if keys.pressed(KeyCode::Left) {
+            // moving left
+            transform.translation.x -= move_factor;
+        } else if keys.pressed(KeyCode::Right) {
+            // moving right
+            transform.translation.x += move_factor;
+        }
+        if keys.pressed(KeyCode::Up) {
+            // moving up
+            transform.translation.y += move_factor;
+        } else if keys.pressed(KeyCode::Down) {
+            // moving down
+            transform.translation.y -= move_factor;
+        }
+        if keys.just_pressed(KeyCode::Space) {
+            // todo, pause game
+        }
+        if keys.just_pressed(KeyCode::Return) {
+            // todo, place life form?
+        }
     }
 }
