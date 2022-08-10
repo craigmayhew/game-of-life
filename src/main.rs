@@ -17,11 +17,12 @@ enum AppState {
     Paused,
 }
 
-struct SessionResource {
+pub struct SessionResource {
     pub life: Vec<Vec<Vec<Vec<bool>>>>,
     pub counter: i64,
     pub generation: i64,
     pub life_form_materials: [bevy::prelude::Handle<StandardMaterial>; 6], //stores handles to the 6 life form tetras
+    pub life_form_meshes: [bevy::prelude::Handle<Mesh>; 2], //stores handles to the two life form meshes
 }
 
 fn setup(
@@ -30,10 +31,6 @@ fn setup(
     meshes: Res<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-    // assets
-    let hill_tetrahrdon:bevy::prelude::Handle<Mesh> = asset_server.load("mesh/hill-tetrahedron.obj");
-    let hill_tetrahrdon_mirorred:bevy::prelude::Handle<Mesh> = asset_server.load("mesh/hill-tetrahedron-mirrored.obj");
-
     //setting up initial state of life throughout our 3d space
     let mut universe_life = vec![vec![vec![vec![false; UNIVERSE_SIZE]; UNIVERSE_SIZE]; UNIVERSE_SIZE]; 6];
         
@@ -76,6 +73,10 @@ fn setup(
                 base_color: Color::rgb(0.2, 0.2, 0.2), // dark grey
                 ..default()
             })
+        ],
+        life_form_meshes: [
+            asset_server.load("mesh/hill-tetrahedron-mirrored.obj"),
+            asset_server.load("mesh/hill-tetrahedron.obj"),
         ]
     });
 
@@ -96,5 +97,6 @@ fn main() {
     .add_plugin(ObjPlugin)
     .add_startup_system(setup)
     .add_system(systems::camera_movement::move_camera_on_keyboard_input)
+    .add_system(systems::life::run)
     .run()
 }

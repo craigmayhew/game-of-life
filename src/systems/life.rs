@@ -22,7 +22,7 @@ fn create_life(
     z:usize,
     asset_server: &Res<AssetServer>,
     commands: &Commands,
-) -> (bevy::prelude::Handle<bevy::prelude::Mesh>, bevy::prelude::Transform, [f32; 3]) {
+) -> (bevy::prelude::Transform, [f32; 3]) {
     let mut transform_new_life: Transform;
     
     let color;
@@ -41,8 +41,6 @@ fn create_life(
         transform_new_life.rotate_x(std::f32::consts::PI*0.75);
         transform_new_life.rotate_y(std::f32::consts::FRAC_PI_2);
         transform_new_life.rotate_z(std::f32::consts::PI);
-
-        mesh = asset_server.load("assets/hill-tetrahedron-mirrored.obj");
     } else if n == 1 {//red DONE DO NOT MOVE OR ROTATE!
         color = [0.6, 0.2, 1.0];
 
@@ -56,8 +54,6 @@ fn create_life(
         transform_new_life.rotate_x(std::f32::consts::PI*1.75);
         transform_new_life.rotate_y(0.0);
         transform_new_life.rotate_z(std::f32::consts::FRAC_PI_2);
-
-        mesh = asset_server.load("assets/hill-tetrahedron.obj");
     } else if n == 2 {//light blue DONE DO NOT MOVE OR ROTATE!
         color = [0.5, 0.5, 1.0];
 
@@ -71,8 +67,6 @@ fn create_life(
         transform_new_life.rotate_x(std::f32::consts::PI*0.75);
         transform_new_life.rotate_y(0.0);
         transform_new_life.rotate_z(0.0);
-
-        mesh = asset_server.load("assets/hill-tetrahedron-mirrored.obj");
     } else if n == 3 {//dark blue DONE DO NOT MOVE OR ROTATE!
         color = [0.2, 0.2, 0.7];
 
@@ -86,8 +80,6 @@ fn create_life(
         transform_new_life.rotate_x(std::f32::consts::PI*0.75);
         transform_new_life.rotate_y(0.0);
         transform_new_life.rotate_z(0.0);
-
-        mesh = asset_server.load("assets/hill-tetrahedron.obj");
     } else if n == 4 {//light grey DONE DO NOT MOVE OR ROTATE!
         color = [0.5, 0.5, 0.5];
 
@@ -101,8 +93,6 @@ fn create_life(
         transform_new_life.rotate_x(std::f32::consts::PI/4.0);
         transform_new_life.rotate_y(std::f32::consts::PI);
         transform_new_life.rotate_z(0.0);
-
-        mesh = asset_server.load("assets/hill-tetrahedron-mirrored.obj");
     } else {//dark grey DONE DO NOT MOVE OR ROTATE!
         color = [0.2, 0.2, 0.2];
 
@@ -116,20 +106,18 @@ fn create_life(
         transform_new_life.rotate_x(std::f32::consts::PI/4.0);
         transform_new_life.rotate_y(std::f32::consts::PI);
         transform_new_life.rotate_z(0.0);
-
-        mesh = asset_server.load("assets/hill-tetrahedron.obj");
     }
 
     //set size of tetrahedrons
     transform_new_life.with_scale(Vec3::new(LIFE_FORM_SIZE, LIFE_FORM_SIZE, LIFE_FORM_SIZE));
 
-    (mesh,transform_new_life,color)
+    (transform_new_life,color)
 }
 
 #[derive(Component)]
-struct Life;
+pub struct Life;
 
-fn run(
+pub fn run(
     query: Query<&mut Life, With<Life>>,
     mut commands: Commands,
     asset_server: Res<AssetServer>,
@@ -158,21 +146,14 @@ fn run(
                             continue;
                         }
 
-                        let mesh: bevy::prelude::Handle<bevy::prelude::Mesh>;
                         let transform_new_life: bevy::prelude::Transform;
                         let color: [f32; 3];
                         
-                        (mesh,transform_new_life,color) = create_life(n, x, y, z, &asset_server, &commands);
-                        
-                        // give the life form a colour
-                        let material = materials.add(StandardMaterial {
-                            base_color: Color::rgb(color[0], color[1], color[2]),
-                            ..default()
-                        });
+                        (transform_new_life,color) = create_life(n, x, y, z, &asset_server, &commands);
                     
                         // make the life form exist!
                         commands.spawn_bundle(PbrBundle {
-                            mesh: mesh,
+                            mesh: session.life_form_meshes[n%2].clone(),
                             material: session.life_form_materials[n].clone(),
                             transform: transform_new_life,
                             ..Default::default()
@@ -215,15 +196,14 @@ fn run(
                             if neighbours == 3 {
                                 next_gen[n][x][y][z] = true;
 
-                                let mesh: bevy::prelude::Handle<bevy::prelude::Mesh>;
                                 let transform_new_life: bevy::prelude::Transform;
                                 let color: [f32; 3];
                                 
-                                (mesh,transform_new_life,color) = create_life(n, x, y, z, &asset_server, &commands);
+                                (transform_new_life,color) = create_life(n, x, y, z, &asset_server, &commands);
                             
                                 // make the life form exist!
                                 commands.spawn_bundle(PbrBundle {
-                                    mesh: mesh,
+                                    mesh: session.life_form_meshes[n%2].clone(),
                                     material: session.life_form_materials[n].clone(),
                                     transform: transform_new_life,
                                     ..Default::default()
@@ -240,15 +220,14 @@ fn run(
                             } else {
                                 next_gen[n][x][y][z] = true;
                                 
-                                let mesh: bevy::prelude::Handle<bevy::prelude::Mesh>;
                                 let transform_new_life: bevy::prelude::Transform;
                                 let color: [f32; 3];
                                 
-                                (mesh,transform_new_life,color) = create_life(n, x, y, z, &asset_server, &commands);
+                                (transform_new_life,color) = create_life(n, x, y, z, &asset_server, &commands);
 
                                 // make the life form exist!
                                 commands.spawn_bundle(PbrBundle {
-                                    mesh: mesh,
+                                    mesh: session.life_form_meshes[n%2].clone(),
                                     material: session.life_form_materials[n].clone(),
                                     transform: transform_new_life,
                                     ..Default::default()
