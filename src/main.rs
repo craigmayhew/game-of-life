@@ -1,6 +1,6 @@
 use bevy::{
     prelude::*, //default bevy
-    window::PresentMode // needed to specify window info
+    window::PresentMode, // needed to specify window info
 };
 use bevy_obj::*; // immport wavefront obj files
 
