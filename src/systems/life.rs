@@ -203,7 +203,7 @@ pub fn run(
                                 // no action required here as we pre populate next gen with empty entity ids.
                             }
                         } else {//if alive in last gen
-                            if neighbours == 4 || neighbours == 0 {
+                            if neighbours == 4 || neighbours == 1 || neighbours == 0 {
                                 commands.entity(entity_life.to_owned()).despawn();
                                 next_gen[n][x][y][z] = Entity::from_raw(0);
 
