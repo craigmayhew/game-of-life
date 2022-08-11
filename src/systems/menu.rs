@@ -22,8 +22,18 @@ pub const NORMAL_BUTTON: Color = Color::rgb(0.4, 0.4, 0.4);
 pub const HOVERED_BUTTON: Color = Color::rgb(0.6, 0.6, 0.6);
 pub const PRESSED_BUTTON: Color = Color::rgb(0.9, 0.9, 0.9);
 
-    let button_style = Style {
 pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
+    let play_button_style = Style {
+        size: Size::new(Val::Px(150.0), Val::Px(65.0)),
+        // center button
+        margin: UiRect::all(Val::Auto),
+        // horizontally center child text
+        justify_content: JustifyContent::Center,
+        // vertically center child text
+        align_items: AlignItems::Center,
+        ..default()
+    };
+    let quit_button_style = Style {
         size: Size::new(Val::Px(150.0), Val::Px(65.0)),
         // center button
         margin: UiRect::all(Val::Auto),
@@ -40,7 +50,7 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     };
     let button_play = commands
         .spawn_bundle(ButtonBundle {
-            style: button_style.clone(),
+            style: play_button_style,
             color: NORMAL_BUTTON.into(),
             ..default()
         })
@@ -55,7 +65,7 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
 
     let button_quit = commands
         .spawn_bundle(ButtonBundle {
-            style: button_style,
+            style: quit_button_style,
             color: NORMAL_BUTTON.into(),
             ..default()
         })
