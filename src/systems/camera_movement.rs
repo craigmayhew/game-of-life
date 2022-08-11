@@ -14,7 +14,7 @@ pub fn setup(mut commands: Commands) {
         projection: PerspectiveProjection  {
             near: 0.1,
             far: 10000.0,
-            aspect_ratio: crate::ARENA_WIDTH / crate::ARENA_HEIGHT,
+            aspect_ratio: 16.0/9.0,
             fov: std::f32::consts::FRAC_PI_3,
         }
         .into(),

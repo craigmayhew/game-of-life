@@ -8,8 +8,6 @@ use bevy_obj::*; // immport wavefront obj files
 
 mod systems;
 
-pub const ARENA_HEIGHT: f32 = 1000.0;
-pub const ARENA_WIDTH: f32 = 1000.0;
 pub const UNIVERSE_SIZE: usize = 30;
 // Defines the amount of time that should elapse between each physics step.
 const TIME_STEP: f32 = 1.0 / 2.0;
