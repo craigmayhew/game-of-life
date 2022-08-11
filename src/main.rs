@@ -9,7 +9,6 @@ mod systems;
 
 pub const ARENA_HEIGHT: f32 = 1000.0;
 pub const ARENA_WIDTH: f32 = 1000.0;
-pub const LIFE_FORM_SIZE: f32 = 150.0;
 pub const UNIVERSE_SIZE: usize = 30;
 
 enum AppState {

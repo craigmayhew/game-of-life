@@ -3,10 +3,10 @@ use bevy::{
 };
 
 use crate::{
-    LIFE_FORM_SIZE,
     SessionResource,
 };
 
+pub const LIFE_FORM_SIZE: f32 = 150.0;
 #[derive(Default)]
 pub struct LifeTag;
 
