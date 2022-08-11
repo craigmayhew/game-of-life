@@ -31,7 +31,7 @@ pub fn move_camera_on_keyboard_input(
     timer: Res<Time>,
     mut state: ResMut<State<AppState>>,
 ) {
-    let move_factor = 100.0 * timer.delta_seconds();
+    let move_factor = 1000.0 * timer.delta_seconds();
     //let rotation_factor = 500.0 * timer.delta_seconds();
     for mut transform in camera.iter_mut() {
         //rotation
@@ -45,10 +45,12 @@ pub fn move_camera_on_keyboard_input(
         // forward / backward
         if keys.pressed(KeyCode::W) {
             // forward
-            transform.translation.z -= move_factor;
+            let move_cam = transform.forward() * move_factor;
+            transform.translation += move_cam;
         } else if keys.pressed(KeyCode::S) {
             // backward
-            transform.translation.z += move_factor;
+            let move_cam = transform.forward() * move_factor;
+            transform.translation -= move_cam;
         }
         //movement
         if keys.pressed(KeyCode::Left) {
