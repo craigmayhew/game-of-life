@@ -14,8 +14,9 @@ pub const UNIVERSE_SIZE: usize = 30;
 // Defines the amount of time that should elapse between each physics step.
 const TIME_STEP: f32 = 1.0 / 2.0;
 
-enum AppState {
-    Menu,
+#[derive(Clone, Eq, PartialEq, Debug, Hash)]
+pub enum AppState {
+    Splash,
     InGame,
     Paused,
 }
