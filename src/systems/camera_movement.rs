@@ -3,6 +3,9 @@ use bevy::{
     input::{keyboard::KeyCode, Input},
 };
 
+use crate::UNIVERSE_SIZE;
+use crate::systems::life::LIFE_FORM_SIZE;
+
 pub fn setup(mut commands: Commands) {
     commands.spawn_bundle(Camera3dBundle {
         projection: PerspectiveProjection  {
@@ -12,7 +15,7 @@ pub fn setup(mut commands: Commands) {
             fov: std::f32::consts::FRAC_PI_3,
         }
         .into(),
-        transform: Transform::from_xyz(10.0, 10.0, 200.0).looking_at(Vec3::ZERO, Vec3::Y),
+        transform: Transform::from_xyz(0.0, 0.0, LIFE_FORM_SIZE*2.0*UNIVERSE_SIZE as f32).looking_at(Vec3::ZERO, Vec3::Y),
         ..default()  
     });
 }
