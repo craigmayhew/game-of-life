@@ -3,8 +3,11 @@ use bevy::{
     input::{keyboard::KeyCode, Input},
 };
 
-use crate::UNIVERSE_SIZE;
-use crate::systems::life::LIFE_FORM_SIZE;
+use crate::{
+    AppState,
+    UNIVERSE_SIZE,
+    systems::life::LIFE_FORM_SIZE,
+};
 
 pub fn setup(mut commands: Commands) {
     commands.spawn_bundle(Camera3dBundle {
@@ -26,6 +29,7 @@ pub fn move_camera_on_keyboard_input(
     mut camera: Query<&mut Transform, With<Camera>>,
     keys: Res<Input<KeyCode>>,
     timer: Res<Time>,
+    mut state: ResMut<State<AppState>>,
 ) {
     let move_factor = 100.0 * timer.delta_seconds();
     //let rotation_factor = 500.0 * timer.delta_seconds();
@@ -62,7 +66,12 @@ pub fn move_camera_on_keyboard_input(
             transform.translation.y -= move_factor;
         }
         if keys.just_pressed(KeyCode::Space) {
-            // todo, pause game
+            // (un)pause game
+            match state.current() {
+                AppState::InGame => state.set(AppState::Paused).unwrap(),
+                AppState::Paused => state.set(AppState::InGame).unwrap(),
+                AppState::Splash => {},
+            }
         }
         if keys.just_pressed(KeyCode::Return) {
             // todo, place life form?
