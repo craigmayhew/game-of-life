@@ -90,6 +90,7 @@ fn main() {
     .add_plugin(ObjPlugin)
     .add_plugin(LogDiagnosticsPlugin::default())
     .add_plugin(FrameTimeDiagnosticsPlugin::default())
+    .insert_resource(ClearColor(Color::BLACK)) //set the background colour of our window (the universe)
     .add_startup_system(setup)
     .add_system(systems::camera_movement::move_camera_on_keyboard_input)
     .add_system_set(
