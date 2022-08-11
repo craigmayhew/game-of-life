@@ -82,13 +82,6 @@ pub fn run(
     mut session: ResMut<SessionResource>,
     state: ResMut<State<AppState>>,
 ) {
-    /*todo:
-        1) [x] read session resource
-        2) determine which new life to create + create it
-        3) removed the need for the init life function in main?
-        4) something to do with storing a delta
-        5) delete life if necessary
-    */
     match state.current() {
         AppState::InGame => {},
         _ => {return},
