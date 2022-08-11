@@ -220,7 +220,6 @@ pub fn run(
 
         session.life = next_gen;
         session.generation += 1;
-        println!("Total of in theory: {}", session.counter.to_string());
     }
 
     //println!("Total of lifeform entitys: {}", total_entities.to_string());
