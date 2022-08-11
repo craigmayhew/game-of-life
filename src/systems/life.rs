@@ -3,6 +3,7 @@ use bevy::{
 };
 
 use crate::{
+    AppState,
     SessionResource,
 };
 
@@ -79,6 +80,7 @@ pub struct Life;
 pub fn run(
     mut commands: Commands,
     mut session: ResMut<SessionResource>,
+    state: ResMut<State<AppState>>,
 ) {
     /*todo:
         1) [x] read session resource
@@ -87,6 +89,10 @@ pub fn run(
         4) something to do with storing a delta
         5) delete life if necessary
     */
+    match state.current() {
+        AppState::InGame => {},
+        _ => {return},
+    }
     // this if statement is hard coded to 3 because we currently have 2 entities at startup (maybe the camera and the sun?)
     if session.generation == 1 {
         let life_to_create: Vec<Vec<Vec<Vec<bevy::prelude::Entity>>>> = session.life.clone();
