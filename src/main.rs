@@ -30,7 +30,6 @@ pub struct SessionResource {
 fn setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
-    meshes: Res<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     //setting up initial state of life throughout our 3d space
