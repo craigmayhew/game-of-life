@@ -71,6 +71,12 @@ fn setup(
         ]
     });
 
+    //ambient light
+    commands.insert_resource(AmbientLight {
+        color: Color::WHITE,
+        brightness: 1.0,
+    });
+
     // camera
     systems::camera_movement::setup(commands);
 }
