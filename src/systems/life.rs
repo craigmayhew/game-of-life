@@ -63,7 +63,7 @@ fn create_life_xyz(
             z as f32 * LIFE_FORM_SIZE
         );
 
-        transform_new_life.rotate_x(std::f32::consts::PI/4.0);
+        transform_new_life.rotate_x(std::f32::consts::FRAC_PI_4);
         transform_new_life.rotate_y(std::f32::consts::PI);
         transform_new_life.rotate_z(0.0);
     }
