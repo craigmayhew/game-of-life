@@ -147,7 +147,7 @@ pub fn run(
                             if last_gen[2][x][y  ][z  ].id() > 0 {neighbours += 1;}
                             //the y>0 and z>0 checks if we are the edge of the univ
                             //TODO also check we arent larger than the universe size, or consider wrapping over to the beginning of the universe
-                            if crate::UNIVERSE_SIZE < y+1 && last_gen[5][x][y+1][z  ].id() > 0 {neighbours += 1;} // touches dark grey above
+                            if crate::UNIVERSE_SIZE < y && last_gen[5][x][y+1][z  ].id() > 0 {neighbours += 1;} // touches dark grey above
                             if crate::UNIVERSE_SIZE == y+1 && last_gen[5][x][0][z  ].id() > 0 {neighbours += 1;} // touches dark grey above (on the other side of the universe)
                             if z > 0 && last_gen[3][x][y  ][z-1].id() > 0 {neighbours += 1;} // touches dark blue in z-1
                             if z == 0 && last_gen[3][x][y  ][crate::UNIVERSE_SIZE-1].id() > 0 {neighbours += 1;} // touches dark blue in z-1 (on the other side of the universe)
@@ -164,7 +164,9 @@ pub fn run(
                             if last_gen[0][x][y  ][z  ].id() > 0 {neighbours += 1;} // touches white
                             //the y >0 checks if we are the edge of the univ
                             if crate::UNIVERSE_SIZE < z && last_gen[1][x  ][y][z+1].id() > 0 {neighbours += 1;} // touches red
+                            if crate::UNIVERSE_SIZE == z+1 && last_gen[1][x  ][y][0].id() > 0 {neighbours += 1;} // touches red (on the other side of the universe)
                             if crate::UNIVERSE_SIZE < x && last_gen[5][x+1][y  ][z].id() > 0 {neighbours += 1;} // touches dark grey
+                            if crate::UNIVERSE_SIZE == x+1 && last_gen[5][0][y  ][z].id() > 0 {neighbours += 1;} // touches dark grey (on the other side of the universe)
                         } else if n == 4 {// light grey touches dark grey and red in the same xyz and light blue and white either side (need to check if thats x or z)
                             if last_gen[5][x][y  ][z  ].id() > 0 {neighbours += 1;} // touches dark grey
                             if last_gen[1][x][y  ][z  ].id() > 0 {neighbours += 1;} // touches red
