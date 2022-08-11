@@ -7,6 +7,7 @@ use crate::{
 };
 
 pub const LIFE_FORM_SIZE: f32 = 150.0;
+
 #[derive(Default)]
 pub struct LifeTag;
 
@@ -120,12 +121,12 @@ pub fn run(
         let last_gen: Vec<Vec<Vec<Vec<bevy::prelude::Entity>>>> = session.life.clone();
         let mut next_gen = vec![vec![vec![vec![Entity::from_raw(0); crate::UNIVERSE_SIZE]; crate::UNIVERSE_SIZE]; crate::UNIVERSE_SIZE]; 6];
         /*
-        dark blue touches light blue and white in same xyz and red and dark grey either side (need to check if thats x or z)
-        light blue touches red and dark blue in the same xyz and white in the y above
-        dark grey touches light grey and white in the same xyz and red in the y below
-        light grey touches dark grey and red in the same xyz and light blue and white either side (need to check if thats x or z)
-        red touches light grey and light blue in same xyz and the dark grey in the y above
         white touches dark blue and dark grey in the same xyz and light blue in the y below
+        red touches light grey and light blue in same xyz and the dark grey in the y above
+        light blue touches red and dark blue in the same xyz and white in the y above
+        dark blue touches light blue and white in same xyz and red and dark grey either side (need to check if thats x or z)
+        light grey touches dark grey and red in the same xyz and light blue and white either side (need to check if thats x or z)
+        dark grey touches light grey and white in the same xyz and red in the y below
         */
         
         for (n, vec1) in last_gen.iter().enumerate() {
@@ -133,12 +134,44 @@ pub fn run(
                 for (y, vec3) in vec2.iter().enumerate() {
                     for (z, entity_life) in vec3.iter().enumerate() {
                         let mut neighbours: usize = 0;
-                        if n == 0 {//white touches dark blue and dark grey in the same xyz and light blue in the y below
+                        if n == 0 {// white touches dark blue and dark grey in the same xyz and light blue in the y below
                             if last_gen[3][x][y  ][z  ].id() > 0 {neighbours += 1;}
                             if last_gen[5][x][y  ][z  ].id() > 0 {neighbours += 1;}
+                            //the y>0 and z>0 checks if we are the edge of the univ
+                            //TODO also check we arent larger than the universe size, or consider wrapping over to the beginning of the universe
+                            if y > 0 && last_gen[2][x][y-1][z  ].id() > 0 {neighbours += 1;} // touches light blue below
+                            if z > 0 && last_gen[4][x][y  ][z-1].id() > 0 {neighbours += 1;} // touches light grey
+                        } else if n == 1 {// red touches light grey and light blue in same xyz and the dark grey in the y above and dark blue in z-1
+                            if last_gen[4][x][y  ][z  ].id() > 0 {neighbours += 1;}
+                            if last_gen[2][x][y  ][z  ].id() > 0 {neighbours += 1;}
+                            //the y>0 and z>0 checks if we are the edge of the univ
+                            //TODO also check we arent larger than the universe size, or consider wrapping over to the beginning of the universe
+                            if crate::UNIVERSE_SIZE < y && last_gen[5][x][y+1][z  ].id() > 0 {neighbours += 1;} // touches dark grey above
+                            if z > 0 && last_gen[3][x][y  ][z-1].id() > 0 {neighbours += 1;} // touches dark blue in z-1
+                        } else if n == 2 {// light blue touches red and dark blue in the same xyz and white in the y above
+                            if last_gen[1][x][y  ][z  ].id() > 0 {neighbours += 1;} // touches red
+                            if last_gen[3][x][y  ][z  ].id() > 0 {neighbours += 1;} // touches dark blue
                             //the y >0 checks if we are the edge of the univ
-                            if y > 0 && last_gen[n][x][y-1][z  ].id() > 0 {neighbours += 1;}
-                            if z > 0 && last_gen[4][x][y  ][z-1].id() > 0 {neighbours += 1;}
+                            if y > 0 && last_gen[0][x][y-1][z  ].id() > 0 {neighbours += 1;} // touches white above CHECK THIS ONE
+                            if crate::UNIVERSE_SIZE < x && last_gen[5][x+1][y  ][z].id() > 0 {neighbours += 1;} // touches dark grey in x+1
+                        } else if n == 3 {// dark blue touches light blue and white in same xyz and red and dark grey either side (need to check if thats x or z)
+                            if last_gen[2][x][y  ][z  ].id() > 0 {neighbours += 1;} // touches light blue
+                            if last_gen[0][x][y  ][z  ].id() > 0 {neighbours += 1;} // touches white
+                            //the y >0 checks if we are the edge of the univ
+                            if crate::UNIVERSE_SIZE < z && last_gen[1][x  ][y][z+1].id() > 0 {neighbours += 1;} // touches red
+                            if crate::UNIVERSE_SIZE < x && last_gen[5][x+1][y  ][z].id() > 0 {neighbours += 1;} // touches dark grey
+                        } else if n == 4 {// light grey touches dark grey and red in the same xyz and light blue and white either side (need to check if thats x or z)
+                            if last_gen[5][x][y  ][z  ].id() > 0 {neighbours += 1;} // touches dark grey
+                            if last_gen[1][x][y  ][z  ].id() > 0 {neighbours += 1;} // touches red
+                            //the y >0 checks if we are the edge of the univ
+                            if x > 0 && last_gen[3][x-1][y  ][z  ].id() > 0 {neighbours += 1;} // touches dark blue
+                            if z > 0 && last_gen[0][x  ][y  ][z-1].id() > 0 {neighbours += 1;} // touches w
+                        } else if n == 5 {// dark grey touches light grey and white in the same xyz and red in the y below and dark blue in x+1
+                            if last_gen[4][x][y  ][z  ].id() > 0 {neighbours += 1;} // touches light grey
+                            if last_gen[0][x][y  ][z  ].id() > 0 {neighbours += 1;} // touches white
+                            //the y >0 checks if we are the edge of the univ
+                            if y > 0 && last_gen[1][x  ][y-1][z].id() > 0 {neighbours += 1;} // touches red below
+                            if x > 0 && last_gen[3][x-1][y  ][z].id() > 0 {neighbours += 1;} // touches dark blue in x-1
                         }
                         
                         if 0 == entity_life.id() {//if not alive in last gen
