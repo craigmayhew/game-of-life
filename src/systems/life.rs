@@ -167,6 +167,7 @@ pub fn run(
                                 session.counter -= 1;
                             } else {
                                 //continue to be alive
+                                next_gen[n][x][y][z] = last_gen[n][x][y][z];
                             }
                         }
                     }
