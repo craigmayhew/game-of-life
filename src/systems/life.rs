@@ -157,7 +157,8 @@ pub fn run(
                                 //increment life counter
                                 session.counter += 1;
                             } else {
-                                //continue to not be alive
+                                // continue to not be alive
+                                // no action required here as we pre populate next gen with empty entity ids.
                             }
                         } else {//if alive in last gen
                             if neighbours == 4 || neighbours == 0 {
