@@ -22,8 +22,8 @@ pub const NORMAL_BUTTON: Color = Color::rgb(0.4, 0.4, 0.4);
 pub const HOVERED_BUTTON: Color = Color::rgb(0.6, 0.6, 0.6);
 pub const PRESSED_BUTTON: Color = Color::rgb(0.9, 0.9, 0.9);
 
-pub fn setup_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
     let button_style = Style {
+pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         size: Size::new(Val::Px(150.0), Val::Px(65.0)),
         // center button
         margin: UiRect::all(Val::Auto),
@@ -70,7 +70,7 @@ pub fn setup_menu(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.insert_resource(MenuData { button_play, button_quit });
 }
 
-pub fn menu(
+pub fn run(
     mut state: ResMut<State<AppState>>,
     mut interaction_query: Query<
         (&Interaction, &mut UiColor, &MenuButtonAction),

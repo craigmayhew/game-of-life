@@ -94,13 +94,13 @@ fn main() {
     // menu system
     .add_system_set(
         SystemSet::on_update(AppState::Splash)
-            .with_system(systems::menu::menu)
+            .with_system(systems::menu::run)
     )
     .add_system_set(
         SystemSet::on_exit(AppState::Splash)
             .with_system(systems::menu::cleanup)
     )
-    .add_startup_system(systems::menu::setup_menu)
+    .add_startup_system(systems::menu::setup)
     // hud system
     .add_system_set(
         SystemSet::on_enter(AppState::InGame)
