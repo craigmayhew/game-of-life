@@ -17,6 +17,8 @@ pub fn setup(mut commands: Commands) {
     });
 }
 
+const MOVE_SPEED: f32 = std::f32::consts::FRAC_1_PI/3.0;
+
 pub fn move_camera_on_keyboard_input(
     mut camera: Query<&mut Transform, With<Camera>>,
     keys: Res<Input<KeyCode>>,
@@ -26,13 +28,12 @@ pub fn move_camera_on_keyboard_input(
     //let rotation_factor = 500.0 * timer.delta_seconds();
     for mut transform in camera.iter_mut() {
         //rotation
-        let move_speed = std::f32::consts::FRAC_1_PI;
         if keys.pressed(KeyCode::A) {
             // look left
-            transform.rotate_local_y(move_speed);
+            transform.rotate_local_y(MOVE_SPEED);
         } else if keys.pressed(KeyCode::D) {
             // look right
-            transform.rotate_local_y(-move_speed);
+            transform.rotate_local_y(-MOVE_SPEED);
         }
         // forward / backward
         if keys.pressed(KeyCode::W) {
