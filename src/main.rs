@@ -102,6 +102,19 @@ fn main() {
             .with_system(systems::menu::cleanup)
     )
     .add_startup_system(systems::menu::setup_menu)
+    // hud system
+    .add_system_set(
+        SystemSet::on_enter(AppState::InGame)
+            .with_system(systems::hud::enter)
+    )
+    .add_system_set(
+        SystemSet::on_update(AppState::InGame)
+            .with_system(systems::hud::run)
+    )
+    .add_system_set(
+        SystemSet::on_exit(AppState::InGame)
+            .with_system(systems::hud::cleanup)
+    )
     // camera system
     .add_system(systems::camera_movement::move_camera_on_keyboard_input)
     // life system
