@@ -26,14 +26,13 @@ pub fn move_camera_on_keyboard_input(
     //let rotation_factor = 500.0 * timer.delta_seconds();
     for mut transform in camera.iter_mut() {
         //rotation
+        let move_speed = std::f32::consts::FRAC_1_PI;
         if keys.pressed(KeyCode::A) {
             // look left
-            let rot_y = transform.rotation.y;
-            transform.rotate_y(rot_y+0.02);
+            transform.rotate_local_y(move_speed);
         } else if keys.pressed(KeyCode::D) {
             // look right
-            let rot_y = transform.rotation.y;
-            transform.rotate_y(rot_y-0.02);
+            transform.rotate_local_y(-move_speed);
         }
         // forward / backward
         if keys.pressed(KeyCode::W) {
