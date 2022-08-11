@@ -87,17 +87,30 @@ fn main() {
         present_mode: PresentMode::AutoVsync,
         ..default()
     })
+    .add_state(AppState::Splash)
     .add_plugins(DefaultPlugins)
     .add_plugin(ObjPlugin)
     .add_plugin(LogDiagnosticsPlugin::default())
     .add_plugin(FrameTimeDiagnosticsPlugin::default())
     .insert_resource(ClearColor(Color::BLACK)) //set the background colour of our window (the universe)
     .add_startup_system(setup)
+    // menu system
+    .add_system_set(
+        SystemSet::on_update(AppState::Splash)
+            .with_system(systems::menu::menu)
+    )
+    .add_system_set(
+        SystemSet::on_exit(AppState::Splash)
+            .with_system(systems::menu::cleanup)
+    )
+    .add_startup_system(systems::menu::setup_menu)
+    // camera system
     .add_system(systems::camera_movement::move_camera_on_keyboard_input)
+    // life system
     .add_system_set(
         SystemSet::new()
-            .with_run_criteria(FixedTimestep::step(TIME_STEP as f64))
             .with_system(systems::life::run)
+            .with_run_criteria(FixedTimestep::step(TIME_STEP as f64))
     )
     .run()
 }
