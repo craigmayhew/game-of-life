@@ -1,10 +1,8 @@
 use bevy::{
-    {app::AppExit}, // detect app exit events
     prelude::*, //default bevy
 };
 
 use crate::{
-    AppState,
     SessionResource,
 };
 
