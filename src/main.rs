@@ -2,6 +2,7 @@ use bevy::{
     prelude::*, //default bevy
     window::PresentMode, // needed to specify window info
     diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin},
+    time::FixedTimestep,
 };
 use bevy_obj::*; // immport wavefront obj files
 
@@ -10,6 +11,8 @@ mod systems;
 pub const ARENA_HEIGHT: f32 = 1000.0;
 pub const ARENA_WIDTH: f32 = 1000.0;
 pub const UNIVERSE_SIZE: usize = 30;
+// Defines the amount of time that should elapse between each physics step.
+const TIME_STEP: f32 = 1.0 / 2.0;
 
 enum AppState {
     Menu,
@@ -89,6 +92,10 @@ fn main() {
     .add_plugin(FrameTimeDiagnosticsPlugin::default())
     .add_startup_system(setup)
     .add_system(systems::camera_movement::move_camera_on_keyboard_input)
-    .add_system(systems::life::run)
+    .add_system_set(
+        SystemSet::new()
+            .with_run_criteria(FixedTimestep::step(TIME_STEP as f64))
+            .with_system(systems::life::run)
+    )
     .run()
 }
