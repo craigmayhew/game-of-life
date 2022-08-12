@@ -173,8 +173,8 @@ pub fn run(
                             //the y >0 checks if we are the edge of the univ
                             if x > 0 && last_gen[3][x-1][y  ][z  ].id() > 0 {neighbours += 1;} // touches dark blue
                             if x == 0 && last_gen[3][crate::UNIVERSE_SIZE-1][y  ][z  ].id() > 0 {neighbours += 1;} // touches dark blue (on the other side of the universe)
-                            if z > 0 && last_gen[0][x  ][y  ][z-1].id() > 0 {neighbours += 1;} // touches white
-                            if z == 0 && last_gen[0][x  ][y  ][crate::UNIVERSE_SIZE-1].id() > 0 {neighbours += 1;} // touches white (on the other side of the universe)
+                            if crate::UNIVERSE_SIZE < z && last_gen[0][x  ][y  ][z+1].id() > 0 {neighbours += 1;} // touches white
+                            if crate::UNIVERSE_SIZE == z+1 && last_gen[0][x  ][y  ][0].id() > 0 {neighbours += 1;} // touches white (on the other side of the universe)
                         } else if n == 5 {// dark grey touches light grey and white in the same xyz and red in the y below and dark blue in x+1
                             if last_gen[4][x][y  ][z  ].id() > 0 {neighbours += 1;} // touches light grey
                             if last_gen[0][x][y  ][z  ].id() > 0 {neighbours += 1;} // touches white
