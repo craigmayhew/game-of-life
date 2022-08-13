@@ -11,3 +11,8 @@ To the bevy cheat book https://bevy-cheatbook.github.io/
 To Hill for his work on the tetrahedron
 To this plugin for wavefront files https://github.com/AmionSky/bevy_obj/tree/master/example
 To the official bevy getting started book https://bevyengine.org/learn/book/getting-started/resources/
+
+## TODO
+ - Unit test game engine against expected universe states
+ - Add save/load
+ 
