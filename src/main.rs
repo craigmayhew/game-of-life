@@ -41,11 +41,11 @@ fn setup(
         generation: 1,
         life_form_materials: [
             materials.add(StandardMaterial {
-                base_color: Color::rgb(1.0, 1.0, 1.0), // white
+                base_color: Color::rgb(0.0, 1.0, 0.0), // white -> green
                 ..default()
             }),
             materials.add(StandardMaterial {
-                base_color: Color::rgb(0.6, 0.2, 1.0), // red
+                base_color: Color::rgb(0.6, 0.2, 0.2), // red
                 ..default()
             }),
             materials.add(StandardMaterial {
@@ -53,11 +53,11 @@ fn setup(
                 ..default()
             }),
             materials.add(StandardMaterial {
-                base_color: Color::rgb(0.2, 0.2, 0.7), // dark blue
+                base_color: Color::rgb(0.1, 0.1, 0.7), // dark blue
                 ..default()
             }),
             materials.add(StandardMaterial {
-                base_color: Color::rgb(0.5, 0.5, 0.5), // light grey
+                base_color: Color::rgb(1.0, 1.0, 0.0), // light grey -> yellow
                 ..default()
             }),
             materials.add(StandardMaterial {
