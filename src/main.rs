@@ -4,11 +4,15 @@ use bevy::{
     diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin},
     time::FixedTimestep,
 };
-use bevy_obj::*; // immport wavefront obj files
+// these are needed to load an icon
+use bevy::{window::WindowId,winit::WinitWindows};
+use winit::window::Icon;
+ // used import wavefront obj files
+use bevy_obj::*;
 
 mod systems;
 
-pub const UNIVERSE_SIZE: usize = 30;
+pub const UNIVERSE_SIZE: usize = 20;
 // Defines the amount of time that should elapse between each physics step.
 const TIME_STEP: f32 = 1.0 / 2.0;
 
@@ -81,6 +85,28 @@ fn setup(
     systems::camera_movement::setup(commands);
 }
 
+fn set_window_icon(
+    // we have to use `NonSend` here
+    windows: NonSend<WinitWindows>,
+) {
+    let primary = windows.get_window(WindowId::primary()).unwrap();
+
+    // here we use the `image` crate to load our icon data from a png file
+    // this is not a very bevy-native solution, but it will do
+    let (icon_rgba, icon_width, icon_height) = {
+        let image = image::open("assets/hills-tetrahedron.png")
+            .expect("Failed to open icon path")
+            .into_rgba8();
+        let (width, height) = image.dimensions();
+        let rgba = image.into_raw();
+        (rgba, width, height)
+    };
+
+    let icon = Icon::from_rgba(icon_rgba, icon_width, icon_height).unwrap();
+
+    primary.set_window_icon(Some(icon));
+}
+
 fn main() {    
     App::new()
     .insert_resource(WindowDescriptor {
@@ -95,6 +121,7 @@ fn main() {
     .add_plugin(ObjPlugin)
     .add_plugin(LogDiagnosticsPlugin::default())
     .add_plugin(FrameTimeDiagnosticsPlugin::default())
+    .add_startup_system(set_window_icon)
     .insert_resource(ClearColor(Color::BLACK)) //set the background colour of our window (the universe)
     .add_startup_system(setup)
     // menu system
