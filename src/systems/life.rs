@@ -86,7 +86,7 @@ pub fn run(
         AppState::InGame => {},
         _ => {return},
     }
-    // this if statement is hard coded to 3 because we currently have 2 entities at startup (maybe the camera and the sun?)
+    // first generation, generate random life
     if session.generation == 1 {
         let life_to_create: Vec<Vec<Vec<Vec<bevy::prelude::Entity>>>> = session.life.clone();
         for (n, vec1) in life_to_create.iter().enumerate() {
