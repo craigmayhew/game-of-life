@@ -27,6 +27,16 @@ pub fn enter(mut commands: Commands, asset_server: Res<AssetServer>) {
                 text_style,
             )
             .with_text_alignment(TextAlignment::TOP_LEFT)
+            .with_style(Style {
+                align_self: AlignSelf::FlexEnd,
+                position_type: PositionType::Absolute,
+                position: UiRect {
+                    bottom: Val::Px(5.0),
+                    left: Val::Px(5.0),
+                    ..default()
+                },
+                ..default()
+            }),
         )
         .insert(LifeCounterText)
         .id();
@@ -38,7 +48,7 @@ pub fn run(
     mut life_counter: Query<&mut Text, With<LifeCounterText>>,
 ) {
     for mut text in &mut life_counter {
-        text.sections[0].value = format!("    Generation:       {:07}\n    Life detected: {:07}\n ",&session.generation,&session.counter);
+        text.sections[0].value = format!("Generation: {:07}\nLife detected: {:07}",&session.generation,&session.counter);
     }
 }
 
