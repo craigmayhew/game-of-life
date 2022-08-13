@@ -133,51 +133,210 @@ pub fn run(
                 for (y, vec3) in vec2.iter().enumerate() {
                     for (z, entity_life) in vec3.iter().enumerate() {
                         let mut neighbours: usize = 0;
-                        if n == 0 {// white touches dark blue and dark grey in the same xyz and light blue in the y below
-                            if last_gen[3][x][y  ][z  ].id() > 0 {neighbours += 1;}
-                            if last_gen[5][x][y  ][z  ].id() > 0 {neighbours += 1;}
-                            //the y>0 and z>0 checks if we are the edge of the univ
-                            //TODO also check we arent larger than the universe size, or consider wrapping over to the beginning of the universe
-                            if y > 0 && last_gen[2][x][y-1][z  ].id() > 0 {neighbours += 1;} // touches light blue below
+                        /*
+                          // the x>0 y>0 and z>0 are for checking if we are not needing to wrap the universe
+                          // the x==0 y==0 z==0 checks are if we are wrapping the universe to find out neighbour
+                        */
+                        if n == 0 {
+                            //CHECK 5 NEIGHBOURS IN SAME CUBE
+                            if last_gen[1][x][y][z].id() > 0 {neighbours += 1;}
+                            if last_gen[2][x][y][z].id() > 0 {neighbours += 1;}
+                            if last_gen[3][x][y][z].id() > 0 {neighbours += 1;}
+                            if last_gen[4][x][y][z].id() > 0 {neighbours += 1;}
+                            if last_gen[5][x][y][z].id() > 0 {neighbours += 1;}
+                            // 2 FACE CHECKS
+                            // white touches dark blue and dark grey in the same xyz and light blue in the y below
+                            if y > 0  && last_gen[2][x][y-1][z  ].id() > 0 {neighbours += 1;} // touches light blue below
                             if y == 0 && last_gen[2][x][crate::UNIVERSE_SIZE-1][z  ].id() > 0 {neighbours += 1;} // touches light blue below (on the other side of the universe)
-                            if z > 0 && last_gen[4][x][y  ][z-1].id() > 0 {neighbours += 1;} // touches light grey
+                            if z > 0  && last_gen[4][x][y  ][z-1].id() > 0 {neighbours += 1;} // touches light grey
                             if z == 0 && last_gen[4][x][y  ][crate::UNIVERSE_SIZE-1].id() > 0 {neighbours += 1;} // touches light grey (on the other side of the universe)
+                            // 6 EDGE CHECKS
+                            //touches 1 in z-1 x-1
+                            //touches 2 in z-1 x-1
+                            if x > 0 {
+                                if z > 0 {
+                                    if last_gen[1][x-1][y][z-1].id() > 0 {neighbours += 1;}
+                                    if last_gen[2][x-1][y][z-1].id() > 0 {neighbours += 1;}
+                                } else {
+                                    if last_gen[1][x-1][y][crate::UNIVERSE_SIZE-1].id() > 0 {neighbours += 1;}
+                                    if last_gen[2][x-1][y][crate::UNIVERSE_SIZE-1].id() > 0 {neighbours += 1;}
+                                }
+                            } else if z > 0 {
+                                if last_gen[1][crate::UNIVERSE_SIZE-1][y][z-1].id() > 0 {neighbours += 1;}
+                                if last_gen[2][crate::UNIVERSE_SIZE-1][y][z-1].id() > 0 {neighbours += 1;}
+                            } else {
+                                if last_gen[1][crate::UNIVERSE_SIZE-1][y][crate::UNIVERSE_SIZE-1].id() > 0 {neighbours += 1;}
+                                if last_gen[2][crate::UNIVERSE_SIZE-1][y][crate::UNIVERSE_SIZE-1].id() > 0 {neighbours += 1;}
+                            }
+                            //touches 1 in z-1
+                            if z == 0 && last_gen[1][x][y][crate::UNIVERSE_SIZE-1].id() > 0 {neighbours += 1;}
+                            if z > 0 && last_gen[1][x][y][z-1].id() > 0 {neighbours += 1;}
+                            //touches 1 in y-1 x+1
+                            if crate::UNIVERSE_SIZE > x+1 {
+                                if y > 0 {
+                                    if last_gen[1][x+1][y-1][z].id() > 0 {neighbours += 1;}
+                                } else if last_gen[1][x+1][y][crate::UNIVERSE_SIZE-1].id() > 0 {
+                                    neighbours += 1;
+                                }
+                            } else if y > 0 {
+                                if last_gen[1][0][y-1][z].id() > 0 {neighbours += 1;}
+                            } else if last_gen[1][0][crate::UNIVERSE_SIZE-1][z].id() > 0 {
+                                neighbours += 1;
+                            }
+                            //touches 3 in x-1
+                            if x == 0 && last_gen[3][crate::UNIVERSE_SIZE-1][y][z].id() > 0 {neighbours += 1;}
+                            if x > 0 && last_gen[3][x-1][y][z].id() > 0 {neighbours += 1;}
+                            //touches 1 in y-1
+                            if y == 0 && last_gen[1][x][crate::UNIVERSE_SIZE-1][z].id() > 0 {neighbours += 1;}
+                            if y > 0 && last_gen[1][x][y-1][z].id() > 0 {neighbours += 1;}
+                            //rememebr z goes down as you move forward
                         } else if n == 1 {// red touches light grey and light blue in same xyz and the dark grey in the y above and dark blue in z-1
-                            if last_gen[4][x][y  ][z  ].id() > 0 {neighbours += 1;}
-                            if last_gen[2][x][y  ][z  ].id() > 0 {neighbours += 1;}
+                            //CHECK 5 NEIGHBOURS IN SAME CUBE
+                            if last_gen[0][x][y][z].id() > 0 {neighbours += 1;}
+                            if last_gen[2][x][y][z].id() > 0 {neighbours += 1;}
+                            if last_gen[3][x][y][z].id() > 0 {neighbours += 1;}
+                            if last_gen[4][x][y][z].id() > 0 {neighbours += 1;}
+                            if last_gen[5][x][y][z].id() > 0 {neighbours += 1;}
+                            // 2 FACE CHECKS
                             //the y>0 and z>0 checks if we are the edge of the univ
-                            //TODO also check we arent larger than the universe size, or consider wrapping over to the beginning of the universe
-                            if crate::UNIVERSE_SIZE < y && last_gen[5][x][y+1][z  ].id() > 0 {neighbours += 1;} // touches dark grey above
+                            if crate::UNIVERSE_SIZE > y+1 && last_gen[5][x][y+1][z  ].id() > 0 {neighbours += 1;} // touches dark grey above
                             if crate::UNIVERSE_SIZE == y+1 && last_gen[5][x][0][z  ].id() > 0 {neighbours += 1;} // touches dark grey above (on the other side of the universe)
                             if z > 0 && last_gen[3][x][y  ][z-1].id() > 0 {neighbours += 1;} // touches dark blue in z-1
                             if z == 0 && last_gen[3][x][y  ][crate::UNIVERSE_SIZE-1].id() > 0 {neighbours += 1;} // touches dark blue in z-1 (on the other side of the universe)
+                            // 6 EDGE CHECKS
+                            //touches 0 in y+1
+                            if crate::UNIVERSE_SIZE >  y+1 && last_gen[0][x][y+1][z].id() > 0 {neighbours += 1;}
+                            if crate::UNIVERSE_SIZE == y+1 && last_gen[0][x][0  ][z].id() > 0 {neighbours += 1;}
+                            //touches 2 in z+1
+                            if crate::UNIVERSE_SIZE >  z+1 && last_gen[2][x][y][z+1].id() > 0 {neighbours += 1;}
+                            if crate::UNIVERSE_SIZE == z+1 && last_gen[2][x][y][0  ].id() > 0 {neighbours += 1;}
+                            //touches 0 in z+1
+                            if crate::UNIVERSE_SIZE >  z+1 && last_gen[0][x][y][z+1].id() > 0 {neighbours += 1;}
+                            if crate::UNIVERSE_SIZE == z+1 && last_gen[0][x][y][0  ].id() > 0 {neighbours += 1;}
+                            //touches 0 in z+1 y+1
+                            if crate::UNIVERSE_SIZE > z+1 {
+                                if crate::UNIVERSE_SIZE > y+1 {
+                                    if last_gen[0][x][y+1][z+1].id() > 0 {neighbours += 1;}
+                                } else if last_gen[0][x][0][z+1].id() > 0 {
+                                    neighbours += 1;
+                                }
+                            } else if crate::UNIVERSE_SIZE > y+1 {
+                                if last_gen[0][x][y+1][0].id() > 0 {neighbours += 1;}
+                            } else if last_gen[0][x][0][0].id() > 0 {
+                                neighbours += 1;
+                            }
+                            //touches 2 in x-1
+                            if x == 0 && last_gen[2][crate::UNIVERSE_SIZE-1][y][z].id() > 0 {neighbours += 1;}
+                            if x > 0 && last_gen[2][x-1][y][z].id() > 0 {neighbours += 1;}
+                            //touches 3 in x-1 y+1
+                            if crate::UNIVERSE_SIZE > y+1 {
+                                if x > 0 {
+                                    if last_gen[3][x-1][y+1][z].id() > 0 {neighbours += 1;}
+                                } else if last_gen[3][crate::UNIVERSE_SIZE-1][y+1][z].id() > 0 {
+                                    neighbours += 1;
+                                }
+                            } else if x > 0 {
+                                if last_gen[3][x-1][0][z].id() > 0 {neighbours += 1;}
+                            } else if last_gen[3][crate::UNIVERSE_SIZE-1][0][z].id() > 0 {
+                                neighbours += 1;
+                            }
                         } else if n == 2 {// light blue touches red and dark blue in the same xyz and white in the y above
-                            if last_gen[1][x][y  ][z  ].id() > 0 {neighbours += 1;} // touches red
-                            if last_gen[3][x][y  ][z  ].id() > 0 {neighbours += 1;} // touches dark blue
+                            // CHECK 5 NEIGHBOURS IN SAME CUBE
+                            if last_gen[0][x][y][z].id() > 0 {neighbours += 1;}
+                            if last_gen[1][x][y][z].id() > 0 {neighbours += 1;}
+                            if last_gen[3][x][y][z].id() > 0 {neighbours += 1;}
+                            if last_gen[4][x][y][z].id() > 0 {neighbours += 1;}
+                            if last_gen[5][x][y][z].id() > 0 {neighbours += 1;}
+                            // 2 FACE CHECKS
                             //the y >0 checks if we are the edge of the univ
-                            if y > 0 && last_gen[0][x][y-1][z  ].id() > 0 {neighbours += 1;} // touches white above CHECK THIS ONE
-                            if y == 0 && last_gen[0][x][crate::UNIVERSE_SIZE-1][z  ].id() > 0 {neighbours += 1;} // touches white above CHECK THIS ONE (on the other side of the universe)
-                            if crate::UNIVERSE_SIZE < x && last_gen[5][x+1][y  ][z].id() > 0 {neighbours += 1;} // touches dark grey in x+1
-                            if crate::UNIVERSE_SIZE == x+1 && last_gen[5][0][y  ][z].id() > 0 {neighbours += 1;} // touches dark grey in x+1 (on the other side of the universe)
+                            if crate::UNIVERSE_SIZE > y+1 && last_gen[0][x][y+1][z  ].id() > 0 {neighbours += 1;} // touches white above
+                            if crate::UNIVERSE_SIZE == y+1 && last_gen[0][x][0][z  ].id() > 0 {neighbours += 1;} // touches white above (on the other side of the universe)
+                            if crate::UNIVERSE_SIZE > x+1 && last_gen[4][x+1][y  ][z].id() > 0 {neighbours += 1;} // touches in x+1
+                            if crate::UNIVERSE_SIZE == x+1 && last_gen[4][0][y  ][z].id() > 0 {neighbours += 1;} // touches in x+1 (on the other side of the universe)
+                            // 9 EDGE CHECKS
+                            //touches 5 in x+1
+                            if crate::UNIVERSE_SIZE >  x+1 && last_gen[5][x+1][y][z].id() > 0 {neighbours += 1;}
+                            if crate::UNIVERSE_SIZE == x+1 && last_gen[5][0  ][y][z].id() > 0 {neighbours += 1;}
+                            //touches 5 in y+1
+                            if crate::UNIVERSE_SIZE >  y+1 && last_gen[5][x][y+1][z].id() > 0 {neighbours += 1;}
+                            if crate::UNIVERSE_SIZE == y+1 && last_gen[5][x][0  ][z].id() > 0 {neighbours += 1;}
+                            //touches 3 in z+1
+                            if crate::UNIVERSE_SIZE >  z+1 && last_gen[3][x][y][z+1].id() > 0 {neighbours += 1;}
+                            if crate::UNIVERSE_SIZE == z+1 && last_gen[3][x][y][0  ].id() > 0 {neighbours += 1;}
+                            //touches 1 in z-1
+                            if z == 0 && last_gen[1][x][y][crate::UNIVERSE_SIZE-1].id() > 0 {neighbours += 1;}
+                            if z > 0  && last_gen[1][x][y][z-1].id() > 0 {neighbours += 1;}
+                            //touches 4 and 5 z-1 y+1
+                            if crate::UNIVERSE_SIZE > y+1 {
+                                if z > 0 {
+                                    if last_gen[4][x][y+1][z-1].id() > 0 {neighbours += 1;}
+                                    if last_gen[5][x][y+1][z-1].id() > 0 {neighbours += 1;}
+                                } else if last_gen[3][crate::UNIVERSE_SIZE-1][y+1][z].id() > 0 {
+                                    neighbours += 1;
+                                }
+                            } else if z > 0 {
+                                if last_gen[4][x][0][z-1].id() > 0 {neighbours += 1;}
+                                if last_gen[5][x][0][z-1].id() > 0 {neighbours += 1;}
+                            } else {
+                                if last_gen[4][x][0][crate::UNIVERSE_SIZE-1].id() > 0 {neighbours += 1;}
+                                if last_gen[5][x][0][crate::UNIVERSE_SIZE-1].id() > 0 {neighbours += 1;}
+                            }
+                            //touches 0 and 5 in z+1 x+1
+                            if crate::UNIVERSE_SIZE > x+1 {
+                                if crate::UNIVERSE_SIZE > z+1 {
+                                    if last_gen[0][x+1][y][z+1].id() > 0 {neighbours += 1;}
+                                    if last_gen[5][x+1][y][z+1].id() > 0 {neighbours += 1;}
+                                } else {
+                                    if last_gen[0][x+1][y][0].id() > 0 {neighbours += 1;}
+                                    if last_gen[5][x+1][y][0].id() > 0 {neighbours += 1;}
+                                }
+                            } else if crate::UNIVERSE_SIZE > z+1 {
+                                if last_gen[0][0][y][z+1].id() > 0 {neighbours += 1;}
+                                if last_gen[5][0][y][z+1].id() > 0 {neighbours += 1;}
+                            } else {
+                                if last_gen[0][0][y][0].id() > 0 {neighbours += 1;}
+                                if last_gen[5][0][y][0].id() > 0 {neighbours += 1;}
+                            }
+                            //touches 5 x+1 y+1
+                            if crate::UNIVERSE_SIZE > x+1 {
+                                if crate::UNIVERSE_SIZE > y+1 {
+                                    if last_gen[5][x+1][y+1][z].id() > 0 {neighbours += 1;}
+                                } else if last_gen[5][x+1][0][z].id() > 0 {
+                                    neighbours += 1;
+                                }
+                            } else if crate::UNIVERSE_SIZE > y+1 {
+                                if last_gen[5][0][y+1][z].id() > 0 {neighbours += 1;}
+                            } else if last_gen[5][0][0][z].id() > 0 {
+                                neighbours += 1;
+                            }
                         } else if n == 3 {// dark blue touches light blue and white in same xyz and red and dark grey either side (need to check if thats x or z)
-                            if last_gen[2][x][y  ][z  ].id() > 0 {neighbours += 1;} // touches light blue
-                            if last_gen[0][x][y  ][z  ].id() > 0 {neighbours += 1;} // touches white
+                            if last_gen[0][x][y][z].id() > 0 {neighbours += 1;}
+                            if last_gen[1][x][y][z].id() > 0 {neighbours += 1;}
+                            if last_gen[2][x][y][z].id() > 0 {neighbours += 1;}
+                            if last_gen[4][x][y][z].id() > 0 {neighbours += 1;}
+                            if last_gen[5][x][y][z].id() > 0 {neighbours += 1;}
                             //the y >0 checks if we are the edge of the univ
-                            if crate::UNIVERSE_SIZE < z && last_gen[1][x  ][y][z+1].id() > 0 {neighbours += 1;} // touches red
+                            if crate::UNIVERSE_SIZE > z+1 && last_gen[1][x  ][y][z+1].id() > 0 {neighbours += 1;} // touches red
                             if crate::UNIVERSE_SIZE == z+1 && last_gen[1][x  ][y][0].id() > 0 {neighbours += 1;} // touches red (on the other side of the universe)
-                            if crate::UNIVERSE_SIZE < x && last_gen[5][x+1][y  ][z].id() > 0 {neighbours += 1;} // touches dark grey
+                            if crate::UNIVERSE_SIZE > x+1 && last_gen[5][x+1][y  ][z].id() > 0 {neighbours += 1;} // touches dark grey
                             if crate::UNIVERSE_SIZE == x+1 && last_gen[5][0][y  ][z].id() > 0 {neighbours += 1;} // touches dark grey (on the other side of the universe)
                         } else if n == 4 {// light grey touches dark grey and red in the same xyz and light blue and white either side (need to check if thats x or z)
-                            if last_gen[5][x][y  ][z  ].id() > 0 {neighbours += 1;} // touches dark grey
-                            if last_gen[1][x][y  ][z  ].id() > 0 {neighbours += 1;} // touches red
+                            if last_gen[0][x][y][z].id() > 0 {neighbours += 1;}
+                            if last_gen[1][x][y][z].id() > 0 {neighbours += 1;}
+                            if last_gen[2][x][y][z].id() > 0 {neighbours += 1;}
+                            if last_gen[3][x][y][z].id() > 0 {neighbours += 1;}
+                            if last_gen[5][x][y][z].id() > 0 {neighbours += 1;}
                             //the y >0 checks if we are the edge of the univ
                             if x > 0 && last_gen[3][x-1][y  ][z  ].id() > 0 {neighbours += 1;} // touches dark blue
                             if x == 0 && last_gen[3][crate::UNIVERSE_SIZE-1][y  ][z  ].id() > 0 {neighbours += 1;} // touches dark blue (on the other side of the universe)
-                            if crate::UNIVERSE_SIZE < z && last_gen[0][x  ][y  ][z+1].id() > 0 {neighbours += 1;} // touches white
+                            if crate::UNIVERSE_SIZE > z+1 && last_gen[0][x  ][y  ][z+1].id() > 0 {neighbours += 1;} // touches white
                             if crate::UNIVERSE_SIZE == z+1 && last_gen[0][x  ][y  ][0].id() > 0 {neighbours += 1;} // touches white (on the other side of the universe)
                         } else if n == 5 {// dark grey touches light grey and white in the same xyz and red in the y below and dark blue in x+1
-                            if last_gen[4][x][y  ][z  ].id() > 0 {neighbours += 1;} // touches light grey
-                            if last_gen[0][x][y  ][z  ].id() > 0 {neighbours += 1;} // touches white
+                            if last_gen[0][x][y][z].id() > 0 {neighbours += 1;}
+                            if last_gen[1][x][y][z].id() > 0 {neighbours += 1;}
+                            if last_gen[2][x][y][z].id() > 0 {neighbours += 1;}
+                            if last_gen[3][x][y][z].id() > 0 {neighbours += 1;}
+                            if last_gen[4][x][y][z].id() > 0 {neighbours += 1;}
                             //the y >0 checks if we are the edge of the univ
                             if y > 0 && last_gen[1][x  ][y-1][z].id() > 0 {neighbours += 1;} // touches red below
                             if y == 0 && last_gen[1][x  ][crate::UNIVERSE_SIZE-1][z].id() > 0 {neighbours += 1;} // touches red below (on the other side of the universe)
@@ -205,7 +364,7 @@ pub fn run(
                                 // no action required here as we pre populate next gen with empty entity ids.
                             }
                         } else {//if alive in last gen
-                            if neighbours == 4 || neighbours == 1 || neighbours == 0 {
+                            if neighbours > 3 || neighbours == 1 || neighbours == 0 {
                                 commands.entity(entity_life.to_owned()).despawn();
                                 next_gen[n][x][y][z] = Entity::from_raw(0);
 
