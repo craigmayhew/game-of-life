@@ -329,7 +329,7 @@ pub fn run(
                             if crate::UNIVERSE_SIZE >  y+1 && last_gen[0][x][y+1][z].id() > 0 {neighbours += 1;}
                             if crate::UNIVERSE_SIZE == y+1 && last_gen[0][x][0  ][z].id() > 0 {neighbours += 1;}
                             //touches 2 in y-1
-                            if y == 0 && last_gen[2][crate::UNIVERSE_SIZE-1][y][z].id() > 0 {neighbours += 1;}
+                            if y == 0 && last_gen[2][x][crate::UNIVERSE_SIZE-1][z].id() > 0 {neighbours += 1;}
                             if y > 0  && last_gen[2][x][y-1][z].id() > 0 {neighbours += 1;}
                             // touches 1 and 4 in x+1 y-1
                             if crate::UNIVERSE_SIZE > x+1 {
@@ -400,7 +400,7 @@ pub fn run(
                             if crate::UNIVERSE_SIZE >  y+1 && last_gen[5][x][y+1][z].id() > 0 {neighbours += 1;}
                             if crate::UNIVERSE_SIZE == y+1 && last_gen[5][x][0  ][z].id() > 0 {neighbours += 1;}
                             // touches 1 in y-1
-                            if y == 0 && last_gen[1][crate::UNIVERSE_SIZE-1][y][z].id() > 0 {neighbours += 1;}
+                            if y == 0 && last_gen[1][x][crate::UNIVERSE_SIZE-1][z].id() > 0 {neighbours += 1;}
                             if y > 0  && last_gen[1][x][y-1][z].id() > 0 {neighbours += 1;}
                             // touches 0 and 3 in x-1 y+1
                             if crate::UNIVERSE_SIZE > y+1 {
@@ -449,7 +449,7 @@ pub fn run(
                             if x == 0 && last_gen[3][crate::UNIVERSE_SIZE-1][y  ][z].id() > 0 {neighbours += 1;} // touches dark blue in x-1 (on the other side of the universe)
                             // 8 EDGE CHECKS
                             // touches 2 in y-1
-                            if y == 0 && last_gen[2][crate::UNIVERSE_SIZE-1][y][z].id() > 0 {neighbours += 1;}
+                            if y == 0 && last_gen[2][x][crate::UNIVERSE_SIZE-1][z].id() > 0 {neighbours += 1;}
                             if y > 0  && last_gen[2][x][y-1][z].id() > 0 {neighbours += 1;}
                             // touches 0 in z+1
                             if crate::UNIVERSE_SIZE >  z+1 && last_gen[0][x][y][z+1].id() > 0 {neighbours += 1;}
