@@ -55,10 +55,12 @@ pub fn move_camera_on_keyboard_input(
         //movement
         if keys.pressed(KeyCode::Left) {
             // moving left
-            transform.translation.x -= move_factor;
+            let move_cam = transform.left() * move_factor;
+            transform.translation += move_cam;
         } else if keys.pressed(KeyCode::Right) {
             // moving right
-            transform.translation.x += move_factor;
+            let move_cam = transform.right() * move_factor;
+            transform.translation += move_cam;
         }
         if keys.pressed(KeyCode::Up) {
             // moving up
