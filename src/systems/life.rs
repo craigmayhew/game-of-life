@@ -85,8 +85,7 @@ pub enum LifeDataContainer {
     Dead(bool),
 }
 
-pub fn run(  
-    ents: Query<Entity, With<Life>>, // todo count these and make sure we arent doing something wierd!
+pub fn run(
     mut commands: Commands,
     mut session: ResMut<SessionResource>,
     state: ResMut<State<AppState>>,
