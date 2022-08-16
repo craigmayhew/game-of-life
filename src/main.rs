@@ -12,7 +12,6 @@ use bevy_obj::*;
 
 mod systems;
 
-pub const UNIVERSE_SIZE: usize = 20;
 // Defines the amount of time that should elapse between each physics step.
 const TIME_STEP: f32 = 1.0 / 2.0;
 
@@ -21,6 +20,8 @@ pub enum AppState {
     Splash,
     InGame,
     Paused,
+    LoadGame,
+    SaveGame,
 }
 
 pub struct SessionResource {
@@ -29,6 +30,7 @@ pub struct SessionResource {
     pub generation: i64,
     pub life_form_materials: [bevy::prelude::Handle<StandardMaterial>; 6], //stores handles to the 6 life form tetras
     pub life_form_meshes: [bevy::prelude::Handle<Mesh>; 2], //stores handles to the two life form meshes
+    pub universe_size: usize,
 }
 
 fn setup(
@@ -36,8 +38,11 @@ fn setup(
     asset_server: Res<AssetServer>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
+    // default universe size if none specified
+    const DEFAULT_UNIVERSE_SIZE: usize = 20;
+
     //setting up initial state of life throughout our 3d space
-    let universe_life = vec![vec![vec![vec![systems::life::LifeDataContainer::Dead(true); UNIVERSE_SIZE]; UNIVERSE_SIZE]; UNIVERSE_SIZE]; 6];
+    let universe_life = vec![vec![vec![vec![systems::life::LifeDataContainer::Dead(true); DEFAULT_UNIVERSE_SIZE]; DEFAULT_UNIVERSE_SIZE]; DEFAULT_UNIVERSE_SIZE]; 6];
     
     commands.insert_resource(SessionResource {
         life: universe_life,
@@ -72,7 +77,8 @@ fn setup(
         life_form_meshes: [
             asset_server.load("mesh/hill-tetrahedron-mirrored.obj"),
             asset_server.load("mesh/hill-tetrahedron.obj"),
-        ]
+        ],
+        universe_size: DEFAULT_UNIVERSE_SIZE,
     });
 
     //ambient light
@@ -147,13 +153,26 @@ fn main() {
         SystemSet::on_exit(AppState::InGame)
             .with_system(systems::hud::cleanup)
     )
-    // camera system
+    // camera system (camera movement controls)
     .add_system(systems::camera_movement::move_camera_on_keyboard_input)
+    // keyboard input (excluding camera movement)
+    .add_system(systems::keyboard::run)
     // life system
     .add_system_set(
         SystemSet::new()
             .with_system(systems::life::run)
             .with_run_criteria(FixedTimestep::step(TIME_STEP as f64))
+    )
+    // load / save games
+    .add_system_set(
+        SystemSet::on_enter(AppState::LoadGame)
+        .with_system(systems::saves::load)
+        .before(systems::life::run)
+    )
+    .add_system_set(
+        SystemSet::on_enter(AppState::SaveGame)
+        .with_system(systems::saves::save)
+        .before(systems::life::run)
     )
     .run()
 }

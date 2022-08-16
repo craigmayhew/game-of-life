@@ -1560,6 +1560,8 @@ dependencies = [
  "bevy_obj",
  "image",
  "rand",
+ "ron",
+ "serde",
  "winit",
 ]
 

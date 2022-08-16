@@ -4,7 +4,6 @@ use bevy::{
 };
 
 use crate::{
-    AppState,
     systems::life::LIFE_FORM_SIZE,
 };
 
@@ -28,7 +27,6 @@ pub fn move_camera_on_keyboard_input(
     mut camera: Query<&mut Transform, With<Camera>>,
     keys: Res<Input<KeyCode>>,
     timer: Res<Time>,
-    mut state: ResMut<State<AppState>>,
 ) {
     let move_factor = 1000.0 * timer.delta_seconds();
     //let rotation_factor = 500.0 * timer.delta_seconds();
@@ -67,17 +65,6 @@ pub fn move_camera_on_keyboard_input(
         } else if keys.pressed(KeyCode::Down) {
             // moving down
             transform.translation.y -= move_factor;
-        }
-        if keys.just_pressed(KeyCode::Space) {
-            // (un)pause game
-            match state.current() {
-                AppState::InGame => state.set(AppState::Paused).unwrap(),
-                AppState::Paused => state.set(AppState::InGame).unwrap(),
-                AppState::Splash => {},
-            }
-        }
-        if keys.just_pressed(KeyCode::Return) {
-            // todo, place life form?
         }
     }
 }
