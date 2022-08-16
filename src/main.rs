@@ -1,3 +1,4 @@
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 use bevy::{
     prelude::*, //default bevy
     window::PresentMode, // needed to specify window info
