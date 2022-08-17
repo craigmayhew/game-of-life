@@ -164,6 +164,15 @@ fn main() {
             .with_system(systems::life::run)
             .with_run_criteria(FixedTimestep::step(TIME_STEP as f64))
     )
+    // PAUSE screen
+    .add_system_set(
+        SystemSet::on_enter(AppState::Paused)
+        .with_system(systems::menu_paused::enter)
+    )
+    .add_system_set(
+        SystemSet::on_exit(AppState::Paused)
+            .with_system(systems::menu_paused::cleanup)
+    )
     // load / save games
     .add_system_set(
         SystemSet::on_enter(AppState::LoadGame)
