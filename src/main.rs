@@ -14,7 +14,11 @@ use bevy_obj::*;
 mod systems;
 
 // Defines the amount of time that should elapse between each physics step.
-const TIME_STEP: f32 = 1.0 / 2.0;
+#[derive(PartialEq, Debug)]
+pub struct GameSpeed {
+    ticks_per_second: f64,
+    last_tick_stamp: f64,
+}
 
 #[derive(Clone, Eq, PartialEq, Debug, Hash)]
 pub enum AppState {
@@ -82,6 +86,11 @@ fn setup(
         universe_size: DEFAULT_UNIVERSE_SIZE,
     });
 
+    commands.insert_resource(GameSpeed {
+        ticks_per_second: 2.0,
+        last_tick_stamp: 0.0
+    });
+
     //ambient light
     commands.insert_resource(AmbientLight {
         color: Color::WHITE,
@@ -113,6 +122,20 @@ fn set_window_icon(
 
     primary.set_window_icon(Some(icon));
 }
+
+use bevy::ecs::schedule::ShouldRun;
+fn run_if_timestep(
+    mut game_speed: ResMut<GameSpeed>,
+    time: Res<Time>,
+  ) -> ShouldRun
+  {
+    if game_speed.last_tick_stamp + (1.0/game_speed.ticks_per_second) < time.seconds_since_startup() {
+        game_speed.last_tick_stamp = time.seconds_since_startup();
+        ShouldRun::Yes
+    } else {
+        ShouldRun::No
+    }
+  }
 
 fn main() {    
     App::new()
@@ -162,7 +185,7 @@ fn main() {
     .add_system_set(
         SystemSet::new()
             .with_system(systems::life::run)
-            .with_run_criteria(FixedTimestep::step(TIME_STEP as f64))
+            .with_run_criteria(run_if_timestep)
     )
     // PAUSE screen
     .add_system_set(
