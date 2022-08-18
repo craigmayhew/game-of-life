@@ -1,5 +1,6 @@
 use bevy::{
     prelude::*, //default bevy
+    input::{keyboard::KeyCode, Input},
 };
 
 use crate::{
@@ -97,23 +98,23 @@ pub fn place_life_with_spacebar(
         _ => {return},
     }
     // if we hit the spacebar then generate life in a specific spot in front of the camera
-    if keys.any_pressed([KeyCode::Key1, KeyCode::Key2, KeyCode::Key3, KeyCode::Key4, KeyCode::Key5, KeyCode::Key6]) {
+    if keys.any_just_pressed([KeyCode::Key1, KeyCode::Key2, KeyCode::Key3, KeyCode::Key4, KeyCode::Key5, KeyCode::Key6, KeyCode::Space]) {
         for transform in camera.iter() {
             let xyz_in_front_of_cam = (transform.translation + (transform.forward()*1500.0)) / LIFE_FORM_SIZE;
 
             let x = xyz_in_front_of_cam.x;
             let y = xyz_in_front_of_cam.y;
             let z = xyz_in_front_of_cam.z;
-            // TODO we need a way of detecting which of 6 tetras needs to created
-            let n = if keys.pressed(KeyCode::Key1) {
+            // TODO we need a way of detecting which of 6 tetras needs to created, for now just use the number keys
+            let n = if keys.just_pressed(KeyCode::Key1) {
                 0
-            } else if keys.pressed(KeyCode::Key2) {
+            } else if keys.just_pressed(KeyCode::Key2) {
                 1
-            } else if keys.pressed(KeyCode::Key3) {
+            } else if keys.just_pressed(KeyCode::Key3) {
                 2
-            } else if keys.pressed(KeyCode::Key4) {
+            } else if keys.just_pressed(KeyCode::Key4) {
                 3
-            } else if keys.pressed(KeyCode::Key5) {
+            } else if keys.just_pressed(KeyCode::Key5) {
                 4
             } else {
                 5
