@@ -3,7 +3,6 @@ use bevy::{
     prelude::*, //default bevy
     window::PresentMode, // needed to specify window info
     diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin},
-    time::FixedTimestep,
 };
 // these are needed to load an icon
 use bevy::{window::WindowId,winit::WinitWindows};
