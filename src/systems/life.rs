@@ -84,6 +84,67 @@ pub enum LifeDataContainer {
     Dead(bool),
 }
 
+pub fn place_life_with_spacebar(
+    camera: Query<&mut Transform, With<Camera>>,
+    mut commands: Commands,
+    keys: Res<Input<KeyCode>>,
+    mut session: ResMut<SessionResource>,
+    state: Res<State<AppState>>,
+) {
+    match state.current() {
+        AppState::InGame => {},
+        AppState::Paused => {},
+        _ => {return},
+    }
+    // if we hit the spacebar then generate life in a specific spot in front of the camera
+    if keys.any_pressed([KeyCode::Key1, KeyCode::Key2, KeyCode::Key3, KeyCode::Key4, KeyCode::Key5, KeyCode::Key6]) {
+        for transform in camera.iter() {
+            let xyz_in_front_of_cam = (transform.translation + (transform.forward()*1500.0)) / LIFE_FORM_SIZE;
+
+            let x = xyz_in_front_of_cam.x;
+            let y = xyz_in_front_of_cam.y;
+            let z = xyz_in_front_of_cam.z;
+            // TODO we need a way of detecting which of 6 tetras needs to created
+            let n = if keys.pressed(KeyCode::Key1) {
+                0
+            } else if keys.pressed(KeyCode::Key2) {
+                1
+            } else if keys.pressed(KeyCode::Key3) {
+                2
+            } else if keys.pressed(KeyCode::Key4) {
+                3
+            } else if keys.pressed(KeyCode::Key5) {
+                4
+            } else {
+                5
+            };
+            
+            if x > 0.0 && x < session.universe_size as f32 &&
+            y > 0.0 && y < session.universe_size as f32 &&
+            z > 0.0 && z < session.universe_size as f32 {
+                match session.life[n][x as usize][y as usize][z as usize] {
+                    LifeDataContainer::Alive(ent) => {//if alive currently
+                        commands.entity(ent.to_owned()).despawn();
+                        session.life[n][x as usize][y as usize][z as usize] = LifeDataContainer::Dead(true);
+                        session.counter -= 1;
+                    },
+                    LifeDataContainer::Dead(_) => {// if dead currently
+                        // Place a life form
+                        let transform_new_life: bevy::prelude::Transform = create_life_xyz(n, x as usize, y as usize, z as usize);
+                        session.life[n][x as usize][y as usize][z as usize] = LifeDataContainer::Alive(commands.spawn_bundle(PbrBundle {
+                            mesh: session.life_form_meshes[n%2].clone(),
+                            material: session.life_form_materials[n].clone(),
+                            transform: transform_new_life,
+                            ..Default::default()
+                        }).insert(Life).id());
+                        session.counter += 1;
+                    }
+                }
+            }
+        }
+    }
+}
+
 pub fn run(
     mut commands: Commands,
     mut session: ResMut<SessionResource>,

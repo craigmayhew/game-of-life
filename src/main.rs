@@ -186,6 +186,12 @@ fn main() {
             .with_system(systems::life::run)
             .with_run_criteria(run_if_timestep)
     )
+    // Place Life with spacebar
+    .add_system_set(
+        SystemSet::new()
+            .with_system(systems::life::place_life_with_spacebar)
+            .with_run_criteria(run_if_timestep)
+    )
     // PAUSE screen
     .add_system_set(
         SystemSet::on_enter(AppState::Paused)
