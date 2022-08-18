@@ -190,7 +190,6 @@ fn main() {
     .add_system_set(
         SystemSet::new()
             .with_system(systems::life::place_life_with_spacebar)
-            .with_run_criteria(run_if_timestep)
     )
     // PAUSE screen
     .add_system_set(
