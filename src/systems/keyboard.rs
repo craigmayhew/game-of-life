@@ -33,7 +33,7 @@ pub fn run (
         }
     } else if keys.just_pressed(KeyCode::L) {
         // load game
-        if state.current() == &AppState::InGame {
+        if state.current() == &AppState::InGame || state.current() == &AppState::Paused {
             let res = state.set(AppState::LoadGame);
             if let Err(e) = res {
                 println!("Keyboard System, Error changing state to LoadGame: {}", e);
@@ -41,7 +41,7 @@ pub fn run (
         }
     } else if keys.just_pressed(KeyCode::K) {
         // save game
-        if state.current() == &AppState::InGame {
+        if state.current() == &AppState::InGame || state.current() == &AppState::Paused {
             let res = state.set(AppState::SaveGame);
             if let Err(e) = res {
                 println!("Keyboard System, Error changing state to SaveGame: {}", e);
