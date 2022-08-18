@@ -150,6 +150,7 @@ pub fn run(
     mut session: ResMut<SessionResource>,
     state: Res<State<AppState>>,
 ) {
+    // only run code after this point when the state is InGame i.e. not paused
     match state.current() {
         AppState::InGame => {},
         _ => {return},
