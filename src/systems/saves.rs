@@ -4,6 +4,7 @@ use bevy::{
 use std::fs::{File,read_to_string};
 use std::io::prelude::*;
 use serde::{Deserialize, Serialize};
+use std::time::SystemTime;
 
 use crate::{
     AppState,
@@ -102,14 +103,20 @@ pub fn save (
         }
     }
 
-    let mut file = File::create("saves/test.ron").unwrap();
-    file.write_all(
-        ron::to_string(&save).
-        unwrap()
-        .as_bytes(),
-    )
-    .unwrap();
-    let result = file.sync_data();
+    let dawn = SystemTime::from(SystemTime::UNIX_EPOCH);
+    for filename in ["latest",&dawn.elapsed().expect("Elapsed time has errored when saving").as_secs().to_string()] {
+        let mut file = File::create("saves/".to_owned()+filename+".ron").unwrap();
+        file.write_all(
+            ron::to_string(&save).
+            unwrap()
+            .as_bytes(),
+        )
+        .unwrap();
+        let result = file.sync_data();
+        if let Err(e) = result {
+            println!("Saves System, Error trying to write save file: {}", e);
+        }
+    }
 
     // in bevy 0.8 overwrite_set() is needed instead of set() when system is called via on_enter()
     let res = state.overwrite_set(AppState::Paused);
