@@ -87,7 +87,7 @@ pub enum LifeDataContainer {
 pub fn run(
     mut commands: Commands,
     mut session: ResMut<SessionResource>,
-    state: ResMut<State<AppState>>,
+    state: Res<State<AppState>>,
 ) {
     match state.current() {
         AppState::InGame => {},

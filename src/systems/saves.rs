@@ -74,7 +74,7 @@ pub fn load (
 }
 
 pub fn save (
-    session: ResMut<SessionResource>,
+    session: Res<SessionResource>,
     mut state: ResMut<State<AppState>>,
 ) {
     match state.current() {

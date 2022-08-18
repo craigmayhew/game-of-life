@@ -44,7 +44,7 @@ pub fn enter(mut commands: Commands, asset_server: Res<AssetServer>) {
 }
 
 pub fn run(
-    session: ResMut<SessionResource>,
+    session: Res<SessionResource>,
     mut life_counter: Query<&mut Text, With<LifeCounterText>>,
 ) {
     for mut text in &mut life_counter {
