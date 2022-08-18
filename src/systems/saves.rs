@@ -40,6 +40,9 @@ pub fn load (
         commands.entity(ent.to_owned()).despawn();
     }
 
+    // resize the universe to match the load file
+    session.life = vec![vec![vec![vec![crate::systems::life::LifeDataContainer::Dead(true); data.universe_size]; data.universe_size]; data.universe_size]; 6];
+
     // so we can spawn new ones form the save file
     for (n, vec1) in data.life.iter().enumerate() {
         for (x, vec2) in vec1.iter().enumerate() {
