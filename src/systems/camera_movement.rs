@@ -21,7 +21,7 @@ pub fn setup(mut commands: Commands) {
     });
 }
 
-const MOVE_SPEED: f32 = std::f32::consts::FRAC_1_PI/3.0;
+const ROTATE_SPEED: f32 = std::f32::consts::FRAC_1_PI/5.0;
 
 pub fn move_camera_on_keyboard_input(
     mut camera: Query<&mut Transform, With<Camera>>,
@@ -34,10 +34,10 @@ pub fn move_camera_on_keyboard_input(
         //rotation
         if keys.pressed(KeyCode::A) {
             // look left
-            transform.rotate_local_y(MOVE_SPEED);
+            transform.rotate_local_y(ROTATE_SPEED);
         } else if keys.pressed(KeyCode::D) {
             // look right
-            transform.rotate_local_y(-MOVE_SPEED);
+            transform.rotate_local_y(-ROTATE_SPEED);
         }
         // forward / backward
         if keys.pressed(KeyCode::W) {
