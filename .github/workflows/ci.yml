@@ -99,4 +99,5 @@ jobs:
         components: rustfmt
     - name: Check formatting
       run: |
+        rustup toolchain install nightly --allow-downgrade -c rustfmt
         cargo fmt --all -- --check
