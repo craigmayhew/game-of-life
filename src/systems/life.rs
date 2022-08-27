@@ -146,6 +146,36 @@ pub fn place_life_with_spacebar(
     }
 }
 
+pub fn dead_universe() -> Vec<Vec<Vec<Vec<LifeDataContainer>>>>{
+    vec![vec![vec![vec![LifeDataContainer::Dead(true); crate::DEFAULT_UNIVERSE_SIZE]; crate::DEFAULT_UNIVERSE_SIZE]; crate::DEFAULT_UNIVERSE_SIZE]; 6]
+}
+
+pub fn new_universe(
+    mut life_entities: Query<Entity, With<Life>>,
+    mut commands: Commands,
+    mut session: ResMut<SessionResource>,
+    mut state: ResMut<State<AppState>>,
+) {
+    match state.current() {
+        AppState::NewGame => {},
+        _ => {return},
+    }
+    session.counter = 0;
+    session.generation = 1;
+    session.life = dead_universe();
+    session.universe_size = crate::DEFAULT_UNIVERSE_SIZE;
+    // unspawn every single life entity
+    for ent in life_entities.iter_mut() {
+        commands.entity(ent.to_owned()).despawn();
+    }
+
+    // in bevy 0.8 overwrite_set() is needed instead of set() when system is called via on_enter()
+    let res = state.overwrite_set(AppState::InGame);
+    if let Err(e) = res {
+        println!("Life System, Error changing state to InGame from NewGame: {}", e);
+    }
+}
+
 pub fn run(
     mut commands: Commands,
     mut session: ResMut<SessionResource>,

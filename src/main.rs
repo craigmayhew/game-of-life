@@ -12,6 +12,9 @@ use bevy_obj::*;
 
 mod systems;
 
+// default universe size if none specified
+const DEFAULT_UNIVERSE_SIZE: usize = 20;
+
 // Defines the amount of time that should elapse between each physics step.
 #[derive(PartialEq, Debug)]
 pub struct GameSpeed {
@@ -25,6 +28,7 @@ pub enum AppState {
     InGame,
     Paused,
     LoadGame,
+    NewGame,
     SaveGame,
 }
 
@@ -42,11 +46,8 @@ fn setup(
     asset_server: Res<AssetServer>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-    // default universe size if none specified
-    const DEFAULT_UNIVERSE_SIZE: usize = 20;
-
-    //setting up initial state of life throughout our 3d space
-    let universe_life = vec![vec![vec![vec![systems::life::LifeDataContainer::Dead(true); DEFAULT_UNIVERSE_SIZE]; DEFAULT_UNIVERSE_SIZE]; DEFAULT_UNIVERSE_SIZE]; 6];
+    //setting up initial state of life throughout our 3d spacec
+    let universe_life = systems::life::dead_universe();
     
     commands.insert_resource(SessionResource {
         life: universe_life,
@@ -162,7 +163,10 @@ fn main() {
         SystemSet::on_exit(AppState::Splash)
             .with_system(systems::menu::cleanup)
     )
-    .add_startup_system(systems::menu::setup)
+    .add_system_set(
+        SystemSet::on_enter(AppState::Splash)
+            .with_system(systems::menu::setup)
+    )
     // hud system
     .add_system_set(
         SystemSet::on_enter(AppState::InGame)
@@ -200,6 +204,13 @@ fn main() {
         SystemSet::on_exit(AppState::Paused)
             .with_system(systems::menu_paused::cleanup)
     )
+    // new game
+    .add_system_set(
+        SystemSet::on_enter(AppState::NewGame)
+        .with_system(systems::life::new_universe)
+        .before(systems::life::run)
+    )
+    
     // load / save games
     .add_system_set(
         SystemSet::on_enter(AppState::LoadGame)

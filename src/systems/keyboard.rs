@@ -56,4 +56,18 @@ pub fn run (
             game_speed.ticks_per_second -= 1.0;
         }
     }
+    //access menu
+    if keys.just_pressed(KeyCode::Escape) {
+        if state.current() == &AppState::InGame || state.current() == &AppState::Paused {
+            let res = state.set(AppState::Splash);
+            if let Err(e) = res {
+                println!("Keyboard System, Error changing state to Splash: {}", e);
+            }
+        } else if state.current() == &AppState::Splash {
+            let res = state.set(AppState::InGame);
+            if let Err(e) = res {
+                println!("Keyboard System, Error changing state to InGame from Splash: {}", e);
+            }
+        }
+    }
 }

@@ -24,7 +24,7 @@ pub const PRESSED_BUTTON: Color = Color::rgb(0.9, 0.9, 0.9);
 
 pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     let play_button_style = Style {
-        size: Size::new(Val::Px(150.0), Val::Px(65.0)),
+        size: Size::new(Val::Px(250.0), Val::Px(65.0)),
         // center button
         margin: UiRect::all(Val::Auto),
         // horizontally center child text
@@ -57,7 +57,7 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         .insert(MenuButtonAction::Play)
         .with_children(|parent| {
             parent.spawn_bundle(TextBundle::from_section(
-                "Play",
+                "New Game",
                 button_text_style.clone(),
             ));
         })
@@ -95,7 +95,7 @@ pub fn run(
                 *color = PRESSED_BUTTON.into();
                 match menu_button_action {
                     MenuButtonAction::Play => {
-                        state.set(AppState::InGame).unwrap();
+                        state.set(AppState::NewGame).unwrap();
                     },
                     MenuButtonAction::Quit => app_exit_events.send(AppExit),
                 }
