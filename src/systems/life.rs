@@ -472,7 +472,7 @@ pub fn run(
                             if session.universe_size == z+1 && let LifeDataContainer::Alive(_) = last_gen[1][x  ][y][0] {neighbours += 1;} // touches red (on the other side of the universe)
                             if session.universe_size > x+1 && let LifeDataContainer::Alive(_) = last_gen[5][x+1][y  ][z] {neighbours += 1;} // touches dark grey
                             if session.universe_size == x+1 && let LifeDataContainer::Alive(_) = last_gen[5][0][y  ][z] {neighbours += 1;} // touches dark grey (on the other side of the universe)
-                            // 9 EDGE CHECKS
+                            // 10 EDGE CHECKS
                             //touches 4 in x+1
                             if session.universe_size >  x+1 && let LifeDataContainer::Alive(_) = last_gen[4][x+1][y][z] {neighbours += 1;}
                             if session.universe_size == x+1 && let LifeDataContainer::Alive(_) = last_gen[4][0  ][y][z] {neighbours += 1;}
@@ -482,6 +482,9 @@ pub fn run(
                             //touches 2 in y-1
                             if y == 0 && let LifeDataContainer::Alive(_) = last_gen[2][x][session.universe_size-1][z] {neighbours += 1;}
                             if y > 0  && let LifeDataContainer::Alive(_) = last_gen[2][x][y-1][z] {neighbours += 1;}
+                            //touches 2 in z-1
+                            if z == 0 && let LifeDataContainer::Alive(_) = last_gen[2][x][y][session.universe_size-1] {neighbours += 1;}
+                            if z > 0  && let LifeDataContainer::Alive(_) = last_gen[2][x][y][z-1] {neighbours += 1;}
                             //touches 4 in z-1
                             if z == 0 && let LifeDataContainer::Alive(_) = last_gen[4][x][y][session.universe_size-1] {neighbours += 1;}
                             if z > 0  && let LifeDataContainer::Alive(_) = last_gen[4][x][y][z-1] {neighbours += 1;}
