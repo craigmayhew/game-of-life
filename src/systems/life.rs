@@ -259,8 +259,8 @@ pub fn run(
                             if x == 0 && let LifeDataContainer::Alive(_) = last_gen[3][session.universe_size-1][y][z] {neighbours += 1;}
                             if x > 0 && let LifeDataContainer::Alive(_) = last_gen[3][x-1][y][z] {neighbours += 1;}
                             //touches 5 in x+1
-                            if x == 0 && let LifeDataContainer::Alive(_) = last_gen[5][session.universe_size-1][y][z] {neighbours += 1;}
-                            if x > 0 && let LifeDataContainer::Alive(_) = last_gen[5][x-1][y][z] {neighbours += 1;}
+                            if session.universe_size >  x+1 && let LifeDataContainer::Alive(_) = last_gen[5][x+1][y][z] {neighbours += 1;}
+                            if session.universe_size == x+1 && let LifeDataContainer::Alive(_) = last_gen[5][0  ][y][z] {neighbours += 1;}
                             //touches 1 in y-1
                             if y == 0 && let LifeDataContainer::Alive(_) = last_gen[1][x][session.universe_size-1][z] {neighbours += 1;}
                             if y > 0 && let LifeDataContainer::Alive(_) = last_gen[1][x][y-1][z] {neighbours += 1;}
