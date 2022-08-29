@@ -267,7 +267,7 @@ pub fn run(
                             //touches 1 in z-1
                             if z == 0 && let LifeDataContainer::Alive(_) = last_gen[1][x][y][session.universe_size-1] {neighbours += 1;}
                             if z > 0 && let LifeDataContainer::Alive(_) = last_gen[1][x][y][z-1] {neighbours += 1;}
-                            //touches 1 and 2 in z-1 x-1
+                            //touches 1 and 2 in x-1 z-1
                             if x > 0 {
                                 if z > 0 {
                                     if let LifeDataContainer::Alive(_) = last_gen[1][x-1][y][z-1] {neighbours += 1;}
