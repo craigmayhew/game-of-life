@@ -238,6 +238,8 @@ pub fn run(
                           // the x>0 y>0 and z>0 are for checking if we are not needing to wrap the universe
                           // the x==0 y==0 z==0 checks are if we are wrapping the universe to find out neighbour
                         */
+                        
+                        //remember z goes down as you move forward from the start position
                         if n == 0 {
                             //CHECK 5 NEIGHBOURS IN SAME CUBE
                             if let LifeDataContainer::Alive(_) = last_gen[1][x][y][z] {neighbours += 1}
@@ -290,7 +292,6 @@ pub fn run(
                             //touches 1 in y-1
                             if y == 0 && let LifeDataContainer::Alive(_) = last_gen[1][x][session.universe_size-1][z] {neighbours += 1;}
                             if y > 0 && let LifeDataContainer::Alive(_) = last_gen[1][x][y-1][z] {neighbours += 1;}
-                            //rememebr z goes down as you move forward
                         } else if n == 1 {// red touches light grey and light blue in same xyz and the dark grey in the y above and dark blue in z-1
                             //CHECK 5 NEIGHBOURS IN SAME CUBE
                             if let LifeDataContainer::Alive(_) = last_gen[0][x][y][z] {neighbours += 1}
