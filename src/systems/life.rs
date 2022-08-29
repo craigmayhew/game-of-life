@@ -551,10 +551,10 @@ pub fn run(
                             if x > 0 && let LifeDataContainer::Alive(_) = last_gen[3][x-1][y  ][z] {neighbours += 1;} // touches dark blue in x-1
                             if x == 0 && let LifeDataContainer::Alive(_) = last_gen[3][session.universe_size-1][y  ][z] {neighbours += 1;} // touches dark blue in x-1 (on the other side of the universe)
                             // 8 EDGE CHECKS
-                            // touches 2 let LifeDataContainer::Alive(_) = in y-1
                             // touches 2 in x-1
                             if x == 0 && let LifeDataContainer::Alive(_) = last_gen[2][session.universe_size-1][y][z] {neighbours += 1;}
                             if x > 0  && let LifeDataContainer::Alive(_) = last_gen[2][x-1][y][z] {neighbours += 1;}
+                            // touches 2 in y-1
                             if y == 0 && let LifeDataContainer::Alive(_) = last_gen[2][x][session.universe_size-1][z] {neighbours += 1;}
                             if y > 0  && let LifeDataContainer::Alive(_) = last_gen[2][x][y-1][z] {neighbours += 1;}
                             // touches 0 in z+1
