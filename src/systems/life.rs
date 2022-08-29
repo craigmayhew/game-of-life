@@ -324,7 +324,7 @@ pub fn run(
                             if session.universe_size == y+1 && let LifeDataContainer::Alive(_) = last_gen[5][x][0][z  ] {neighbours += 1;} // touches dark grey above (on the other side of the universe)
                             if z > 0 && let LifeDataContainer::Alive(_) = last_gen[3][x][y  ][z-1] {neighbours += 1;} // touches dark blue in z-1
                             if z == 0 && let LifeDataContainer::Alive(_) = last_gen[3][x][y  ][session.universe_size-1] {neighbours += 1;} // touches dark blue in z-1 (on the other side of the universe)
-                            // 7 EDGE CHECKS
+                            // 10 EDGE CHECKS
                             //touches 2 in x-1
                             if x == 0 && let LifeDataContainer::Alive(_) = last_gen[2][session.universe_size-1][y][z] {neighbours += 1;}
                             if x > 0 && let LifeDataContainer::Alive(_) = last_gen[2][x-1][y][z] {neighbours += 1;}
@@ -352,17 +352,37 @@ pub fn run(
                             } else if let LifeDataContainer::Alive(_) = last_gen[0][x][0][0] {
                                 neighbours += 1;
                             }
-                            //touches 3 in x-1 y+1
+                            //touches 0 and 5 in x+1 z+1
+                            if session.universe_size > x+1 {
+                                if session.universe_size > z+1 {
+                                    if let LifeDataContainer::Alive(_) = last_gen[0][x+1][y][z+1] {neighbours += 1;}
+                                    if let LifeDataContainer::Alive(_) = last_gen[5][x+1][y][z+1] {neighbours += 1;}
+                                } else {
+                                    if let LifeDataContainer::Alive(_) = last_gen[0][x+1][y][0] {neighbours += 1;}
+                                    if let LifeDataContainer::Alive(_) = last_gen[5][x+1][y][0] {neighbours += 1;}
+                                }
+                            } else if session.universe_size > z+1 {
+                                if let LifeDataContainer::Alive(_) = last_gen[0][0][y][z+1] {neighbours += 1;}
+                                if let LifeDataContainer::Alive(_) = last_gen[5][0][y][z+1] {neighbours += 1;}
+                            } else {
+                                if let LifeDataContainer::Alive(_) = last_gen[0][0][y][0] {neighbours += 1;}
+                                if let LifeDataContainer::Alive(_) = last_gen[5][0][y][0] {neighbours += 1;}
+                            }
+                            //touches 0 and 3 in x-1 y+1
                             if session.universe_size > y+1 {
                                 if x > 0 {
+                                    if let LifeDataContainer::Alive(_) = last_gen[0][x-1][y+1][z] {neighbours += 1;}
                                     if let LifeDataContainer::Alive(_) = last_gen[3][x-1][y+1][z] {neighbours += 1;}
-                                } else if let LifeDataContainer::Alive(_) = last_gen[3][session.universe_size-1][y+1][z] {
-                                    neighbours += 1;
+                                } else {
+                                    if let LifeDataContainer::Alive(_) = last_gen[0][session.universe_size-1][y+1][z] {neighbours += 1;}
+                                    if let LifeDataContainer::Alive(_) = last_gen[3][session.universe_size-1][y+1][z] {neighbours += 1;}
                                 }
                             } else if x > 0 {
+                                if let LifeDataContainer::Alive(_) = last_gen[0][x-1][0][z] {neighbours += 1;}
                                 if let LifeDataContainer::Alive(_) = last_gen[3][x-1][0][z] {neighbours += 1;}
-                            } else if let LifeDataContainer::Alive(_) = last_gen[3][session.universe_size-1][0][z] {
-                                neighbours += 1;
+                            } else {
+                                if let LifeDataContainer::Alive(_) = last_gen[0][session.universe_size-1][0][z] {neighbours += 1;}
+                                if let LifeDataContainer::Alive(_) = last_gen[3][session.universe_size-1][0][z] {neighbours += 1;}
                             }
                         } else if n == 2 {// light blue touches red and dark blue in the same xyz and white in the y above
                             // CHECK 5 NEIGHBOURS IN SAME CUBE
