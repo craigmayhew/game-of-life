@@ -720,12 +720,14 @@ mod tests {
     use super::*;
 
     use bevy_obj::*;// used import wavefront obj files
-    use bevy::asset::AssetPlugin;
-    use bevy::core::CorePlugin;
-    use bevy::core_pipeline::CorePipelinePlugin;
-    use bevy::pbr::PbrPlugin;
-    use bevy::render::RenderPlugin;
-    use bevy::window::WindowPlugin;
+    use bevy::{
+        asset::AssetPlugin,
+        core::CorePlugin,
+        core_pipeline::CorePipelinePlugin,
+        pbr::PbrPlugin,
+        render::RenderPlugin,
+        window::WindowPlugin,
+    };
 
     #[test]
     fn test_life_two_is_stable() {
