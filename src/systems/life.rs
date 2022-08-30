@@ -805,7 +805,7 @@ mod tests {
         // Add our systems
         app.add_system(run);
         app.add_system_set(
-            SystemSet::on_enter(AppState::LoadGame)
+            SystemSet::new()
             .with_system(crate::systems::saves::load)
             .before(run)
         );
@@ -813,8 +813,11 @@ mod tests {
     }
 
     #[test]
-    fn test_life_two_is_stable() {
+    fn test_life_two_in_same_cube_is_stable() {
         let mut app = initialise_test_universe("test_01");
+
+        //state = LoadGame at this point as we are about to load a game save on the next tic
+        assert_eq!(app.world.resource::<State<AppState>>().current(), &AppState::LoadGame);
 
         // Check we have the right number of life forms on generation 1
         assert_eq!(app.world.resource::<SessionResource>().generation, 1);
@@ -822,11 +825,48 @@ mod tests {
 
         // Run systems (run one tick of time)
         app.update();
+        assert_eq!(app.world.resource::<State<AppState>>().current(), &AppState::InGame);
 
         // Check we have the right number of life forms on generation 2
         assert_eq!(app.world.resource::<SessionResource>().generation, 2);
         assert_eq!(app.world.resource::<SessionResource>().counter, 2);
+    }
+    #[test]
+    fn test_life_three_in_same_cube_breeds() {
+        let mut app = initialise_test_universe("test_02");
 
-        //assert_eq!(add(1, 2), 3);
+        //state = LoadGame at this point as we are about to load a game save on the next tic
+        assert_eq!(app.world.resource::<State<AppState>>().current(), &AppState::LoadGame);
+
+        // Check we have the right number of life forms on generation 1 before we load the save
+        assert_eq!(app.world.resource::<SessionResource>().generation, 1);
+        assert_eq!(app.world.resource::<SessionResource>().counter, 0);
+
+        // Run systems (run one tick of time)
+        app.update();
+        // test save file has now loaded
+        assert_eq!(app.world.resource::<State<AppState>>().current(), &AppState::InGame);
+
+        // Check we have the right number of life forms on generation 2
+        assert_eq!(app.world.resource::<SessionResource>().generation, 2);
+        assert_eq!(app.world.resource::<SessionResource>().counter, 3);
+
+        // Run systems (run one tick of time)
+        app.update();
+        assert_eq!(app.world.resource::<State<AppState>>().current(), &AppState::InGame);
+
+        // Check we have the right number of life forms on generation 3
+        assert_eq!(app.world.resource::<SessionResource>().generation, 3);
+        assert_eq!(app.world.resource::<SessionResource>().counter, 6);
+        // at this point we have one solid cube of 6 lifeforms
+
+        // Run systems (run one tick of time)
+        app.update();
+        assert_eq!(app.world.resource::<State<AppState>>().current(), &AppState::InGame);
+
+        // Check we have the right number of life forms on generation 4
+        assert_eq!(app.world.resource::<SessionResource>().generation, 4);
+        assert_eq!(app.world.resource::<SessionResource>().counter, 12);
+        // at this point we have twelve lifeforms that exist from the faces of the starting cube
     }
 }
