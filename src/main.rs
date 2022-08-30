@@ -187,10 +187,10 @@ fn main() {
             .with_system(systems::life::run)
             .with_run_criteria(run_if_timestep)
     )
-    // Place Life with spacebar
+    // Place Life with keyboard
     .add_system_set(
         SystemSet::new()
-            .with_system(systems::life::place_life_with_spacebar)
+            .with_system(systems::life::place_life_with_keyboard)
     )
     // PAUSE screen
     .add_system_set(

@@ -85,7 +85,7 @@ pub enum LifeDataContainer {
     Dead(bool),
 }
 
-pub fn place_life_with_spacebar(
+pub fn place_life_with_keyboard(
     camera: Query<&mut Transform, With<Camera>>,
     mut commands: Commands,
     keys: Res<Input<KeyCode>>,
@@ -97,7 +97,7 @@ pub fn place_life_with_spacebar(
         AppState::Paused => {},
         _ => {return},
     }
-    // if we hit the spacebar then generate life in a specific spot in front of the camera
+    // if we hit the right key(s) then generate life in a specific spot in front of the camera
     if keys.any_just_pressed([KeyCode::Key1, KeyCode::Key2, KeyCode::Key3, KeyCode::Key4, KeyCode::Key5, KeyCode::Key6, KeyCode::Space]) {
         for transform in camera.iter() {
             let xyz_in_front_of_cam = (transform.translation + (transform.forward()*1500.0)) / LIFE_FORM_SIZE;
