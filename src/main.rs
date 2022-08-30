@@ -83,6 +83,9 @@ fn setup(
         universe_size: DEFAULT_UNIVERSE_SIZE,
     });
 
+    //resource used to know which save file to load if/when needed
+    commands.insert_resource(systems::saves::GameFileToLoad::None());
+
     commands.insert_resource(GameSpeed {
         ticks_per_second: 2.0,
         last_tick_stamp: 0.0

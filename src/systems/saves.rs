@@ -12,6 +12,11 @@ use crate::{
     systems::life::{Life,LifeDataContainer},
 };
 
+pub enum GameFileToLoad {
+    Some(String),
+    None(),
+}
+
 #[derive(Debug, Deserialize, Serialize)]
 pub struct SaveResource {
     pub life: Vec<Vec<Vec<Vec<usize>>>>,
@@ -25,13 +30,20 @@ pub fn load (
     mut commands: Commands,
     mut session: ResMut<SessionResource>,
     mut state: ResMut<State<AppState>>,
+    mut game_to_be_loaded: ResMut<GameFileToLoad>,
 ) {
     match state.current() {
         AppState::LoadGame => {},
         _ => {return},
     }
+
+    let name_of_load_file: String;
+    match game_to_be_loaded.as_mut() {
+        GameFileToLoad::Some(file_name) => {name_of_load_file = file_name.to_string();},
+        GameFileToLoad::None() => {name_of_load_file = "latest".to_string();}
+    }
     
-    let contents = read_to_string("saves/test.ron").expect("Failed to load save file");
+    let contents = read_to_string("saves/".to_string()+&name_of_load_file+".ron").expect("Failed to load save file");
 
     let result = ron::from_str::<SaveResource>(&contents);
 
