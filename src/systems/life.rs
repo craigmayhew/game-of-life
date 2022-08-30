@@ -744,7 +744,7 @@ mod tests {
         app.add_plugin(PbrPlugin::default());
         
         app.add_plugin(ObjPlugin);
-        app.add_state(crate::AppState::Splash);
+        app.add_state(crate::AppState::LoadGame);
 
         //asset server for meshes
         let asset_server = app.world.get_resource::<AssetServer>().expect("expected asset server");
