@@ -46,11 +46,8 @@ fn setup(
     asset_server: Res<AssetServer>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-    //setting up initial state of life throughout our 3d spacec
-    let universe_life = systems::life::dead_universe();
-    
     commands.insert_resource(SessionResource {
-        life: universe_life,
+        life: systems::life::dead_universe(),
         counter: 0,
         generation: 1,
         life_form_materials: [
