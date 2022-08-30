@@ -90,7 +90,11 @@ pub fn load (
     }
 
     // in bevy 0.8 overwrite_set() is needed instead of set() when system is called via on_enter()
-    let res = state.overwrite_set(AppState::Paused);
+    let res = if &name_of_load_file[0..5] == "test_" {
+        state.overwrite_set(AppState::InGame)
+    }else{
+        state.overwrite_set(AppState::Paused)
+    };
     if let Err(e) = res {
         println!("Saves System, Error changing state to Paused: {}", e);
     }
