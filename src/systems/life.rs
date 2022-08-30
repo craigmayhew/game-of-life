@@ -729,11 +729,10 @@ mod tests {
         window::WindowPlugin,
     };
 
-    #[test]
-    fn test_life_two_is_stable() {
+    fn initialise_test_universe(save_filename: &str) -> bevy::prelude::App {
         // Setup app
         let mut app = App::new();
-        
+            
         app.add_plugins(MinimalPlugins);
         app.add_plugin(CorePlugin::default());
 
@@ -796,7 +795,7 @@ mod tests {
         };
 
         //new load game resource so we can load our test universe
-        let game_file_to_load = crate::systems::saves::GameFileToLoad::Some("test_01".to_string());
+        let game_file_to_load = crate::systems::saves::GameFileToLoad::Some(save_filename.to_string());
 
         // Add session resource
         app.insert_resource(session);
@@ -810,6 +809,12 @@ mod tests {
             .with_system(crate::systems::saves::load)
             .before(run)
         );
+        app
+    }
+
+    #[test]
+    fn test_life_two_is_stable() {
+        let mut app = initialise_test_universe("test_01");
 
         // Check we have the right number of life forms on generation 1
         assert_eq!(app.world.resource::<SessionResource>().generation, 1);
