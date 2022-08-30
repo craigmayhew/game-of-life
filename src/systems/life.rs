@@ -719,10 +719,30 @@ pub fn run(
 mod tests {
     use super::*;
 
+    use bevy_obj::*;// used import wavefront obj files
+    use bevy::asset::AssetPlugin;
+    use bevy::core::CorePlugin;
+    use bevy::core_pipeline::CorePipelinePlugin;
+    use bevy::pbr::PbrPlugin;
+    use bevy::render::RenderPlugin;
+    use bevy::window::WindowPlugin;
+
     #[test]
     fn test_life_two_is_stable() {
         // Setup app
         let mut app = App::new();
+        
+        app.add_plugins(MinimalPlugins);
+        app.add_plugin(CorePlugin::default());
+
+        app.add_plugin(AssetPlugin::default());
+        app.add_plugin(WindowPlugin::default());
+        app.add_plugin(RenderPlugin::default());
+        app.add_plugin(CorePipelinePlugin::default());
+        app.add_plugin(PbrPlugin::default());
+        
+        app.add_plugin(ObjPlugin);
+        app.add_state(crate::AppState::Splash);
 
         //asset server for meshes
         let asset_server = app.world.get_resource::<AssetServer>().expect("expected asset server");
@@ -778,12 +798,18 @@ mod tests {
 
         // Setup initial universe
 
+        
+        
+        // Check we have the right number of life forms on generation 1
+        assert_eq!(app.world.resource::<SessionResource>().generation, 1);
+        assert_eq!(app.world.resource::<SessionResource>().counter, 0);
 
         // Run systems
         app.update();
 
         // Check we have the right number of life forms on generation 2
-        assert_eq!(app.world.resource::<SessionResource>().counter, 2);
+        assert_eq!(app.world.resource::<SessionResource>().generation, 2);
+        assert_eq!(app.world.resource::<SessionResource>().counter, 0);
 
         //assert_eq!(add(1, 2), 3);
     }
