@@ -343,7 +343,6 @@ pub fn run(
                             //touches 4 in y+1
                             if session.universe_size >  y+1 && let LifeDataContainer::Alive(_) = last_gen[4][x][y+1][z] {neighbours += 1;}
                             if session.universe_size == y+1 && let LifeDataContainer::Alive(_) = last_gen[4][x][0  ][z] {neighbours += 1;}
-                            //ALL THESE zs ARE WRONG
                             //touches 2 in z+1
                             if session.universe_size >  z+1 && let LifeDataContainer::Alive(_) = last_gen[2][x][y][z+1] {neighbours += 1;}
                             if session.universe_size == z+1 && let LifeDataContainer::Alive(_) = last_gen[2][x][y][0  ] {neighbours += 1;}
