@@ -782,8 +782,8 @@ mod tests {
             }).clone(),
         ];
 
-        // Add session resource
-        app.insert_resource(SessionResource {
+        //new session resource
+        let session = SessionResource {
             life: dead_universe(),
             counter: 0,
             generation: 1,
@@ -792,26 +792,35 @@ mod tests {
                 tetrahedron_mirrored.clone(),
                 tetrahedron.clone(),
             ],
-            universe_size: crate::DEFAULT_UNIVERSE_SIZE,
-        });
+            universe_size: 10,
+        };
 
-        // Add our two systems
+        //new load game resource so we can load our test universe
+        let game_file_to_load = crate::systems::saves::GameFileToLoad::Some("test_01".to_string());
+
+        // Add session resource
+        app.insert_resource(session);
+        // add our test case save file to be loaded up
+        app.insert_resource(game_file_to_load);
+
+        // Add our systems
         app.add_system(run);
+        app.add_system_set(
+            SystemSet::on_enter(AppState::LoadGame)
+            .with_system(crate::systems::saves::load)
+            .before(run)
+        );
 
-        // Setup initial universe
-
-        
-        
         // Check we have the right number of life forms on generation 1
         assert_eq!(app.world.resource::<SessionResource>().generation, 1);
         assert_eq!(app.world.resource::<SessionResource>().counter, 0);
 
-        // Run systems
+        // Run systems (run one tick of time)
         app.update();
 
         // Check we have the right number of life forms on generation 2
         assert_eq!(app.world.resource::<SessionResource>().generation, 2);
-        assert_eq!(app.world.resource::<SessionResource>().counter, 0);
+        assert_eq!(app.world.resource::<SessionResource>().counter, 2);
 
         //assert_eq!(add(1, 2), 3);
     }
