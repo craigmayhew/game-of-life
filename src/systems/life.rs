@@ -715,9 +715,76 @@ pub fn run(
     }
 }
 
-/* at some point we should write tests! */
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-/*
-Test 1: A full cube of 6 tetras with no neighbours is stable by our rules. Each tetra touches two other tetra within the cube.
-Test 2: A half cube would have 3 lifeforms in gen 1, 1 in gen 2, 0 for gen 3 onwards.
-*/
+    #[test]
+    fn test_life_two_is_stable() {
+        // Setup app
+        let mut app = App::new();
+
+        //asset server for meshes
+        let asset_server = app.world.get_resource::<AssetServer>().expect("expected asset server");
+
+        //load meshes
+        let tetrahedron_mirrored = asset_server.load("mesh/hill-tetrahedron-mirrored.obj");
+        let tetrahedron = asset_server.load("mesh/hill-tetrahedron.obj");
+
+        //materials
+        let mut materials = app.world.get_resource_mut::<Assets<StandardMaterial>>().expect("expected standard materials");
+        let material_handles = [
+            materials.add(StandardMaterial {
+                base_color: Color::rgb(0.0, 1.0, 0.0), // white -> green
+                ..default()
+            }).clone(),
+            materials.add(StandardMaterial {
+                base_color: Color::rgb(0.6, 0.2, 0.2), // red
+                ..default()
+            }).clone(),
+            materials.add(StandardMaterial {
+                base_color: Color::rgb(0.5, 0.5, 1.0), // light blue
+                ..default()
+            }).clone(),
+            materials.add(StandardMaterial {
+                base_color: Color::rgb(0.1, 0.1, 0.7), // dark blue
+                ..default()
+            }).clone(),
+            materials.add(StandardMaterial {
+                base_color: Color::rgb(1.0, 1.0, 0.0), // light grey -> yellow
+                ..default()
+            }).clone(),
+            materials.add(StandardMaterial {
+                base_color: Color::rgb(0.2, 0.2, 0.2), // dark grey
+                ..default()
+            }).clone(),
+        ];
+
+        // Add session resource
+        app.insert_resource(SessionResource {
+            life: dead_universe(),
+            counter: 0,
+            generation: 1,
+            life_form_materials: material_handles,
+            life_form_meshes: [
+                tetrahedron_mirrored.clone(),
+                tetrahedron.clone(),
+            ],
+            universe_size: crate::DEFAULT_UNIVERSE_SIZE,
+        });
+
+        // Add our two systems
+        app.add_system(run);
+
+        // Setup initial universe
+
+
+        // Run systems
+        app.update();
+
+        // Check we have the right number of life forms on generation 2
+        assert_eq!(app.world.resource::<SessionResource>().counter, 2);
+
+        //assert_eq!(add(1, 2), 3);
+    }
+}
