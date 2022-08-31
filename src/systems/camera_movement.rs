@@ -5,6 +5,7 @@ use bevy::{
 
 use crate::{
     systems::life::LIFE_FORM_SIZE,
+    DEFAULT_UNIVERSE_SIZE,
 };
 
 pub fn setup(mut commands: Commands) {
@@ -16,7 +17,13 @@ pub fn setup(mut commands: Commands) {
             fov: std::f32::consts::FRAC_PI_3,
         }
         .into(),
-        transform: Transform::from_xyz(0.0, 0.0, LIFE_FORM_SIZE*2.0).looking_at(Vec3::ZERO, Vec3::Y),
+        //TODO: It would be better if we started with our universe in view
+        transform: Transform::from_xyz(
+            DEFAULT_UNIVERSE_SIZE as f32*LIFE_FORM_SIZE/2.0,
+            DEFAULT_UNIVERSE_SIZE as f32*LIFE_FORM_SIZE/2.0,
+            DEFAULT_UNIVERSE_SIZE as f32*LIFE_FORM_SIZE*2.0
+        )
+        .looking_at(Vec3::new(DEFAULT_UNIVERSE_SIZE as f32*LIFE_FORM_SIZE/2.0,DEFAULT_UNIVERSE_SIZE as f32*LIFE_FORM_SIZE/2.0,0.0), Vec3::Y),
         ..default()  
     });
 }
