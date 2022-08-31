@@ -856,7 +856,13 @@ mod tests {
         assert_eq!(app.world.resource::<SessionResource>().counter, 0);
     }
     #[test]
-    fn test_life_three_in_same_cube_breeds() {
+    fn test_life_012_in_same_cube_breeds() {
+        /* TEST DESCRIPTION
+           Start State: 3 tetras indexed 0,1,2 in the same cube
+           Expect: 3 to become a cube of 6t.
+                   6 to die and create 12t.
+        */
+
         let mut app = initialise_test_universe("test_02");
 
         //state = LoadGame at this point as we are about to load a game save on the next tic
