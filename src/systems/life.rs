@@ -23,7 +23,6 @@ pub fn create_life_xyz(
     z:usize,
 ) -> bevy::prelude::Transform {
     let mut transform_new_life: Transform;
-    //rotate it if it's every third life form (todo: as this rotations only have 4 variants they could exist outside this loop!)
     //TODO consider if n == 0 and n == 1 could/should actually be identical blocks
     if n == 0 {//white
         // position the life form in 3d space
