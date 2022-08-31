@@ -5,7 +5,7 @@ authors = ["Craig Mayhew <craig@mayhew.io>"]
 edition = "2021"
 
 [dependencies]
-bevy = "0.8"
+bevy = "0.8.1"
 bevy_obj = "0.8" # used to load wavefront o.bj files into bevy
 rand = "0.8.5"
 winit = "0.26.1" # used to set the window icon as bevy does not support currently
