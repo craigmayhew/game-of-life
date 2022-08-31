@@ -824,6 +824,12 @@ mod tests {
         app
     }
 
+    fn check_universe_state(world: &World,expected_app_state: &AppState,expected_generation: i64,expected_counter: i64) {
+        assert_eq!(world.resource::<State<AppState>>().current(), expected_app_state);
+        assert_eq!(world.resource::<SessionResource>().generation, expected_generation);
+        assert_eq!(world.resource::<SessionResource>().counter, expected_counter);
+    }
+
     #[test]
     fn test_life_two_in_same_cube_dies() {
         /* TEST DESCRIPTION
@@ -831,29 +837,11 @@ mod tests {
            Expect: universe to die off
         */
         let mut app = initialise_test_universe("test_01");
-
-        //state = LoadGame at this point as we are about to load a game save on the next tic
-        assert_eq!(app.world.resource::<State<AppState>>().current(), &AppState::LoadGame);
-
-        // Check we have the right number of life forms on generation 1
-        assert_eq!(app.world.resource::<SessionResource>().generation, 1);
-        assert_eq!(app.world.resource::<SessionResource>().counter, 0);
-
-        // Run systems (run one tick of time)
+        check_universe_state(&app.world,&AppState::LoadGame,1,0);
         app.update();
-        assert_eq!(app.world.resource::<State<AppState>>().current(), &AppState::InGame);
-
-        // Check we have the right number of life forms on generation 2
-        assert_eq!(app.world.resource::<SessionResource>().generation, 2);
-        assert_eq!(app.world.resource::<SessionResource>().counter, 2);
-
-        // Run systems (run one tick of time)
+        check_universe_state(&app.world,&AppState::InGame,2,2);
         app.update();
-        assert_eq!(app.world.resource::<State<AppState>>().current(), &AppState::InGame);
-
-        // Check we have the right number of life forms on generation 3
-        assert_eq!(app.world.resource::<SessionResource>().generation, 3);
-        assert_eq!(app.world.resource::<SessionResource>().counter, 0);
+        check_universe_state(&app.world,&AppState::InGame,3,0);
     }
     #[test]
     fn test_life_012_in_same_cube_breeds() {
@@ -862,42 +850,16 @@ mod tests {
            Expect: 3 to become a cube of 6t.
                    6 to die and create 12t.
         */
-
         let mut app = initialise_test_universe("test_02");
-
-        //state = LoadGame at this point as we are about to load a game save on the next tic
-        assert_eq!(app.world.resource::<State<AppState>>().current(), &AppState::LoadGame);
-
-        // Check we have the right number of life forms on generation 1 before we load the save
-        assert_eq!(app.world.resource::<SessionResource>().generation, 1);
-        assert_eq!(app.world.resource::<SessionResource>().counter, 0);
-
-        // Run systems (run one tick of time)
+        check_universe_state(&app.world,&AppState::LoadGame,1,0);
         app.update();
-        // test save file has now loaded
-        assert_eq!(app.world.resource::<State<AppState>>().current(), &AppState::InGame);
-
-        // Check we have the right number of life forms on generation 2
-        assert_eq!(app.world.resource::<SessionResource>().generation, 2);
-        assert_eq!(app.world.resource::<SessionResource>().counter, 3);
-
-        // Run systems (run one tick of time)
+        check_universe_state(&app.world,&AppState::InGame,2,3);
         app.update();
-        assert_eq!(app.world.resource::<State<AppState>>().current(), &AppState::InGame);
-
-        // Check we have the right number of life forms on generation 3
-        assert_eq!(app.world.resource::<SessionResource>().generation, 3);
-        assert_eq!(app.world.resource::<SessionResource>().counter, 6);
         // at this point we have one solid cube of 6 lifeforms
-
-        // Run systems (run one tick of time)
+        check_universe_state(&app.world,&AppState::InGame,3,6);
         app.update();
-        assert_eq!(app.world.resource::<State<AppState>>().current(), &AppState::InGame);
-
-        // Check we have the right number of life forms on generation 4
-        assert_eq!(app.world.resource::<SessionResource>().generation, 4);
-        assert_eq!(app.world.resource::<SessionResource>().counter, 12);
         // at this point we have twelve lifeforms that exist from the faces of the starting cube
+        check_universe_state(&app.world,&AppState::InGame,4,12);
     }
     #[test]
     fn test_life_345_in_same_cube_breeds() {
@@ -906,41 +868,15 @@ mod tests {
            Expect: 3 to become a cube of 6t.
                    6 to die and create 12t.
         */
-
         let mut app = initialise_test_universe("test_03");
-
-        //state = LoadGame at this point as we are about to load a game save on the next tic
-        assert_eq!(app.world.resource::<State<AppState>>().current(), &AppState::LoadGame);
-
-        // Check we have the right number of life forms on generation 1 before we load the save
-        assert_eq!(app.world.resource::<SessionResource>().generation, 1);
-        assert_eq!(app.world.resource::<SessionResource>().counter, 0);
-
-        // Run systems (run one tick of time)
+        check_universe_state(&app.world,&AppState::LoadGame,1,0);
         app.update();
-        // test save file has now loaded
-        assert_eq!(app.world.resource::<State<AppState>>().current(), &AppState::InGame);
-
-        // Check we have the right number of life forms on generation 2
-        assert_eq!(app.world.resource::<SessionResource>().generation, 2);
-        assert_eq!(app.world.resource::<SessionResource>().counter, 3);
-
-        // Run systems (run one tick of time)
+        check_universe_state(&app.world,&AppState::InGame,2,3);
         app.update();
-        assert_eq!(app.world.resource::<State<AppState>>().current(), &AppState::InGame);
-
-        // Check we have the right number of life forms on generation 3
-        assert_eq!(app.world.resource::<SessionResource>().generation, 3);
-        assert_eq!(app.world.resource::<SessionResource>().counter, 6);
         // at this point we have one solid cube of 6 lifeforms
-
-        // Run systems (run one tick of time)
+        check_universe_state(&app.world,&AppState::InGame,3,6);
         app.update();
-        assert_eq!(app.world.resource::<State<AppState>>().current(), &AppState::InGame);
-
-        // Check we have the right number of life forms on generation 4
-        assert_eq!(app.world.resource::<SessionResource>().generation, 4);
-        assert_eq!(app.world.resource::<SessionResource>().counter, 12);
         // at this point we have twelve lifeforms that exist from the faces of the starting cube
+        check_universe_state(&app.world,&AppState::InGame,4,12);
     }
 }
