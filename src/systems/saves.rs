@@ -32,11 +32,6 @@ pub fn load (
     mut state: ResMut<State<AppState>>,
     mut game_to_be_loaded: ResMut<GameFileToLoad>,
 ) {
-    match state.current() {
-        AppState::LoadGame => {},
-        _ => {return},
-    }
-
     let name_of_load_file: String;
     match game_to_be_loaded.as_mut() {
         GameFileToLoad::Some(file_name) => {name_of_load_file = file_name.to_string();},
@@ -104,11 +99,6 @@ pub fn save (
     session: Res<SessionResource>,
     mut state: ResMut<State<AppState>>,
 ) {
-    match state.current() {
-        AppState::SaveGame => {},
-        _ => {return},
-    }
-
     // save game state
     let mut save = SaveResource {
         life: vec![vec![vec![vec![0; session.universe_size]; session.universe_size]; session.universe_size]; 6],
