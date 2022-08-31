@@ -154,7 +154,21 @@ fn main() {
     .add_startup_system(set_window_icon)
     .insert_resource(ClearColor(Color::BLACK)) //set the background colour of our window (the universe)
     .add_startup_system(setup)
-    // menu system
+    // camera system (camera movement controls)
+    .add_system(systems::camera_movement::move_camera_on_keyboard_input)
+    // keyboard input (excluding camera movement)
+    .add_system(systems::keyboard::run)
+    // life system
+    .add_system_set(
+        SystemSet::new()
+            .with_system(systems::life::run)
+            .with_run_criteria(run_if_timestep)
+    )
+    // AppState::Splash
+    .add_system_set(
+        SystemSet::on_enter(AppState::Splash)
+            .with_system(systems::menu::setup)
+    )
     .add_system_set(
         SystemSet::on_update(AppState::Splash)
             .with_system(systems::menu::run)
@@ -163,11 +177,7 @@ fn main() {
         SystemSet::on_exit(AppState::Splash)
             .with_system(systems::menu::cleanup)
     )
-    .add_system_set(
-        SystemSet::on_enter(AppState::Splash)
-            .with_system(systems::menu::setup)
-    )
-    // hud system
+    // AppState::InGame
     .add_system_set(
         SystemSet::on_enter(AppState::InGame)
             .with_system(systems::hud::enter)
@@ -182,17 +192,7 @@ fn main() {
         SystemSet::on_exit(AppState::InGame)
             .with_system(systems::hud::cleanup)
     )
-    // camera system (camera movement controls)
-    .add_system(systems::camera_movement::move_camera_on_keyboard_input)
-    // keyboard input (excluding camera movement)
-    .add_system(systems::keyboard::run)
-    // life system
-    .add_system_set(
-        SystemSet::new()
-            .with_system(systems::life::run)
-            .with_run_criteria(run_if_timestep)
-    )
-    // PAUSE screen
+    // AppState::Paused
     .add_system_set(
         SystemSet::on_enter(AppState::Paused)
         .with_system(systems::menu_paused::enter)
@@ -209,19 +209,19 @@ fn main() {
             .with_system(systems::menu_paused::cleanup)
             .with_system(systems::hud::cleanup)
     )
-    // new game
+    // AppState::NewGame
     .add_system_set(
         SystemSet::on_enter(AppState::NewGame)
         .with_system(systems::life::new_universe)
         .before(systems::life::run)
     )
-    
-    // load / save games
+    // AppState::LoadGame
     .add_system_set(
         SystemSet::on_enter(AppState::LoadGame)
         .with_system(systems::saves::load)
         .before(systems::life::run)
     )
+    // AppState::SaveGame
     .add_system_set(
         SystemSet::on_enter(AppState::SaveGame)
         .with_system(systems::saves::save)
