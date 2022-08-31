@@ -90,13 +90,7 @@ pub fn place_life_with_keyboard(
     mut commands: Commands,
     keys: Res<Input<KeyCode>>,
     mut session: ResMut<SessionResource>,
-    state: Res<State<AppState>>,
 ) {
-    match state.current() {
-        AppState::InGame => {},
-        AppState::Paused => {},
-        _ => {return},
-    }
     // if we hit the right key(s) then generate life in a specific spot in front of the camera
     if keys.any_just_pressed([KeyCode::Key1, KeyCode::Key2, KeyCode::Key3, KeyCode::Key4, KeyCode::Key5, KeyCode::Key6, KeyCode::Space]) {
         for transform in camera.iter() {

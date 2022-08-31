@@ -175,6 +175,8 @@ fn main() {
     .add_system_set(
         SystemSet::on_update(AppState::InGame)
             .with_system(systems::hud::run)
+            // Place Life with keyboard
+            .with_system(systems::life::place_life_with_keyboard)
     )
     .add_system_set(
         SystemSet::on_exit(AppState::InGame)
@@ -190,11 +192,6 @@ fn main() {
             .with_system(systems::life::run)
             .with_run_criteria(run_if_timestep)
     )
-    // Place Life with keyboard
-    .add_system_set(
-        SystemSet::new()
-            .with_system(systems::life::place_life_with_keyboard)
-    )
     // PAUSE screen
     .add_system_set(
         SystemSet::on_enter(AppState::Paused)
@@ -204,6 +201,8 @@ fn main() {
     .add_system_set(
         SystemSet::on_update(AppState::Paused)
             .with_system(systems::hud::run)
+            // Place Life with keyboard
+            .with_system(systems::life::place_life_with_keyboard)
     )
     .add_system_set(
         SystemSet::on_exit(AppState::Paused)
