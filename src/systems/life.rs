@@ -817,7 +817,7 @@ mod tests {
         // Add our systems
         app.add_system(run);
         app.add_system_set(
-            SystemSet::new()
+            SystemSet::on_enter(AppState::LoadGame)
             .with_system(crate::systems::saves::load)
             .before(run)
         );
