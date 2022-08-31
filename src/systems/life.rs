@@ -899,4 +899,48 @@ mod tests {
         assert_eq!(app.world.resource::<SessionResource>().counter, 12);
         // at this point we have twelve lifeforms that exist from the faces of the starting cube
     }
+    #[test]
+    fn test_life_345_in_same_cube_breeds() {
+        /* TEST DESCRIPTION
+           Start State: 3 tetras indexed 3,4,5 in the same cube
+           Expect: 3 to become a cube of 6t.
+                   6 to die and create 12t.
+        */
+
+        let mut app = initialise_test_universe("test_03");
+
+        //state = LoadGame at this point as we are about to load a game save on the next tic
+        assert_eq!(app.world.resource::<State<AppState>>().current(), &AppState::LoadGame);
+
+        // Check we have the right number of life forms on generation 1 before we load the save
+        assert_eq!(app.world.resource::<SessionResource>().generation, 1);
+        assert_eq!(app.world.resource::<SessionResource>().counter, 0);
+
+        // Run systems (run one tick of time)
+        app.update();
+        // test save file has now loaded
+        assert_eq!(app.world.resource::<State<AppState>>().current(), &AppState::InGame);
+
+        // Check we have the right number of life forms on generation 2
+        assert_eq!(app.world.resource::<SessionResource>().generation, 2);
+        assert_eq!(app.world.resource::<SessionResource>().counter, 3);
+
+        // Run systems (run one tick of time)
+        app.update();
+        assert_eq!(app.world.resource::<State<AppState>>().current(), &AppState::InGame);
+
+        // Check we have the right number of life forms on generation 3
+        assert_eq!(app.world.resource::<SessionResource>().generation, 3);
+        assert_eq!(app.world.resource::<SessionResource>().counter, 6);
+        // at this point we have one solid cube of 6 lifeforms
+
+        // Run systems (run one tick of time)
+        app.update();
+        assert_eq!(app.world.resource::<State<AppState>>().current(), &AppState::InGame);
+
+        // Check we have the right number of life forms on generation 4
+        assert_eq!(app.world.resource::<SessionResource>().generation, 4);
+        assert_eq!(app.world.resource::<SessionResource>().counter, 12);
+        // at this point we have twelve lifeforms that exist from the faces of the starting cube
+    }
 }
