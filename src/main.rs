@@ -199,10 +199,16 @@ fn main() {
     .add_system_set(
         SystemSet::on_enter(AppState::Paused)
         .with_system(systems::menu_paused::enter)
+        .with_system(systems::hud::enter)
+    )
+    .add_system_set(
+        SystemSet::on_update(AppState::Paused)
+            .with_system(systems::hud::run)
     )
     .add_system_set(
         SystemSet::on_exit(AppState::Paused)
             .with_system(systems::menu_paused::cleanup)
+            .with_system(systems::hud::cleanup)
     )
     // new game
     .add_system_set(
