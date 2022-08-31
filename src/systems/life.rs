@@ -22,49 +22,39 @@ pub fn create_life_xyz(
     y:usize,
     z:usize,
 ) -> bevy::prelude::Transform {
+    // position the life form in 3d space
     let mut transform_new_life: Transform;
-    //TODO consider if n == 0 and n == 1 could/should actually be identical blocks
-    if n == 0 {//white
-        // position the life form in 3d space
-        transform_new_life = Transform::from_xyz(
-            (x as f32) * LIFE_FORM_SIZE,
-            (y as f32) * LIFE_FORM_SIZE,
-            (z as f32) * LIFE_FORM_SIZE
-        );
-        
-        transform_new_life.rotate_x(std::f32::consts::PI*0.75);
-        transform_new_life.rotate_y(std::f32::consts::FRAC_PI_2);
-        transform_new_life.rotate_z(std::f32::consts::PI);
-    } else if n == 1 {//red
-        // position the life form in 3d space
-        transform_new_life = Transform::from_xyz(
-            (x as f32) * LIFE_FORM_SIZE,
-            (y as f32) * LIFE_FORM_SIZE,
-            (z as f32) * LIFE_FORM_SIZE
-        );
-        
-        transform_new_life.rotate_x(std::f32::consts::PI*1.75);
-        transform_new_life.rotate_y(0.0);
-        transform_new_life.rotate_z(std::f32::consts::FRAC_PI_2);
-    } else if n == 2 || n == 3 {//light blue and dark blue
+    if n == 2 || n == 3 {
         // position the life form in 3d space
         transform_new_life = Transform::from_xyz(
             (x as f32-1.0) * LIFE_FORM_SIZE,
             (y as f32+1.0) * LIFE_FORM_SIZE,
             (z as f32-1.0) * LIFE_FORM_SIZE
         );
-        
+    } else {
+        transform_new_life = Transform::from_xyz(
+            (x as f32) * LIFE_FORM_SIZE,
+            (y as f32) * LIFE_FORM_SIZE,
+            (z as f32) * LIFE_FORM_SIZE
+        );
+    }
+    //TODO consider if n == 0 and n == 1 could/should actually be identical blocks
+    //NOTES: We seem to be doing all of this in eigths of a turn i.e. 0.25 PI
+    //       This suggests our shape starts out at an angle. Confirmed by viewing obj file.
+    //BETTER TODO: Replace most of this code with 6 correctly rotated obj files
+    if n == 0 {//white
+        transform_new_life.rotate_x(std::f32::consts::PI*0.75);
+        transform_new_life.rotate_y(std::f32::consts::FRAC_PI_2);
+        transform_new_life.rotate_z(std::f32::consts::PI);
+    } else if n == 1 {//red
+        transform_new_life.rotate_x(std::f32::consts::PI*1.75);
+        transform_new_life.rotate_y(0.0);
+        transform_new_life.rotate_z(std::f32::consts::FRAC_PI_2);
+    } else if n == 2 || n == 3 {//light blue and dark blue
         transform_new_life.rotate_x(std::f32::consts::PI*0.75);
         transform_new_life.rotate_y(0.0);
         transform_new_life.rotate_z(0.0);
     } else {//light grey and dark grey
-        // position the life form in 3d space
-        transform_new_life = Transform::from_xyz(
-            x as f32 * LIFE_FORM_SIZE,
-            y as f32 * LIFE_FORM_SIZE,
-            z as f32 * LIFE_FORM_SIZE
-        );
-
         transform_new_life.rotate_x(std::f32::consts::FRAC_PI_4);
         transform_new_life.rotate_y(std::f32::consts::PI);
         transform_new_life.rotate_z(0.0);
