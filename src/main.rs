@@ -154,8 +154,6 @@ fn main() {
     .add_startup_system(set_window_icon)
     .insert_resource(ClearColor(Color::BLACK)) //set the background colour of our window (the universe)
     .add_startup_system(setup)
-    // camera system (camera movement controls)
-    .add_system(systems::camera_movement::move_camera_on_keyboard_input)
     // keyboard input (excluding camera movement)
     .add_system(systems::keyboard::run)
     // life system
@@ -187,6 +185,8 @@ fn main() {
             .with_system(systems::hud::run)
             // Place Life with keyboard
             .with_system(systems::life::place_life_with_keyboard)
+            // camera system (camera movement controls)
+            .with_system(systems::camera_movement::move_camera_on_keyboard_input)
     )
     .add_system_set(
         SystemSet::on_exit(AppState::InGame)
@@ -203,6 +203,8 @@ fn main() {
             .with_system(systems::hud::run)
             // Place Life with keyboard
             .with_system(systems::life::place_life_with_keyboard)
+            // camera system (camera movement controls)
+            .with_system(systems::camera_movement::move_camera_on_keyboard_input)
     )
     .add_system_set(
         SystemSet::on_exit(AppState::Paused)
