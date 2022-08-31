@@ -825,7 +825,11 @@ mod tests {
     }
 
     #[test]
-    fn test_life_two_in_same_cube_is_stable() {
+    fn test_life_two_in_same_cube_dies() {
+        /* TEST DESCRIPTION
+           Start State: 2 tetras indexed ?,? in the same cube
+           Expect: universe to die off
+        */
         let mut app = initialise_test_universe("test_01");
 
         //state = LoadGame at this point as we are about to load a game save on the next tic
@@ -842,6 +846,14 @@ mod tests {
         // Check we have the right number of life forms on generation 2
         assert_eq!(app.world.resource::<SessionResource>().generation, 2);
         assert_eq!(app.world.resource::<SessionResource>().counter, 2);
+
+        // Run systems (run one tick of time)
+        app.update();
+        assert_eq!(app.world.resource::<State<AppState>>().current(), &AppState::InGame);
+
+        // Check we have the right number of life forms on generation 3
+        assert_eq!(app.world.resource::<SessionResource>().generation, 3);
+        assert_eq!(app.world.resource::<SessionResource>().counter, 0);
     }
     #[test]
     fn test_life_three_in_same_cube_breeds() {
