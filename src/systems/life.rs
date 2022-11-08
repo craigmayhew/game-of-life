@@ -534,8 +534,8 @@ pub fn run(
                             if let LifeDataContainer::Alive(_) = last_gen[5][x][y][z] {neighbours += 1}
                             // 2 FACE CHECKS
                             //the y >0 checks if we are the edge of the univ
-                            if x > 0 && let LifeDataContainer::Alive(_) = last_gen[3][x-1][y  ][z  ] {neighbours += 1;} // touches dark blue
-                            if x == 0 && let LifeDataContainer::Alive(_) = last_gen[3][session.universe_size-1][y  ][z  ] {neighbours += 1;} // touches dark blue (on the other side of the universe)
+                            if x > 0 && let LifeDataContainer::Alive(_) = last_gen[2][x-1][y  ][z  ] {neighbours += 1;} // touches dark blue
+                            if x == 0 && let LifeDataContainer::Alive(_) = last_gen[2][session.universe_size-1][y  ][z  ] {neighbours += 1;} // touches dark blue (on the other side of the universe)
                             if session.universe_size > z+1 && let LifeDataContainer::Alive(_) = last_gen[0][x  ][y  ][z+1] {neighbours += 1;} // touches white
                             if session.universe_size == z+1 && let LifeDataContainer::Alive(_) = last_gen[0][x  ][y  ][0] {neighbours += 1;} // touches white (on the other side of the universe)
                             // 11 EDGE CHECKS
