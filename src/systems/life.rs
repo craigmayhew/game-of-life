@@ -274,6 +274,60 @@ pub fn run(
                     for (z, entity_life) in vec3.iter().enumerate() {
                         let mut neighbours: usize = 0;
                         
+                        for check in checks(n).iter() {
+                            let mut check_x = x;
+                            let mut check_y = y;
+                            let mut check_z = z;
+
+                            match &check.axis {
+                                Axis::XPos => {check_x += 1},
+                                Axis::XNeg => {check_x = check_x.wrapping_sub(1)},
+                                Axis::YPos => {check_y += 1},
+                                Axis::YNeg => {check_y = check_y.wrapping_sub(1)},
+                                Axis::ZPos => {check_z += 1},
+                                Axis::ZNeg => {check_z = check_z.wrapping_sub(1)},
+                                Axis::XPosYPos => {check_x += 1;check_y += 1},
+                                Axis::XPosYNeg => {check_x += 1;check_y -= 1},
+                                Axis::XNegYPos => {check_x -= 1;check_y += 1},
+                                Axis::XNegYNeg => {check_x -= 1;check_y -= 1},
+                                Axis::XPosZPos => {check_x += 1;check_z += 1},
+                                Axis::XPosZNeg => {check_x += 1;check_z -= 1},
+                                Axis::XNegZPos => {check_x -= 1;check_z += 1},
+                                Axis::XNegZNeg => {check_x -= 1;check_z -= 1},
+                                Axis::YPosZPos => {check_y += 1;check_z += 1},
+                                Axis::YPosZNeg => {check_y += 1;check_z -= 1},
+                                Axis::YNegZPos => {check_y += 1;check_z += 1},
+                                Axis::YNegZNeg => {check_y += 1;check_z -= 1},
+                            }
+
+                            // handle overflow
+                            //TODO: in universe size 256 this may not be needed
+                            if check_x == session.universe_size {
+                                check_x = 0;
+                            }
+                            if check_y == session.universe_size {
+                                check_y = 0;
+                            }
+                            if check_z == session.universe_size {
+                                check_z = 0;
+                            }
+
+                            // handle underflow
+                            //TODO: in universe size 256 this may not be needed
+                            if check_x > session.universe_size {
+                                check_x = session.universe_size-1;
+                            }
+                            if check_y > session.universe_size {
+                                check_y = session.universe_size-1;
+                            }
+                            if check_z > session.universe_size {
+                                check_z = session.universe_size-1;
+                            }
+
+                            // check if the neighbour is alive, and if so increment neighbours!
+                            if let LifeDataContainer::Alive(_) = last_gen[check.n][check_x][check_y][check_z] {neighbours += 1;}
+                        }
+
                         // CHECK 5 NEIGHBOURS IN SAME CUBE
                         if n != 0 && let LifeDataContainer::Alive(_) = last_gen[0][x][y][z] {neighbours += 1}
                         if n != 1 && let LifeDataContainer::Alive(_) = last_gen[1][x][y][z] {neighbours += 1}
@@ -562,60 +616,6 @@ pub fn run(
                                 if let LifeDataContainer::Alive(_) = last_gen[5][x][0][session.universe_size-1] {neighbours += 1;}
                             }
                         } else if n == 4 {// light grey touches dark grey and red in the same xyz and light blue and white either side (need to check if thats x or z)
-                            for check in checks(n).iter() {
-                                let mut check_x = x;
-                                let mut check_y = y;
-                                let mut check_z = z;
-
-                                match &check.axis {
-                                    Axis::XPos => {check_x += 1},
-                                    Axis::XNeg => {check_x = check_x.wrapping_sub(1)},
-                                    Axis::YPos => {check_y += 1},
-                                    Axis::YNeg => {check_y = check_y.wrapping_sub(1)},
-                                    Axis::ZPos => {check_z += 1},
-                                    Axis::ZNeg => {check_z = check_z.wrapping_sub(1)},
-                                    Axis::XPosYPos => {check_x += 1;check_y += 1},
-                                    Axis::XPosYNeg => {check_x += 1;check_y -= 1},
-                                    Axis::XNegYPos => {check_x -= 1;check_y += 1},
-                                    Axis::XNegYNeg => {check_x -= 1;check_y -= 1},
-                                    Axis::XPosZPos => {check_x += 1;check_z += 1},
-                                    Axis::XPosZNeg => {check_x += 1;check_z -= 1},
-                                    Axis::XNegZPos => {check_x -= 1;check_z += 1},
-                                    Axis::XNegZNeg => {check_x -= 1;check_z -= 1},
-                                    Axis::YPosZPos => {check_y += 1;check_z += 1},
-                                    Axis::YPosZNeg => {check_y += 1;check_z -= 1},
-                                    Axis::YNegZPos => {check_y += 1;check_z += 1},
-                                    Axis::YNegZNeg => {check_y += 1;check_z -= 1},
-                                }
-
-                                // handle overflow
-                                //TODO: in universe size 256 this may not be needed
-                                if check_x == session.universe_size {
-                                    check_x = 0;
-                                }
-                                if check_y == session.universe_size {
-                                    check_y = 0;
-                                }
-                                if check_z == session.universe_size {
-                                    check_z = 0;
-                                }
-
-                                // handle underflow
-                                //TODO: in universe size 256 this may not be needed
-                                if check_x > session.universe_size {
-                                    check_x = session.universe_size-1;
-                                }
-                                if check_y > session.universe_size {
-                                    check_y = session.universe_size-1;
-                                }
-                                if check_z > session.universe_size {
-                                    check_z = session.universe_size-1;
-                                }
-
-                                // check if the neighbour is alive, and if so increment neighbours!
-                                if let LifeDataContainer::Alive(_) = last_gen[check.n][check_x][check_y][check_z] {neighbours += 1;}
-                            }
-
                             // touches 3 in x-1 z+1
                             if session.universe_size > z+1 {
                                 if x > 0 {
