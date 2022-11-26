@@ -273,10 +273,6 @@ pub fn run(
                 for (y, vec3) in vec2.iter().enumerate() {
                     for (z, entity_life) in vec3.iter().enumerate() {
                         let mut neighbours: usize = 0;
-                        /*
-                          // the x>0 y>0 and z>0 are for checking if we are not needing to wrap the universe
-                          // the x==0 y==0 z==0 checks are if we are wrapping the universe to find out neighbour
-                        */
                         
                         //remember z goes down as you move forward from the start position
                         if n == 0 {
@@ -643,7 +639,6 @@ pub fn run(
                                 if let LifeDataContainer::Alive(_) = last_gen[check.n][check_x][check_y][check_z] {neighbours += 1;}
                             }
 
-                            // 2 FACE CHECKS
                             // touches 3 in x-1 z+1
                             if session.universe_size > z+1 {
                                 if x > 0 {
