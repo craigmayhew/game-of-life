@@ -208,6 +208,12 @@ fn checks(n: usize) -> Vec<NeighbourChecks> {
             NeighbourChecks{n: 4, axis: Axis::YNeg},// touches 4 in y-1
             NeighbourChecks{n: 0, axis: Axis::ZPos},// touches 0 in z+1
             NeighbourChecks{n: 4, axis: Axis::ZNeg},// touches 4 in z-1
+            // 5 DOUBLE AXIS EDGE CHECKS
+            NeighbourChecks{n: 2, axis: Axis::XNegYNeg},// touches 2 in x-1 y-1
+            NeighbourChecks{n: 1, axis: Axis::XNegZNeg},// touches 1 in x-1 z-1
+            NeighbourChecks{n: 2, axis: Axis::XNegZNeg},// touches 2 in x-1 z-1
+            NeighbourChecks{n: 2, axis: Axis::YNegZPos},// touches 2 y-1 z+1
+            NeighbourChecks{n: 3, axis: Axis::YNegZPos},// touches 3 y-1 z+1
         ]
     } else {
         //TODO this next one is wrong wrong wrong!!!! And will go when refactor n to be a enum+match
@@ -438,46 +444,7 @@ pub fn run(
                         } else if n == 4 {
 
                         } else if n == 5 {
-                            // touches 2 in x-1 y-1
-                            if y > 0 {
-                                if x > 0 {
-                                    if let LifeDataContainer::Alive(_) = last_gen[2][x-1][y-1][z] {neighbours += 1;}
-                                } else if let LifeDataContainer::Alive(_) = last_gen[2][session.universe_size-1][y-1][z] {neighbours += 1;}
-                            } else if x > 0 {
-                                if let LifeDataContainer::Alive(_) = last_gen[2][x-1][session.universe_size-1][z] {neighbours += 1;}
-                            } else if let LifeDataContainer::Alive(_) = last_gen[2][session.universe_size-1][session.universe_size-1][z] {neighbours += 1;}
-                            // touches 1 and 2 in x-1 z-1
-                            if z > 0 {
-                                if x > 0 {
-                                    if let LifeDataContainer::Alive(_) = last_gen[1][x-1][y][z-1] {neighbours += 1;}
-                                    if let LifeDataContainer::Alive(_) = last_gen[2][x-1][y][z-1] {neighbours += 1;}
-                                } else {
-                                    if let LifeDataContainer::Alive(_) = last_gen[1][session.universe_size-1][y][z-1] {neighbours += 1;}
-                                    if let LifeDataContainer::Alive(_) = last_gen[2][session.universe_size-1][y][z-1] {neighbours += 1;}
-                                }
-                            } else if x > 0 {
-                                if let LifeDataContainer::Alive(_) = last_gen[1][x-1][y][session.universe_size-1] {neighbours += 1;}
-                                if let LifeDataContainer::Alive(_) = last_gen[2][x-1][y][session.universe_size-1] {neighbours += 1;}
-                            } else {
-                                if let LifeDataContainer::Alive(_) = last_gen[1][session.universe_size-1][y][session.universe_size-1] {neighbours += 1;}
-                                if let LifeDataContainer::Alive(_) = last_gen[2][session.universe_size-1][y][session.universe_size-1] {neighbours += 1;}
-                            }
-                            // touches 2 and 3 y-1 z+1
-                            if session.universe_size > z+1 {
-                                if y > 0 {
-                                    if let LifeDataContainer::Alive(_) = last_gen[2][x][y-1][z+1] {neighbours += 1;}
-                                    if let LifeDataContainer::Alive(_) = last_gen[3][x][y-1][z+1] {neighbours += 1;}
-                                } else {
-                                    if let LifeDataContainer::Alive(_) = last_gen[2][x][session.universe_size-1][z+1] {neighbours += 1;}
-                                    if let LifeDataContainer::Alive(_) = last_gen[3][x][session.universe_size-1][z+1] {neighbours += 1;}
-                                }
-                            } else if y > 0 {
-                                if let LifeDataContainer::Alive(_) = last_gen[2][x][y-1][0] {neighbours += 1;}
-                                if let LifeDataContainer::Alive(_) = last_gen[3][x][y-1][0] {neighbours += 1;}
-                            } else {
-                                if let LifeDataContainer::Alive(_) = last_gen[2][x][session.universe_size-1][0] {neighbours += 1;}
-                                if let LifeDataContainer::Alive(_) = last_gen[3][x][session.universe_size-1][0] {neighbours += 1;}
-                            }
+                            
                         } else {
                             println!("Error: n was not in 0-5");
                         }
