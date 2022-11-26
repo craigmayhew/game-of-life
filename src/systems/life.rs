@@ -17,47 +17,55 @@ pub struct LifeTag;
 pub struct LifeSystem {}
 
 pub fn create_life_xyz(
-    n:usize,
+    n:&TetraIndex,
     x:usize,
     y:usize,
     z:usize,
 ) -> bevy::prelude::Transform {
     // position the life form in 3d space
     let mut transform_new_life: Transform;
-    if n == 2 || n == 3 {
-        // position the life form in 3d space
-        transform_new_life = Transform::from_xyz(
-            (x as f32-1.0) * LIFE_FORM_SIZE,
-            (y as f32+1.0) * LIFE_FORM_SIZE,
-            (z as f32-1.0) * LIFE_FORM_SIZE
-        );
-    } else {
-        transform_new_life = Transform::from_xyz(
-            (x as f32) * LIFE_FORM_SIZE,
-            (y as f32) * LIFE_FORM_SIZE,
-            (z as f32) * LIFE_FORM_SIZE
-        );
+    match n {
+        TetraIndex::Two | TetraIndex::Three => {
+            // position the life form in 3d space
+            transform_new_life = Transform::from_xyz(
+                (x as f32-1.0) * LIFE_FORM_SIZE,
+                (y as f32+1.0) * LIFE_FORM_SIZE,
+                (z as f32-1.0) * LIFE_FORM_SIZE
+            );
+        },
+        TetraIndex::Zero | TetraIndex::One | TetraIndex::Four | TetraIndex::Five => {
+            transform_new_life = Transform::from_xyz(
+                (x as f32) * LIFE_FORM_SIZE,
+                (y as f32) * LIFE_FORM_SIZE,
+                (z as f32) * LIFE_FORM_SIZE
+            );
+        }
     }
     //TODO consider if n == 0 and n == 1 could/should actually be identical blocks
     //NOTES: We seem to be doing all of this in eigths of a turn i.e. 0.25 PI
     //       This suggests our shape starts out at an angle. Confirmed by viewing obj file.
     //BETTER TODO: Replace most of this code with 6 correctly rotated obj files
-    if n == 0 {//white
-        transform_new_life.rotate_x(std::f32::consts::PI*0.75);
-        transform_new_life.rotate_y(std::f32::consts::FRAC_PI_2);
-        transform_new_life.rotate_z(std::f32::consts::PI);
-    } else if n == 1 {//red
-        transform_new_life.rotate_x(std::f32::consts::PI*1.75);
-        transform_new_life.rotate_y(0.0);
-        transform_new_life.rotate_z(std::f32::consts::FRAC_PI_2);
-    } else if n == 2 || n == 3 {//light blue and dark blue
-        transform_new_life.rotate_x(std::f32::consts::PI*0.75);
-        transform_new_life.rotate_y(0.0);
-        transform_new_life.rotate_z(0.0);
-    } else {//light grey and dark grey
-        transform_new_life.rotate_x(std::f32::consts::FRAC_PI_4);
-        transform_new_life.rotate_y(std::f32::consts::PI);
-        transform_new_life.rotate_z(0.0);
+    match n {
+        TetraIndex::Zero => {//white
+            transform_new_life.rotate_x(std::f32::consts::PI*0.75);
+            transform_new_life.rotate_y(std::f32::consts::FRAC_PI_2);
+            transform_new_life.rotate_z(std::f32::consts::PI);
+        },
+        TetraIndex::One => {//red
+            transform_new_life.rotate_x(std::f32::consts::PI*1.75);
+            transform_new_life.rotate_y(0.0);
+            transform_new_life.rotate_z(std::f32::consts::FRAC_PI_2);
+        },
+        TetraIndex::Two | TetraIndex::Three => {//light blue and dark blue
+            transform_new_life.rotate_x(std::f32::consts::PI*0.75);
+            transform_new_life.rotate_y(0.0);
+            transform_new_life.rotate_z(0.0);
+        },
+        TetraIndex::Four | TetraIndex::Five => {//light grey and dark grey
+            transform_new_life.rotate_x(std::f32::consts::FRAC_PI_4);
+            transform_new_life.rotate_y(std::f32::consts::PI);
+            transform_new_life.rotate_z(0.0);
+        },
     }
 
     //set size of tetrahedrons and return
@@ -74,7 +82,46 @@ pub enum LifeDataContainer {
     Dead(bool),
 }
 
-//
+pub enum TetraIndex {
+    Zero,
+    One,
+    Two,
+    Three,
+    Four,
+    Five
+}
+pub const TETRA_INDEXES: [TetraIndex; 6] = [TetraIndex::Zero,TetraIndex::One,TetraIndex::Two,TetraIndex::Three,TetraIndex::Four,TetraIndex::Five];
+
+use std::ops::Index;
+impl Index<TetraIndex> for TetraIndex {
+    type Output = usize;
+
+    fn index(&self, tetraindex: TetraIndex) -> &Self::Output {
+        match tetraindex {
+            TetraIndex::Zero => &0,
+            TetraIndex::One => &1,
+            TetraIndex::Two => &2,
+            TetraIndex::Three => &3,
+            TetraIndex::Four => &4,
+            TetraIndex::Five => &5,
+        }
+    }
+}
+impl Index<TetraIndex> for Vec<Vec<Vec<LifeDataContainer>>> {
+    type Output = usize;
+
+    fn index(&self, tetraindex: TetraIndex) -> &Self::Output {
+        match tetraindex {
+            TetraIndex::Zero => &0,
+            TetraIndex::One => &1,
+            TetraIndex::Two => &2,
+            TetraIndex::Three => &3,
+            TetraIndex::Four => &4,
+            TetraIndex::Five => &5,
+        }
+    }
+}
+
 pub enum Axis {
     XPos,
     XNeg,
@@ -96,136 +143,137 @@ pub enum Axis {
     YNegZNeg,
 }
 pub struct NeighbourChecks {
-    n: usize,
+    n: TetraIndex,
     axis: Axis,
 }
 
-fn checks(n: usize) -> Vec<NeighbourChecks> {
+fn checks(n: &TetraIndex) -> Vec<NeighbourChecks> {
     // Q: WHY ARE THERE NO TRIPLE AXIS CHECKS?
     // A: We only check faces and sides of tetras!
     //    Three axis checks are only a requirement of corner checks
     // NOTE: z goes down as you move forward from the start position
-    if n == 0 {
-        vec![
-            // 2 FACE CHECKS
-            NeighbourChecks{n: 2, axis: Axis::YNeg},// touches 2 in y-1
-            NeighbourChecks{n: 4, axis: Axis::ZNeg},// touches 4 in z-1
-            // 6 SINGLE AXIS EDGE CHECKS
-            NeighbourChecks{n: 3, axis: Axis::XNeg},// touches 3 in x-1
-            NeighbourChecks{n: 5, axis: Axis::XPos},// touches 5 in x+1
-            NeighbourChecks{n: 1, axis: Axis::YNeg},// touches 1 in y-1
-            NeighbourChecks{n: 3, axis: Axis::YNeg},// touches 3 in y-1
-            NeighbourChecks{n: 1, axis: Axis::ZNeg},// touches 1 in z-1
-            NeighbourChecks{n: 5, axis: Axis::ZNeg},// touches 5 in z-1
-            // 5 DOUBLE AXIS EDGE CHECKS
-            NeighbourChecks{n: 1, axis: Axis::YNegZNeg},// touches 1 in y-1 z-1
-            NeighbourChecks{n: 1, axis: Axis::XNegZNeg},// touches 1 in x-1 z-1
-            NeighbourChecks{n: 2, axis: Axis::XNegZNeg},// touches 2 in x-1 z-1
-            NeighbourChecks{n: 1, axis: Axis::XPosYNeg},// touches 1 in x+1 y-1
-            NeighbourChecks{n: 4, axis: Axis::XPosYNeg},// touches 4 in x+1 y-1
-        ]
-    } else if n == 1 {
-        vec![
-            // 2 FACE CHECKS
-            NeighbourChecks{n: 5, axis: Axis::YPos}, // touches 5 in y+1
-            NeighbourChecks{n: 3, axis: Axis::ZPos}, // touches 3 in z+1
-            // 6 SINGLE AXIS EDGE CHECKS
-            NeighbourChecks{n: 2, axis: Axis::XNeg},// touches 2 in x-1
-            NeighbourChecks{n: 4, axis: Axis::XPos},// touches 4 in x+1
-            NeighbourChecks{n: 0, axis: Axis::YPos},// touches 0 in y+1
-            NeighbourChecks{n: 4, axis: Axis::YPos},// touches 4 in y+1
-            NeighbourChecks{n: 2, axis: Axis::ZPos},// touches 2 in z+1
-            NeighbourChecks{n: 0, axis: Axis::ZPos},// touches 0 in z+1
-            // 5 DOUBLE AXIS EDGE CHECKS
-            NeighbourChecks{n: 0, axis: Axis::YPosZPos},// touches 0 in y+1 z+1
-            NeighbourChecks{n: 0, axis: Axis::XPosZPos},// touches 0 in x+1 z+1
-            NeighbourChecks{n: 5, axis: Axis::XPosZPos},// touches 5 in x+1 z+1
-            NeighbourChecks{n: 0, axis: Axis::XNegYPos},// touches 0 in x-1 y+1
-            NeighbourChecks{n: 3, axis: Axis::XNegYPos},// touches 3 in x-1 y+1
-        ]
-    } else if n == 2 {
-        vec![
-            // 2 FACE CHECKS
-            NeighbourChecks{n: 4, axis: Axis::XPos}, // touches 4 in x+1
-            NeighbourChecks{n: 0, axis: Axis::YPos}, // touches 0 in y+1
-            // 6 SINGLE AXIS EDGE CHECKS
-            NeighbourChecks{n: 1, axis: Axis::XPos},// touches 1 in x+1
-            NeighbourChecks{n: 5, axis: Axis::XPos},// touches 5 in x+1
-            NeighbourChecks{n: 3, axis: Axis::YPos},// touches 3 in y+1
-            NeighbourChecks{n: 5, axis: Axis::YPos},// touches 5 in y+1
-            NeighbourChecks{n: 3, axis: Axis::ZPos},// touches 3 in z+1
-            NeighbourChecks{n: 1, axis: Axis::ZNeg},// touches 1 in z-1
-            // 5 DOUBLE AXIS EDGE CHECKS
-            NeighbourChecks{n: 4, axis: Axis::YPosZNeg},// touches 4 in y+1 z-1
-            NeighbourChecks{n: 5, axis: Axis::YPosZNeg},// touches 5 in y+1 z-1
-            NeighbourChecks{n: 0, axis: Axis::XPosZPos},// touches 0 in x+1 z+1
-            NeighbourChecks{n: 5, axis: Axis::XPosZPos},// touches 5 in x+1 z+1
-            NeighbourChecks{n: 5, axis: Axis::XPosYPos},// touches 5 in x+1 y+1
-        ]
-    } else if n == 3 {
-        vec![
-            // 2 FACE CHECKS
-            NeighbourChecks{n: 5, axis: Axis::XPos}, // touches 5 in x+1
-            NeighbourChecks{n: 1, axis: Axis::ZNeg}, // touches 1 in z-1
-            // 6 SINGLE AXIS EDGE CHECKS
-            NeighbourChecks{n: 0, axis: Axis::XPos},// touches 0 in x+1
-            NeighbourChecks{n: 4, axis: Axis::XPos},// touches 4 in x+1
-            NeighbourChecks{n: 0, axis: Axis::YPos},// touches 0 in y+1
-            NeighbourChecks{n: 2, axis: Axis::YNeg},// touches 2 in y-1
-            NeighbourChecks{n: 2, axis: Axis::ZNeg},// touches 2 in z-1
-            NeighbourChecks{n: 4, axis: Axis::ZNeg},// touches 4 in z-1
-            // 5 DOUBLE AXIS EDGE CHECKS
-            NeighbourChecks{n: 1, axis: Axis::XPosYNeg},// touches 1 in x+1 y-1
-            NeighbourChecks{n: 4, axis: Axis::XPosYNeg},// touches 4 in x+1 y-1
-            NeighbourChecks{n: 4, axis: Axis::XPosZNeg},// touches 4 in x+1 z-1
-            NeighbourChecks{n: 4, axis: Axis::YPosZNeg},// touches 4 in y+1 z-1
-            NeighbourChecks{n: 5, axis: Axis::YPosZNeg},// touches 5 in y+1 z-1
-        ]
-    } else if n == 4 { // yellow
-        vec![
-            // 2 FACE CHECKS
-            NeighbourChecks{n: 2, axis: Axis::XNeg},// touches face of dark blue 
-            NeighbourChecks{n: 0, axis: Axis::ZPos},// touches face of white
-            // 6 SINGLE AXIS EDGE CHECKS
-            NeighbourChecks{n: 1, axis: Axis::XNeg},// touches 1 in x-1
-            NeighbourChecks{n: 3, axis: Axis::XNeg},// touches 3 in x-1
-            NeighbourChecks{n: 5, axis: Axis::YPos},// touches 5 in y+1
-            NeighbourChecks{n: 1, axis: Axis::YNeg},// touches 1 in y-1
-            NeighbourChecks{n: 3, axis: Axis::ZPos},// touches 3 in z+1
-            NeighbourChecks{n: 5, axis: Axis::ZPos},// touches 5 in z+1
-            // 5 DOUBLE AXIS EDGE CHECKS
-            NeighbourChecks{n: 3, axis: Axis::XNegZPos},// touches 3 in x-1 z+1
-            NeighbourChecks{n: 0, axis: Axis::XNegYPos},// touches 0 in x-1 y+1
-            NeighbourChecks{n: 3, axis: Axis::XNegYPos},// touches 3 in x-1 y+1
-            NeighbourChecks{n: 2, axis: Axis::YNegZPos},// touches 2 y-1 z+1
-            NeighbourChecks{n: 3, axis: Axis::YNegZPos},// touches 3 y-1 z+1
-        ]
-    } else if n == 5 {
-        vec![
-            // 2 FACE CHECKS
-            NeighbourChecks{n: 3, axis: Axis::XNeg}, // touches 3 in x-1
-            NeighbourChecks{n: 1, axis: Axis::YNeg}, // touches 1 in y-1
-            // 6 SINGLE AXIS EDGE CHECKS
-            NeighbourChecks{n: 2, axis: Axis::XNeg},// touches 2 in x-1
-            NeighbourChecks{n: 0, axis: Axis::XNeg},// touches 0 in x-1
-            NeighbourChecks{n: 2, axis: Axis::YNeg},// touches 2 in y-1
-            NeighbourChecks{n: 4, axis: Axis::YNeg},// touches 4 in y-1
-            NeighbourChecks{n: 0, axis: Axis::ZPos},// touches 0 in z+1
-            NeighbourChecks{n: 4, axis: Axis::ZNeg},// touches 4 in z-1
-            // 5 DOUBLE AXIS EDGE CHECKS
-            NeighbourChecks{n: 2, axis: Axis::XNegYNeg},// touches 2 in x-1 y-1
-            NeighbourChecks{n: 1, axis: Axis::XNegZNeg},// touches 1 in x-1 z-1
-            NeighbourChecks{n: 2, axis: Axis::XNegZNeg},// touches 2 in x-1 z-1
-            NeighbourChecks{n: 2, axis: Axis::YNegZPos},// touches 2 y-1 z+1
-            NeighbourChecks{n: 3, axis: Axis::YNegZPos},// touches 3 y-1 z+1
-        ]
-    } else {
-        //TODO this next one is wrong wrong wrong!!!! And will go when refactor n to be a enum+match
-        vec![
-            // 2 FACE CHECKS
-            NeighbourChecks{n: 2, axis: Axis::XNeg},
-            NeighbourChecks{n: 0, axis: Axis::ZPos},
-        ]
+    match n {
+        TetraIndex::Zero => {
+            vec![
+                // 2 FACE CHECKS
+                NeighbourChecks{n: TetraIndex::Two, axis: Axis::YNeg},// touches 2 in y-1
+                NeighbourChecks{n: TetraIndex::Four, axis: Axis::ZNeg},// touches 4 in z-1
+                // 6 SINGLE AXIS EDGE CHECKS
+                NeighbourChecks{n: TetraIndex::Three, axis: Axis::XNeg},// touches 3 in x-1
+                NeighbourChecks{n: TetraIndex::Five, axis: Axis::XPos},// touches 5 in x+1
+                NeighbourChecks{n: TetraIndex::One, axis: Axis::YNeg},// touches 1 in y-1
+                NeighbourChecks{n: TetraIndex::Three, axis: Axis::YNeg},// touches 3 in y-1
+                NeighbourChecks{n: TetraIndex::One, axis: Axis::ZNeg},// touches 1 in z-1
+                NeighbourChecks{n: TetraIndex::Five, axis: Axis::ZNeg},// touches 5 in z-1
+                // 5 DOUBLE AXIS EDGE CHECKS
+                NeighbourChecks{n: TetraIndex::One, axis: Axis::YNegZNeg},// touches 1 in y-1 z-1
+                NeighbourChecks{n: TetraIndex::One, axis: Axis::XNegZNeg},// touches 1 in x-1 z-1
+                NeighbourChecks{n: TetraIndex::Two, axis: Axis::XNegZNeg},// touches 2 in x-1 z-1
+                NeighbourChecks{n: TetraIndex::One, axis: Axis::XPosYNeg},// touches 1 in x+1 y-1
+                NeighbourChecks{n: TetraIndex::Four, axis: Axis::XPosYNeg},// touches 4 in x+1 y-1
+            ]
+        },
+        TetraIndex::One => {
+            vec![
+                // 2 FACE CHECKS
+                NeighbourChecks{n: TetraIndex::Five, axis: Axis::YPos}, // touches 5 in y+1
+                NeighbourChecks{n: TetraIndex::Three, axis: Axis::ZPos}, // touches 3 in z+1
+                // 6 SINGLE AXIS EDGE CHECKS
+                NeighbourChecks{n: TetraIndex::Two, axis: Axis::XNeg},// touches 2 in x-1
+                NeighbourChecks{n: TetraIndex::Four, axis: Axis::XPos},// touches 4 in x+1
+                NeighbourChecks{n: TetraIndex::Zero, axis: Axis::YPos},// touches 0 in y+1
+                NeighbourChecks{n: TetraIndex::Four, axis: Axis::YPos},// touches 4 in y+1
+                NeighbourChecks{n: TetraIndex::Two, axis: Axis::ZPos},// touches 2 in z+1
+                NeighbourChecks{n: TetraIndex::Zero, axis: Axis::ZPos},// touches 0 in z+1
+                // 5 DOUBLE AXIS EDGE CHECKS
+                NeighbourChecks{n: TetraIndex::Zero, axis: Axis::YPosZPos},// touches 0 in y+1 z+1
+                NeighbourChecks{n: TetraIndex::Zero, axis: Axis::XPosZPos},// touches 0 in x+1 z+1
+                NeighbourChecks{n: TetraIndex::Five, axis: Axis::XPosZPos},// touches 5 in x+1 z+1
+                NeighbourChecks{n: TetraIndex::Zero, axis: Axis::XNegYPos},// touches 0 in x-1 y+1
+                NeighbourChecks{n: TetraIndex::Three, axis: Axis::XNegYPos},// touches 3 in x-1 y+1
+            ]
+        },
+        TetraIndex::Two => {
+            vec![
+                // 2 FACE CHECKS
+                NeighbourChecks{n: TetraIndex::Four, axis: Axis::XPos}, // touches 4 in x+1
+                NeighbourChecks{n: TetraIndex::Zero, axis: Axis::YPos}, // touches 0 in y+1
+                // 6 SINGLE AXIS EDGE CHECKS
+                NeighbourChecks{n: TetraIndex::One, axis: Axis::XPos},// touches 1 in x+1
+                NeighbourChecks{n: TetraIndex::Five, axis: Axis::XPos},// touches 5 in x+1
+                NeighbourChecks{n: TetraIndex::Three, axis: Axis::YPos},// touches 3 in y+1
+                NeighbourChecks{n: TetraIndex::Five, axis: Axis::YPos},// touches 5 in y+1
+                NeighbourChecks{n: TetraIndex::Three, axis: Axis::ZPos},// touches 3 in z+1
+                NeighbourChecks{n: TetraIndex::One, axis: Axis::ZNeg},// touches 1 in z-1
+                // 5 DOUBLE AXIS EDGE CHECKS
+                NeighbourChecks{n: TetraIndex::Four, axis: Axis::YPosZNeg},// touches 4 in y+1 z-1
+                NeighbourChecks{n: TetraIndex::Five, axis: Axis::YPosZNeg},// touches 5 in y+1 z-1
+                NeighbourChecks{n: TetraIndex::Zero, axis: Axis::XPosZPos},// touches 0 in x+1 z+1
+                NeighbourChecks{n: TetraIndex::Five, axis: Axis::XPosZPos},// touches 5 in x+1 z+1
+                NeighbourChecks{n: TetraIndex::Five, axis: Axis::XPosYPos},// touches 5 in x+1 y+1
+            ]
+        },
+        TetraIndex::Three => {
+            vec![
+                // 2 FACE CHECKS
+                NeighbourChecks{n: TetraIndex::Five, axis: Axis::XPos}, // touches 5 in x+1
+                NeighbourChecks{n: TetraIndex::One, axis: Axis::ZNeg}, // touches 1 in z-1
+                // 6 SINGLE AXIS EDGE CHECKS
+                NeighbourChecks{n: TetraIndex::Zero, axis: Axis::XPos},// touches 0 in x+1
+                NeighbourChecks{n: TetraIndex::Four, axis: Axis::XPos},// touches 4 in x+1
+                NeighbourChecks{n: TetraIndex::Zero, axis: Axis::YPos},// touches 0 in y+1
+                NeighbourChecks{n: TetraIndex::Two, axis: Axis::YNeg},// touches 2 in y-1
+                NeighbourChecks{n: TetraIndex::Two, axis: Axis::ZNeg},// touches 2 in z-1
+                NeighbourChecks{n: TetraIndex::Four, axis: Axis::ZNeg},// touches 4 in z-1
+                // 5 DOUBLE AXIS EDGE CHECKS
+                NeighbourChecks{n: TetraIndex::One, axis: Axis::XPosYNeg},// touches 1 in x+1 y-1
+                NeighbourChecks{n: TetraIndex::Four, axis: Axis::XPosYNeg},// touches 4 in x+1 y-1
+                NeighbourChecks{n: TetraIndex::Four, axis: Axis::XPosZNeg},// touches 4 in x+1 z-1
+                NeighbourChecks{n: TetraIndex::Four, axis: Axis::YPosZNeg},// touches 4 in y+1 z-1
+                NeighbourChecks{n: TetraIndex::Five, axis: Axis::YPosZNeg},// touches 5 in y+1 z-1
+            ]
+            
+        },
+        TetraIndex::Four => {
+            vec![
+                // 2 FACE CHECKS
+                NeighbourChecks{n: TetraIndex::Two, axis: Axis::XNeg},// touches face of dark blue 
+                NeighbourChecks{n: TetraIndex::Zero, axis: Axis::ZPos},// touches face of white
+                // 6 SINGLE AXIS EDGE CHECKS
+                NeighbourChecks{n: TetraIndex::One, axis: Axis::XNeg},// touches 1 in x-1
+                NeighbourChecks{n: TetraIndex::Three, axis: Axis::XNeg},// touches 3 in x-1
+                NeighbourChecks{n: TetraIndex::Five, axis: Axis::YPos},// touches 5 in y+1
+                NeighbourChecks{n: TetraIndex::One, axis: Axis::YNeg},// touches 1 in y-1
+                NeighbourChecks{n: TetraIndex::Three, axis: Axis::ZPos},// touches 3 in z+1
+                NeighbourChecks{n: TetraIndex::Five, axis: Axis::ZPos},// touches 5 in z+1
+                // 5 DOUBLE AXIS EDGE CHECKS
+                NeighbourChecks{n: TetraIndex::Three, axis: Axis::XNegZPos},// touches 3 in x-1 z+1
+                NeighbourChecks{n: TetraIndex::Zero, axis: Axis::XNegYPos},// touches 0 in x-1 y+1
+                NeighbourChecks{n: TetraIndex::Three, axis: Axis::XNegYPos},// touches 3 in x-1 y+1
+                NeighbourChecks{n: TetraIndex::Two, axis: Axis::YNegZPos},// touches 2 y-1 z+1
+                NeighbourChecks{n: TetraIndex::Three, axis: Axis::YNegZPos},// touches 3 y-1 z+1
+            ]
+        },
+        TetraIndex::Five => {
+            vec![
+                // 2 FACE CHECKS
+                NeighbourChecks{n: TetraIndex::Three, axis: Axis::XNeg}, // touches 3 in x-1
+                NeighbourChecks{n: TetraIndex::One, axis: Axis::YNeg}, // touches 1 in y-1
+                // 6 SINGLE AXIS EDGE CHECKS
+                NeighbourChecks{n: TetraIndex::Two, axis: Axis::XNeg},// touches 2 in x-1
+                NeighbourChecks{n: TetraIndex::Zero, axis: Axis::XNeg},// touches 0 in x-1
+                NeighbourChecks{n: TetraIndex::Two, axis: Axis::YNeg},// touches 2 in y-1
+                NeighbourChecks{n: TetraIndex::Four, axis: Axis::YNeg},// touches 4 in y-1
+                NeighbourChecks{n: TetraIndex::Zero, axis: Axis::ZPos},// touches 0 in z+1
+                NeighbourChecks{n: TetraIndex::Four, axis: Axis::ZNeg},// touches 4 in z-1
+                // 5 DOUBLE AXIS EDGE CHECKS
+                NeighbourChecks{n: TetraIndex::Two, axis: Axis::XNegYNeg},// touches 2 in x-1 y-1
+                NeighbourChecks{n: TetraIndex::One, axis: Axis::XNegZNeg},// touches 1 in x-1 z-1
+                NeighbourChecks{n: TetraIndex::Two, axis: Axis::XNegZNeg},// touches 2 in x-1 z-1
+                NeighbourChecks{n: TetraIndex::Two, axis: Axis::YNegZPos},// touches 2 y-1 z+1
+                NeighbourChecks{n: TetraIndex::Three, axis: Axis::YNegZPos},// touches 3 y-1 z+1
+            ]
+        }
     }
 }
 
@@ -257,6 +305,17 @@ pub fn place_life_with_keyboard(
             } else {
                 5
             };
+
+            //TODO it doesn't seem very safe to have the if elseif else above and then convert to this
+            let tetra_index = match n {
+                0 => TetraIndex::Zero,
+                1 => TetraIndex::One,
+                2 => TetraIndex::Two,
+                3 => TetraIndex::Three,
+                4 => TetraIndex::Four,
+                5 => TetraIndex::Five,
+                _ => TetraIndex::Five,
+            };
             
             if x > 0.0 && x < session.universe_size as f32 &&
             y > 0.0 && y < session.universe_size as f32 &&
@@ -269,7 +328,7 @@ pub fn place_life_with_keyboard(
                     },
                     LifeDataContainer::Dead(_) => {// if dead currently
                         // Place a life form
-                        let transform_new_life: bevy::prelude::Transform = create_life_xyz(n, x as usize, y as usize, z as usize);
+                        let transform_new_life: bevy::prelude::Transform = create_life_xyz(&tetra_index, x as usize, y as usize, z as usize);
                         session.life[n][x as usize][y as usize][z as usize] = LifeDataContainer::Alive(commands.spawn_bundle(PbrBundle {
                             mesh: session.life_form_meshes[n%2].clone(),
                             material: session.life_form_materials[n].clone(),
@@ -328,8 +387,9 @@ pub fn run(
     // first generation, generate random life
     if session.generation == 1 {
         let life_to_create: Vec<Vec<Vec<Vec<LifeDataContainer>>>> = session.life.clone();
-        for (n, vec1) in life_to_create.iter().enumerate() {
-            for (x, vec2) in vec1.iter().enumerate() {
+        for tetra_index in TETRA_INDEXES {
+            let n:usize = tetra_index as usize;
+            for (x, vec2) in life_to_create[n].iter().enumerate() {
                 for (y, vec3) in vec2.iter().enumerate() {
                     for (z, _empty_entity_id) in vec3.iter().enumerate() {
                         //randomly generate initial life in the universe
@@ -338,11 +398,11 @@ pub fn run(
                             continue;
                         }
 
-                        let transform_new_life: bevy::prelude::Transform = create_life_xyz(n, x, y, z);
+                        let transform_new_life: bevy::prelude::Transform = create_life_xyz(&tetra_index, x, y, z);
                     
                         // make the life form exist!
                         session.life[n][x][y][z] = LifeDataContainer::Alive(commands.spawn_bundle(PbrBundle {
-                            mesh: session.life_form_meshes[n%2].clone(),
+                            mesh: session.life_form_meshes[n %2].clone(),
                             material: session.life_form_materials[n].clone(),
                             transform: transform_new_life,
                             ..Default::default()
@@ -367,13 +427,14 @@ pub fn run(
         dark grey touches light grey and white in the same xyz and red in the y below
         */
         
-        for (n, vec1) in last_gen.iter().enumerate() {
-            for (x, vec2) in vec1.iter().enumerate() {
+        for tetra_index in [TetraIndex::Zero,TetraIndex::One,TetraIndex::Two,TetraIndex::Three,TetraIndex::Four,TetraIndex::Five] {
+            let n: usize = tetra_index as usize;
+            for (x, vec2) in last_gen[n].iter().enumerate() {
                 for (y, vec3) in vec2.iter().enumerate() {
                     for (z, entity_life) in vec3.iter().enumerate() {
                         let mut neighbours: usize = 0;
                         
-                        for check in checks(n).iter() {
+                        for check in checks(&tetra_index).iter() {
                             let mut check_x = x;
                             let mut check_y = y;
                             let mut check_z = z;
@@ -424,7 +485,7 @@ pub fn run(
                             }
 
                             // check if the neighbour is alive, and if so increment neighbours!
-                            if let LifeDataContainer::Alive(_) = last_gen[check.n][check_x][check_y][check_z] {neighbours += 1;}
+                            if let LifeDataContainer::Alive(_) = last_gen[check.n as usize][check_x][check_y][check_z] {neighbours += 1;}
                         }
 
                         // CHECK 5 NEIGHBOURS IN SAME CUBE
@@ -450,7 +511,7 @@ pub fn run(
                             LifeDataContainer::Dead(_) => {// if dead in last gen
                                 //if neighbours = 3 then become alive
                                 if neighbours == 3 {
-                                    let transform_new_life: bevy::prelude::Transform = create_life_xyz(n, x, y, z);
+                                    let transform_new_life: bevy::prelude::Transform = create_life_xyz(&tetra_index, x, y, z);
                                 
                                     // make the life form exist!
                                     next_gen[n][x][y][z] = LifeDataContainer::Alive(commands.spawn_bundle(PbrBundle {

@@ -9,7 +9,11 @@ use std::time::SystemTime;
 use crate::{
     AppState,
     SessionResource,
-    systems::life::{Life,LifeDataContainer},
+    systems::life::{
+        Life,
+        LifeDataContainer,
+        TETRA_INDEXES,
+    },
 };
 
 pub enum GameFileToLoad {
@@ -50,15 +54,16 @@ pub fn load (
             }
 
             // resize the universe to match the load file
-            session.life = vec![vec![vec![vec![crate::systems::life::LifeDataContainer::Dead(true); data.universe_size]; data.universe_size]; data.universe_size]; 6];
+            session.life = vec![vec![vec![vec![LifeDataContainer::Dead(true); data.universe_size]; data.universe_size]; data.universe_size]; 6];
 
             // so we can spawn new ones form the save file
-            for (n, vec1) in data.life.iter().enumerate() {
-                for (x, vec2) in vec1.iter().enumerate() {
+            for tetra_index in TETRA_INDEXES {
+                let n: usize = tetra_index as usize;
+                for (x, vec2) in data.life[n].iter().enumerate() {
                     for (y, vec3) in vec2.iter().enumerate() {
                         for (z, alive_or_not) in vec3.iter().enumerate() {
                             if alive_or_not == &1 {
-                                let transform_new_life: bevy::prelude::Transform = crate::systems::life::create_life_xyz(n, x, y, z);
+                                let transform_new_life: bevy::prelude::Transform = crate::systems::life::create_life_xyz(&tetra_index, x, y, z);
                             
                                 // make the life form exist!
                                 session.life[n][x][y][z] = LifeDataContainer::Alive(commands.spawn_bundle(PbrBundle {
