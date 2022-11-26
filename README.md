@@ -13,3 +13,7 @@ To AmionSky's [plugin for wavefront files](https://github.com/AmionSky/bevy_obj/
 To the official bevy [getting started book](https://bevyengine.org/learn/book/getting-started/resources/). 
 
 ## Findings
+
+### Conways original 2d rules
+Universes based on the original conways game of life rules have endless entropy when faces and edges are checked for neighbours. If life dies where neighbours are less than 2 or more than 3, and is created where neighbours = 3. There is no stable state, no combination of tetras will remain stable.
+
