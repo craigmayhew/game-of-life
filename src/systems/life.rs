@@ -936,6 +936,9 @@ mod tests {
         app.update();
         // at this point we have twelve lifeforms that exist from the faces of the starting cube
         check_universe_state(&app.world,&AppState::InGame,4,12);
+        app.update();
+        //
+        check_universe_state(&app.world,&AppState::InGame,5,36);
     }
     #[test]
     fn test_life_345_in_same_cube_breeds() {
@@ -954,5 +957,8 @@ mod tests {
         app.update();
         // at this point we have twelve lifeforms that exist from the faces of the starting cube
         check_universe_state(&app.world,&AppState::InGame,4,12);
+        app.update();
+        //
+        check_universe_state(&app.world,&AppState::InGame,5,36);
     }
 }
