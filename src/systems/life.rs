@@ -118,10 +118,10 @@ fn checks(n: usize) -> Vec<NeighbourChecks> {
             // touches 0 and 3 in x-1 y+1
             // touches 2 and 3 y-1 z+1
             // 0 TRIPLE AXIS EDGE CHECKS
-            // TODO is there no check that requires movement in all 3 axis?!
+            // TODO is there no check that requires movement in all 3 axis?! No, because we only check sides!
         ]
     } else {
-        //TODO this next one is wrong wrong wrong!!!!
+        //TODO this next one is wrong wrong wrong!!!! And will go when refactor n to be a enum+match
         vec![
             // 2 FACE CHECKS
             NeighbourChecks{n: 2, axis: Axis::XNeg},
