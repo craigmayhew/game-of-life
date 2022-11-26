@@ -104,6 +104,7 @@ fn checks(n: usize) -> Vec<NeighbourChecks> {
     // Q: WHY ARE THERE NO TRIPLE AXIS CHECKS?
     // A: We only check faces and sides of tetras!
     //    Three axis checks are only a requirement of corner checks
+    // NOTE: z goes down as you move forward from the start position
     if n == 0 {
         vec![
             // 2 FACE CHECKS
@@ -434,23 +435,6 @@ pub fn run(
                         if n != 4 && let LifeDataContainer::Alive(_) = last_gen[4][x][y][z] {neighbours += 1}
                         if n != 5 && let LifeDataContainer::Alive(_) = last_gen[5][x][y][z] {neighbours += 1}
                         
-                        //remember z goes down as you move forward from the start position
-                        if n == 0 {
-                            
-                            
-                        } else if n == 1 {
-                            
-                        } else if n == 2 {
-                            
-                        } else if n == 3 {
-                            
-                        } else if n == 4 {
-
-                        } else if n == 5 {
-                            
-                        } else {
-                            println!("Error: n was not in 0-5");
-                        }
                         match entity_life {
                             LifeDataContainer::Alive(ent) => {//if alive in last gen
                                 if neighbours > 3 || neighbours == 1 || neighbours == 0 {
