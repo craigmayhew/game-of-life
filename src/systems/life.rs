@@ -101,6 +101,9 @@ pub struct NeighbourChecks {
 }
 
 fn checks(n: usize) -> Vec<NeighbourChecks> {
+    // Q: WHY ARE THERE NO TRIPLE AXIS CHECKS?
+    // A: We only check faces and sides of tetras!
+    //    Three axis checks are only a requirement of corner checks
     if n == 0 {
         vec![
             // 2 FACE CHECKS
