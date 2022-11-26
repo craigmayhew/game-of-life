@@ -274,14 +274,16 @@ pub fn run(
                     for (z, entity_life) in vec3.iter().enumerate() {
                         let mut neighbours: usize = 0;
                         
+                        // CHECK 5 NEIGHBOURS IN SAME CUBE
+                        if n != 0 && let LifeDataContainer::Alive(_) = last_gen[0][x][y][z] {neighbours += 1}
+                        if n != 1 && let LifeDataContainer::Alive(_) = last_gen[1][x][y][z] {neighbours += 1}
+                        if n != 2 && let LifeDataContainer::Alive(_) = last_gen[2][x][y][z] {neighbours += 1}
+                        if n != 3 && let LifeDataContainer::Alive(_) = last_gen[3][x][y][z] {neighbours += 1}
+                        if n != 4 && let LifeDataContainer::Alive(_) = last_gen[4][x][y][z] {neighbours += 1}
+                        if n != 5 && let LifeDataContainer::Alive(_) = last_gen[5][x][y][z] {neighbours += 1}
+                        
                         //remember z goes down as you move forward from the start position
                         if n == 0 {
-                            //CHECK 5 NEIGHBOURS IN SAME CUBE
-                            if let LifeDataContainer::Alive(_) = last_gen[1][x][y][z] {neighbours += 1}
-                            if let LifeDataContainer::Alive(_) = last_gen[2][x][y][z] {neighbours += 1}
-                            if let LifeDataContainer::Alive(_) = last_gen[3][x][y][z] {neighbours += 1}
-                            if let LifeDataContainer::Alive(_) = last_gen[4][x][y][z] {neighbours += 1}
-                            if let LifeDataContainer::Alive(_) = last_gen[5][x][y][z] {neighbours += 1}
                             // 2 FACE CHECKS
                             // white touches dark blue and dark grey in the same xyz and light blue in the y below
                             if y > 0 && let LifeDataContainer::Alive(_) = last_gen[2][x][y-1][z] {neighbours += 1} // touches light blue below
@@ -353,12 +355,6 @@ pub fn run(
                                 if let LifeDataContainer::Alive(_) = last_gen[4][0][session.universe_size-1][z] {neighbours += 1;}
                             }
                         } else if n == 1 {// red touches light grey and light blue in same xyz and the dark grey in the y above and dark blue in z-1
-                            //CHECK 5 NEIGHBOURS IN SAME CUBE
-                            if let LifeDataContainer::Alive(_) = last_gen[0][x][y][z] {neighbours += 1}
-                            if let LifeDataContainer::Alive(_) = last_gen[2][x][y][z] {neighbours += 1}
-                            if let LifeDataContainer::Alive(_) = last_gen[3][x][y][z] {neighbours += 1}
-                            if let LifeDataContainer::Alive(_) = last_gen[4][x][y][z] {neighbours += 1}
-                            if let LifeDataContainer::Alive(_) = last_gen[5][x][y][z] {neighbours += 1}
                             // 2 FACE CHECKS
                             //the y>0 and z>0 checks if we are the edge of the univ
                             if session.universe_size > y+1 && let LifeDataContainer::Alive(_) = last_gen[5][x][y+1][z  ] {neighbours += 1;} // touches dark grey above
@@ -429,12 +425,6 @@ pub fn run(
                                 if let LifeDataContainer::Alive(_) = last_gen[3][session.universe_size-1][0][z] {neighbours += 1;}
                             }
                         } else if n == 2 {// light blue touches red and dark blue in the same xyz and white in the y above
-                            // CHECK 5 NEIGHBOURS IN SAME CUBE
-                            if let LifeDataContainer::Alive(_) = last_gen[0][x][y][z] {neighbours += 1}
-                            if let LifeDataContainer::Alive(_) = last_gen[1][x][y][z] {neighbours += 1}
-                            if let LifeDataContainer::Alive(_) = last_gen[3][x][y][z] {neighbours += 1}
-                            if let LifeDataContainer::Alive(_) = last_gen[4][x][y][z] {neighbours += 1}
-                            if let LifeDataContainer::Alive(_) = last_gen[5][x][y][z] {neighbours += 1}
                             // 2 FACE CHECKS
                             //the y >0 checks if we are the edge of the univ
                             if session.universe_size > y+1 && let LifeDataContainer::Alive(_) = last_gen[0][x][y+1][z  ] {neighbours += 1;} // touches white above
@@ -504,12 +494,6 @@ pub fn run(
                                 neighbours += 1;
                             }
                         } else if n == 3 {// dark blue touches light blue and white in same xyz and red and dark grey either side (need to check if thats x or z)
-                            // CHECK 5 NEIGHBOURS IN SAME CUBE
-                            if let LifeDataContainer::Alive(_) = last_gen[0][x][y][z] {neighbours += 1}
-                            if let LifeDataContainer::Alive(_) = last_gen[1][x][y][z] {neighbours += 1}
-                            if let LifeDataContainer::Alive(_) = last_gen[2][x][y][z] {neighbours += 1}
-                            if let LifeDataContainer::Alive(_) = last_gen[4][x][y][z] {neighbours += 1}
-                            if let LifeDataContainer::Alive(_) = last_gen[5][x][y][z] {neighbours += 1}
                             // 2 FACE CHECKS
                             //the y >0 checks if we are the edge of the univ
                             if session.universe_size > x+1 && let LifeDataContainer::Alive(_) = last_gen[5][x+1][y  ][z] {neighbours += 1;} // touches dark grey
@@ -578,13 +562,6 @@ pub fn run(
                                 if let LifeDataContainer::Alive(_) = last_gen[5][x][0][session.universe_size-1] {neighbours += 1;}
                             }
                         } else if n == 4 {// light grey touches dark grey and red in the same xyz and light blue and white either side (need to check if thats x or z)
-                            // CHECK 5 NEIGHBOURS IN SAME CUBE
-                            if let LifeDataContainer::Alive(_) = last_gen[0][x][y][z] {neighbours += 1}
-                            if let LifeDataContainer::Alive(_) = last_gen[1][x][y][z] {neighbours += 1}
-                            if let LifeDataContainer::Alive(_) = last_gen[2][x][y][z] {neighbours += 1}
-                            if let LifeDataContainer::Alive(_) = last_gen[3][x][y][z] {neighbours += 1}
-                            if let LifeDataContainer::Alive(_) = last_gen[5][x][y][z] {neighbours += 1}
-                            
                             for check in checks(n).iter() {
                                 let mut check_x = x;
                                 let mut check_y = y;
@@ -684,12 +661,6 @@ pub fn run(
                                 if let LifeDataContainer::Alive(_) = last_gen[3][x][session.universe_size-1][0] {neighbours += 1;}
                             }
                         } else if n == 5 {// dark grey touches light grey and white in the same xyz and red in the y below and dark blue in x+1
-                            // CHECK 5 NEIGHBOURS IN SAME CUBE
-                            if let LifeDataContainer::Alive(_) = last_gen[0][x][y][z] {neighbours += 1}
-                            if let LifeDataContainer::Alive(_) = last_gen[1][x][y][z] {neighbours += 1}
-                            if let LifeDataContainer::Alive(_) = last_gen[2][x][y][z] {neighbours += 1}
-                            if let LifeDataContainer::Alive(_) = last_gen[3][x][y][z] {neighbours += 1}
-                            if let LifeDataContainer::Alive(_) = last_gen[4][x][y][z] {neighbours += 1}
                             // 2 FACE CHECKS
                             //the y >0 checks if we are the edge of the univ
                             if y > 0 && let LifeDataContainer::Alive(_) = last_gen[1][x  ][y-1][z] {neighbours += 1;} // touches red below
