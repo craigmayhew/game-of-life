@@ -844,6 +844,12 @@ mod tests {
         app.update();
         //
         check_universe_state(&app.world,&AppState::InGame,5,36);
+        app.update();
+        //
+        check_universe_state(&app.world,&AppState::InGame,6,12);
+        app.update();
+        //
+        check_universe_state(&app.world,&AppState::InGame,7,0);
     }
     #[test]
     fn test_life_345_in_same_cube_breeds() {
@@ -865,5 +871,11 @@ mod tests {
         app.update();
         //
         check_universe_state(&app.world,&AppState::InGame,5,36);
+        app.update();
+        //
+        check_universe_state(&app.world,&AppState::InGame,6,12);
+        app.update();
+        //
+        check_universe_state(&app.world,&AppState::InGame,7,0);
     }
 }
