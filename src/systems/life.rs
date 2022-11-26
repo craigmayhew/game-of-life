@@ -179,7 +179,7 @@ fn checks(n: usize) -> Vec<NeighbourChecks> {
             NeighbourChecks{n: 1, axis: Axis::YNeg}, // touches 1 in y-1
             // 6 SINGLE AXIS EDGE CHECKS
             NeighbourChecks{n: 2, axis: Axis::XNeg},// touches 2 in x-1
-            NeighbourChecks{n: 5, axis: Axis::XNeg},// touches 5 in x-1
+            NeighbourChecks{n: 0, axis: Axis::XNeg},// touches 0 in x-1
             NeighbourChecks{n: 2, axis: Axis::YNeg},// touches 2 in y-1
             NeighbourChecks{n: 4, axis: Axis::YNeg},// touches 4 in y-1
             NeighbourChecks{n: 0, axis: Axis::ZPos},// touches 0 in z+1
