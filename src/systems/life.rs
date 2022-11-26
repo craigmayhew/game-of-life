@@ -113,6 +113,12 @@ fn checks(n: usize) -> Vec<NeighbourChecks> {
             NeighbourChecks{n: 3, axis: Axis::YNeg},// touches 3 in y-1
             NeighbourChecks{n: 1, axis: Axis::ZNeg},// touches 1 in z-1
             NeighbourChecks{n: 5, axis: Axis::ZNeg},// touches 5 in z-1
+            // 5 DOUBLE AXIS EDGE CHECKS
+            NeighbourChecks{n: 1, axis: Axis::YNegZNeg},// touches 1 in y-1 z-1
+            NeighbourChecks{n: 1, axis: Axis::XNegZNeg},// touches 1 in x-1 z-1
+            NeighbourChecks{n: 2, axis: Axis::XNegZNeg},// touches 2 in x-1 z-1
+            NeighbourChecks{n: 1, axis: Axis::XPosYNeg},// touches 1 in x+1 y-1
+            NeighbourChecks{n: 4, axis: Axis::XPosYNeg},// touches 4 in x+1 y-1
         ]
     } else if n == 1 {
         vec![
@@ -352,17 +358,17 @@ pub fn run(
                                 Axis::ZPos => {check_z += 1},
                                 Axis::ZNeg => {check_z = check_z.wrapping_sub(1)},
                                 Axis::XPosYPos => {check_x += 1;check_y += 1},
-                                Axis::XPosYNeg => {check_x += 1;check_y -= 1},
-                                Axis::XNegYPos => {check_x -= 1;check_y += 1},
-                                Axis::XNegYNeg => {check_x -= 1;check_y -= 1},
+                                Axis::XPosYNeg => {check_x += 1;check_y = check_y.wrapping_sub(1)},
+                                Axis::XNegYPos => {check_x = check_x.wrapping_sub(1);check_y += 1},
+                                Axis::XNegYNeg => {check_x = check_x.wrapping_sub(1);check_y  = check_y.wrapping_sub(1)},
                                 Axis::XPosZPos => {check_x += 1;check_z += 1},
-                                Axis::XPosZNeg => {check_x += 1;check_z -= 1},
-                                Axis::XNegZPos => {check_x -= 1;check_z += 1},
-                                Axis::XNegZNeg => {check_x -= 1;check_z -= 1},
+                                Axis::XPosZNeg => {check_x += 1;check_z = check_z.wrapping_sub(1)},
+                                Axis::XNegZPos => {check_x = check_x.wrapping_sub(1);check_z += 1},
+                                Axis::XNegZNeg => {check_x = check_x.wrapping_sub(1);check_z = check_z.wrapping_sub(1)},
                                 Axis::YPosZPos => {check_y += 1;check_z += 1},
-                                Axis::YPosZNeg => {check_y += 1;check_z -= 1},
+                                Axis::YPosZNeg => {check_y += 1;check_z = check_z.wrapping_sub(1)},
                                 Axis::YNegZPos => {check_y += 1;check_z += 1},
-                                Axis::YNegZNeg => {check_y += 1;check_z -= 1},
+                                Axis::YNegZNeg => {check_y += 1;check_z = check_z.wrapping_sub(1)},
                             }
 
                             // handle overflow
@@ -403,50 +409,8 @@ pub fn run(
                         
                         //remember z goes down as you move forward from the start position
                         if n == 0 {
-                            // touches 1 y-1 z-1
-                            if z > 0 {
-                                if y > 0 {
-                                    if let LifeDataContainer::Alive(_) = last_gen[1][x][y-1][z-1] {neighbours += 1;}
-                                } else {
-                                    if let LifeDataContainer::Alive(_) = last_gen[1][x][session.universe_size-1][z-1] {neighbours += 1;}
-                                }
-                            } else if y > 0 {
-                                if let LifeDataContainer::Alive(_) = last_gen[1][x][y-1][session.universe_size-1] {neighbours += 1;}
-                            } else {
-                                if let LifeDataContainer::Alive(_) = last_gen[1][x][session.universe_size-1][session.universe_size-1] {neighbours += 1;}
-                            }
-                            //touches 1 and 2 in x-1 z-1
-                            if x > 0 {
-                                if z > 0 {
-                                    if let LifeDataContainer::Alive(_) = last_gen[1][x-1][y][z-1] {neighbours += 1;}
-                                    if let LifeDataContainer::Alive(_) = last_gen[2][x-1][y][z-1] {neighbours += 1;}
-                                } else {
-                                    if let LifeDataContainer::Alive(_) = last_gen[1][x-1][y][session.universe_size-1] {neighbours += 1;}
-                                    if let LifeDataContainer::Alive(_) = last_gen[2][x-1][y][session.universe_size-1] {neighbours += 1;}
-                                }
-                            } else if z > 0 {
-                                if let LifeDataContainer::Alive(_) = last_gen[1][session.universe_size-1][y][z-1] {neighbours += 1;}
-                                if let LifeDataContainer::Alive(_) = last_gen[2][session.universe_size-1][y][z-1] {neighbours += 1;}
-                            } else {
-                                if let LifeDataContainer::Alive(_) = last_gen[1][session.universe_size-1][y][session.universe_size-1] {neighbours += 1;}
-                                if let LifeDataContainer::Alive(_) = last_gen[2][session.universe_size-1][y][session.universe_size-1] {neighbours += 1;}
-                            }
-                            // touches 1 and 4 in x+1 y-1
-                            if session.universe_size > x+1 {
-                                if y > 0 {
-                                    if let LifeDataContainer::Alive(_) = last_gen[1][x+1][y-1][z] {neighbours += 1;}
-                                    if let LifeDataContainer::Alive(_) = last_gen[4][x+1][y-1][z] {neighbours += 1;}
-                                } else {
-                                    if let LifeDataContainer::Alive(_) = last_gen[1][x+1][y][session.universe_size-1] {neighbours += 1;}
-                                    if let LifeDataContainer::Alive(_) = last_gen[4][x+1][y][session.universe_size-1] {neighbours += 1;}
-                                }
-                            } else if y > 0 {
-                                if let LifeDataContainer::Alive(_) = last_gen[1][0][y-1][z] {neighbours += 1;}
-                                if let LifeDataContainer::Alive(_) = last_gen[4][0][y-1][z] {neighbours += 1;}
-                            } else {
-                                if let LifeDataContainer::Alive(_) = last_gen[1][0][session.universe_size-1][z] {neighbours += 1;}
-                                if let LifeDataContainer::Alive(_) = last_gen[4][0][session.universe_size-1][z] {neighbours += 1;}
-                            }
+                            
+                            
                         } else if n == 1 {
                             //touches 0 in y+1 z+1
                             if session.universe_size > z+1 {
