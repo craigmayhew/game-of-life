@@ -74,6 +74,62 @@ pub enum LifeDataContainer {
     Dead(bool),
 }
 
+//
+pub enum Axis {
+    XPos,
+    XNeg,
+    YPos,
+    YNeg,
+    ZPos,
+    ZNeg,
+    XPosYPos,
+    XPosYNeg,
+    XNegYPos,
+    XNegYNeg,
+    XPosZPos,
+    XPosZNeg,
+    XNegZPos,
+    XNegZNeg,
+    YPosZPos,
+    YPosZNeg,
+    YNegZPos,
+    YNegZNeg,
+}
+pub struct NeighbourChecks {
+    n: usize,
+    axis: Axis,
+}
+
+fn checks(n: usize) -> Vec<NeighbourChecks> {
+    if n == 4 { // yellow
+        vec![
+            // 2 FACE CHECKS
+            NeighbourChecks{n: 2, axis: Axis::XNeg},// touches face of dark blue 
+            NeighbourChecks{n: 0, axis: Axis::ZPos},// touches face of white
+            // 6 SINGLE AXIS EDGE CHECKS
+            NeighbourChecks{n: 3, axis: Axis::ZPos},// touches 3 in z+1
+            NeighbourChecks{n: 5, axis: Axis::ZPos},// touches 5 in z+1
+            NeighbourChecks{n: 1, axis: Axis::XNeg},// touches 1 in x-1
+            NeighbourChecks{n: 3, axis: Axis::XNeg},// touches 3 in x-1
+            NeighbourChecks{n: 5, axis: Axis::YPos},// touches 5 in y+1
+            NeighbourChecks{n: 5, axis: Axis::YNeg},// touches 5 in y-1
+            // 5 DOUBLE AXIS EDGE CHECKS
+            // touches 3 in x-1 z+1
+            // touches 0 and 3 in x-1 y+1
+            // touches 2 and 3 y-1 z+1
+            // 0 TRIPLE AXIS EDGE CHECKS
+            // TODO is there no check that requires movement in all 3 axis?!
+        ]
+    } else {
+        //TODO this next one is wrong wrong wrong!!!!
+        vec![
+            // 2 FACE CHECKS
+            NeighbourChecks{n: 2, axis: Axis::XNeg},
+            NeighbourChecks{n: 0, axis: Axis::ZPos},
+        ]
+    }
+}
+
 pub fn place_life_with_keyboard(
     camera: Query<&mut Transform, With<Camera>>,
     mut commands: Commands,
@@ -532,31 +588,62 @@ pub fn run(
                             if let LifeDataContainer::Alive(_) = last_gen[2][x][y][z] {neighbours += 1}
                             if let LifeDataContainer::Alive(_) = last_gen[3][x][y][z] {neighbours += 1}
                             if let LifeDataContainer::Alive(_) = last_gen[5][x][y][z] {neighbours += 1}
+                            
+                            for check in checks(n).iter() {
+                                let mut check_x = x;
+                                let mut check_y = y;
+                                let mut check_z = z;
+
+                                match &check.axis {
+                                    Axis::XPos => {check_x += 1},
+                                    Axis::XNeg => {check_x = check_x.wrapping_sub(1)},
+                                    Axis::YPos => {check_y += 1},
+                                    Axis::YNeg => {check_y = check_y.wrapping_sub(1)},
+                                    Axis::ZPos => {check_z += 1},
+                                    Axis::ZNeg => {check_z = check_z.wrapping_sub(1)},
+                                    Axis::XPosYPos => {check_x += 1;check_y += 1},
+                                    Axis::XPosYNeg => {check_x += 1;check_y -= 1},
+                                    Axis::XNegYPos => {check_x -= 1;check_y += 1},
+                                    Axis::XNegYNeg => {check_x -= 1;check_y -= 1},
+                                    Axis::XPosZPos => {check_x += 1;check_z += 1},
+                                    Axis::XPosZNeg => {check_x += 1;check_z -= 1},
+                                    Axis::XNegZPos => {check_x -= 1;check_z += 1},
+                                    Axis::XNegZNeg => {check_x -= 1;check_z -= 1},
+                                    Axis::YPosZPos => {check_y += 1;check_z += 1},
+                                    Axis::YPosZNeg => {check_y += 1;check_z -= 1},
+                                    Axis::YNegZPos => {check_y += 1;check_z += 1},
+                                    Axis::YNegZNeg => {check_y += 1;check_z -= 1},
+                                }
+
+                                // handle overflow
+                                //TODO: in universe size 256 this may not be needed
+                                if check_x == session.universe_size {
+                                    check_x = 0;
+                                }
+                                if check_y == session.universe_size {
+                                    check_y = 0;
+                                }
+                                if check_z == session.universe_size {
+                                    check_z = 0;
+                                }
+
+                                // handle underflow
+                                //TODO: in universe size 256 this may not be needed
+                                if check_x > session.universe_size {
+                                    check_x = session.universe_size-1;
+                                }
+                                if check_y > session.universe_size {
+                                    check_y = session.universe_size-1;
+                                }
+                                if check_z > session.universe_size {
+                                    check_z = session.universe_size-1;
+                                }
+
+                                // check if the neighbour is alive, and if so increment neighbours!
+                                if let LifeDataContainer::Alive(_) = last_gen[check.n][check_x][check_y][check_z] {neighbours += 1;}
+                            }
+
                             // 2 FACE CHECKS
-                            //the y >0 checks if we are the edge of the univ
-                            if x > 0 && let LifeDataContainer::Alive(_) = last_gen[2][x-1][y  ][z  ] {neighbours += 1;} // touches dark blue
-                            if x == 0 && let LifeDataContainer::Alive(_) = last_gen[2][session.universe_size-1][y  ][z  ] {neighbours += 1;} // touches dark blue (on the other side of the universe)
-                            if session.universe_size > z+1 && let LifeDataContainer::Alive(_) = last_gen[0][x  ][y  ][z+1] {neighbours += 1;} // touches white
-                            if session.universe_size == z+1 && let LifeDataContainer::Alive(_) = last_gen[0][x  ][y  ][0] {neighbours += 1;} // touches white (on the other side of the universe)
-                            // 11 EDGE CHECKS
-                            // touches 3 in z+1
-                            if session.universe_size >  z+1 && let LifeDataContainer::Alive(_) = last_gen[3][x][y][z+1] {neighbours += 1;}
-                            if session.universe_size == z+1 && let LifeDataContainer::Alive(_) = last_gen[3][x][y][0  ] {neighbours += 1;}
-                            // touches 5 in z+1
-                            if session.universe_size >  z+1 && let LifeDataContainer::Alive(_) = last_gen[5][x][y][z+1] {neighbours += 1;}
-                            if session.universe_size == z+1 && let LifeDataContainer::Alive(_) = last_gen[5][x][y][0  ] {neighbours += 1;}
-                            // touches 1 in x-1
-                            if x == 0 && let LifeDataContainer::Alive(_) = last_gen[1][session.universe_size-1][y][z] {neighbours += 1;}
-                            if x > 0 && let LifeDataContainer::Alive(_) = last_gen[1][x-1][y][z] {neighbours += 1;}
-                            // touches 3 in x-1
-                            if x == 0 && let LifeDataContainer::Alive(_) = last_gen[3][session.universe_size-1][y][z] {neighbours += 1;}
-                            if x > 0 && let LifeDataContainer::Alive(_) = last_gen[3][x-1][y][z] {neighbours += 1;}
-                            // touches 5 in y+1
-                            if session.universe_size >  y+1 && let LifeDataContainer::Alive(_) = last_gen[5][x][y+1][z] {neighbours += 1;}
-                            if session.universe_size == y+1 && let LifeDataContainer::Alive(_) = last_gen[5][x][0  ][z] {neighbours += 1;}
-                            // touches 1 in y-1
-                            if y == 0 && let LifeDataContainer::Alive(_) = last_gen[1][x][session.universe_size-1][z] {neighbours += 1;}
-                            if y > 0  && let LifeDataContainer::Alive(_) = last_gen[1][x][y-1][z] {neighbours += 1;}
                             // touches 3 in x-1 z+1
                             if session.universe_size > z+1 {
                                 if x > 0 {
