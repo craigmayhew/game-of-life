@@ -159,12 +159,12 @@ fn checks(n: usize) -> Vec<NeighbourChecks> {
             NeighbourChecks{n: 2, axis: Axis::XNeg},// touches face of dark blue 
             NeighbourChecks{n: 0, axis: Axis::ZPos},// touches face of white
             // 6 SINGLE AXIS EDGE CHECKS
-            NeighbourChecks{n: 3, axis: Axis::ZPos},// touches 3 in z+1
-            NeighbourChecks{n: 5, axis: Axis::ZPos},// touches 5 in z+1
             NeighbourChecks{n: 1, axis: Axis::XNeg},// touches 1 in x-1
             NeighbourChecks{n: 3, axis: Axis::XNeg},// touches 3 in x-1
             NeighbourChecks{n: 5, axis: Axis::YPos},// touches 5 in y+1
-            NeighbourChecks{n: 5, axis: Axis::YNeg},// touches 5 in y-1
+            NeighbourChecks{n: 1, axis: Axis::YNeg},// touches 1 in y-1
+            NeighbourChecks{n: 3, axis: Axis::ZPos},// touches 3 in z+1
+            NeighbourChecks{n: 5, axis: Axis::ZPos},// touches 5 in z+1
             // 5 DOUBLE AXIS EDGE CHECKS
             // touches 3 in x-1 z+1
             // touches 0 and 3 in x-1 y+1
