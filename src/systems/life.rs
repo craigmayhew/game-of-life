@@ -82,6 +82,7 @@ pub enum LifeDataContainer {
     Dead(bool),
 }
 
+#[derive(Clone, Copy)]
 pub enum TetraIndex {
     Zero,
     One,
