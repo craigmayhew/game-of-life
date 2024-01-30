@@ -1,3 +1,4 @@
+#![feature(let_chains)] // allow if something && let Some(blah) =
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 use bevy::{
     prelude::*, //default bevy
