@@ -1,6 +1,6 @@
 
 use bevy::{
-    {app::AppExit}, // detect app exit events
+    app::AppExit, // detect app exit events
     prelude::*, //default bevy
 };
 
