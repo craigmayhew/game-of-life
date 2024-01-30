@@ -9,7 +9,7 @@ use crate::{
 };
 
 pub fn setup(mut commands: Commands) {
-    commands.spawn_bundle(Camera3dBundle {
+    commands.spawn(Camera3dBundle {
         projection: PerspectiveProjection  {
             near: 0.1,
             far: 10000.0,

@@ -68,7 +68,7 @@ pub fn load (
                                 let transform_new_life: bevy::prelude::Transform = create_life_xyz(&tetra_index, x, y, z);
                             
                                 // make the life form exist!
-                                session.life[n][x][y][z] = LifeDataContainer::Alive(commands.spawn_bundle(PbrBundle {
+                                session.life[n][x][y][z] = LifeDataContainer::Alive(commands.spawn(PbrBundle {
                                     mesh: session.life_form_meshes[n%2].clone(),
                                     material: session.life_form_materials[n].clone(),
                                     transform: transform_new_life,

@@ -50,14 +50,14 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         color: Color::rgb(0.9, 0.9, 0.9),
     };
     let button_play = commands
-        .spawn_bundle(ButtonBundle {
+        .spawn(ButtonBundle {
             style: play_button_style,
             background_color: NORMAL_BUTTON.into(),
             ..default()
         })
         .insert(MenuButtonAction::Play)
         .with_children(|parent| {
-            parent.spawn_bundle(TextBundle::from_section(
+            parent.spawn(TextBundle::from_section(
                 "New Game",
                 button_text_style.clone(),
             ));
@@ -65,14 +65,14 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         .id();
 
     let button_quit = commands
-        .spawn_bundle(ButtonBundle {
+        .spawn(ButtonBundle {
             style: quit_button_style,
             background_color: NORMAL_BUTTON.into(),
             ..default()
         })
         .insert(MenuButtonAction::Quit)
         .with_children(|parent| {
-            parent.spawn_bundle(TextBundle::from_section(
+            parent.spawn(TextBundle::from_section(
                 "Quit",
                 button_text_style,
             ));

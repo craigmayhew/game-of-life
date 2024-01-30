@@ -18,7 +18,7 @@ pub fn enter(mut commands: Commands, asset_server: Res<AssetServer>) {
         color: Color::rgb(0.9, 0.9, 0.9),
     };
     let paused = commands
-        .spawn_bundle(
+        .spawn(
             TextBundle::from_section(
                 "PAUSED",
                 text_style,

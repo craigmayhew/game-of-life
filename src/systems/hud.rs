@@ -22,7 +22,7 @@ pub fn enter(mut commands: Commands, asset_server: Res<AssetServer>) {
         color: Color::rgb(0.9, 0.9, 0.9),
     };
     let counters = commands
-        .spawn_bundle(
+        .spawn(
             TextBundle::from_section(
                 "Life detected: 0000000",
                 text_style,

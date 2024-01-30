@@ -330,7 +330,7 @@ pub fn place_life_with_keyboard(
                     LifeDataContainer::Dead(_) => {// if dead currently
                         // Place a life form
                         let transform_new_life: bevy::prelude::Transform = create_life_xyz(&tetra_index, x as usize, y as usize, z as usize);
-                        session.life[n][x as usize][y as usize][z as usize] = LifeDataContainer::Alive(commands.spawn_bundle(PbrBundle {
+                        session.life[n][x as usize][y as usize][z as usize] = LifeDataContainer::Alive(commands.spawn(PbrBundle {
                             mesh: session.life_form_meshes[n%2].clone(),
                             material: session.life_form_materials[n].clone(),
                             transform: transform_new_life,
@@ -402,7 +402,7 @@ pub fn run(
                         let transform_new_life: bevy::prelude::Transform = create_life_xyz(&tetra_index, x, y, z);
                     
                         // make the life form exist!
-                        session.life[n][x][y][z] = LifeDataContainer::Alive(commands.spawn_bundle(PbrBundle {
+                        session.life[n][x][y][z] = LifeDataContainer::Alive(commands.spawn(PbrBundle {
                             mesh: session.life_form_meshes[n %2].clone(),
                             material: session.life_form_materials[n].clone(),
                             transform: transform_new_life,
@@ -515,7 +515,7 @@ pub fn run(
                                     let transform_new_life: bevy::prelude::Transform = create_life_xyz(&tetra_index, x, y, z);
                                 
                                     // make the life form exist!
-                                    next_gen[n][x][y][z] = LifeDataContainer::Alive(commands.spawn_bundle(PbrBundle {
+                                    next_gen[n][x][y][z] = LifeDataContainer::Alive(commands.spawn(PbrBundle {
                                         mesh: session.life_form_meshes[n%2].clone(),
                                         material: session.life_form_materials[n].clone(),
                                         transform: transform_new_life,
