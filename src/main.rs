@@ -17,13 +17,13 @@ mod systems;
 const DEFAULT_UNIVERSE_SIZE: usize = 20;
 
 // Defines the amount of time that should elapse between each physics step.
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Debug, Resource)]
 pub struct GameSpeed {
     ticks_per_second: f64,
     last_tick_stamp: f64,
 }
 
-#[derive(Clone, Eq, PartialEq, Debug, Hash)]
+#[derive(Clone, Eq, PartialEq, Debug, Hash, Resource)]
 pub enum AppState {
     Splash,
     InGame,
@@ -33,6 +33,7 @@ pub enum AppState {
     SaveGame,
 }
 
+#[derive(Resource)]
 pub struct SessionResource {
     pub life: Vec<Vec<Vec<Vec<systems::life::LifeDataContainer>>>>,
     pub counter: i64,
@@ -127,8 +128,8 @@ fn run_if_timestep(
     time: Res<Time>,
   ) -> ShouldRun
   {
-    if game_speed.last_tick_stamp + (1.0/game_speed.ticks_per_second) < time.seconds_since_startup() {
-        game_speed.last_tick_stamp = time.seconds_since_startup();
+    if game_speed.last_tick_stamp + (1.0/game_speed.ticks_per_second) < time.elapsed_seconds_f64() {
+        game_speed.last_tick_stamp = time.elapsed_seconds_f64();
         ShouldRun::Yes
     } else {
         ShouldRun::No
@@ -137,15 +138,18 @@ fn run_if_timestep(
 
 fn main() {    
     App::new()
-    .insert_resource(WindowDescriptor {
-        title: "Game of Life".to_string(),
-        width: 1500.,
-        height: 900.,
-        present_mode: PresentMode::AutoVsync,
+    .add_plugins(DefaultPlugins.set(WindowPlugin {
+        window: WindowDescriptor {
+            title: "Game of Life".to_string(),
+            width: 1500.,
+            height: 900.,
+            present_mode: PresentMode::AutoVsync,
+            ..default()
+        },
         ..default()
-    })
+    }))
     .add_state(AppState::Splash)
-    .add_plugins(DefaultPlugins)
+    //.add_plugins(DefaultPlugins)
     .add_plugin(ObjPlugin)
     .add_plugin(LogDiagnosticsPlugin::default())
     .add_plugin(FrameTimeDiagnosticsPlugin::default())

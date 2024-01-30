@@ -17,6 +17,7 @@ use crate::{
     },
 };
 
+#[derive(Resource)]
 pub enum GameFileToLoad {
     Some(String),
     None(),

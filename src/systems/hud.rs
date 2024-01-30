@@ -6,6 +6,7 @@ use crate::{
     SessionResource,
 };
 
+#[derive(Resource)]
 pub struct HudData {
     counters: Entity,
 }

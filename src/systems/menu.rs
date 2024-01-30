@@ -6,6 +6,7 @@ use bevy::{
 
 use crate::AppState;
 
+#[derive(Resource)]
 pub struct MenuData {
     button_play: Entity,
     button_quit: Entity,
@@ -51,7 +52,7 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     let button_play = commands
         .spawn_bundle(ButtonBundle {
             style: play_button_style,
-            color: NORMAL_BUTTON.into(),
+            background_color: NORMAL_BUTTON.into(),
             ..default()
         })
         .insert(MenuButtonAction::Play)
@@ -66,7 +67,7 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     let button_quit = commands
         .spawn_bundle(ButtonBundle {
             style: quit_button_style,
-            color: NORMAL_BUTTON.into(),
+            background_color: NORMAL_BUTTON.into(),
             ..default()
         })
         .insert(MenuButtonAction::Quit)
@@ -83,7 +84,7 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
 pub fn run(
     mut state: ResMut<State<AppState>>,
     mut interaction_query: Query<
-        (&Interaction, &mut UiColor, &MenuButtonAction),
+        (&Interaction, &mut BackgroundColor, &MenuButtonAction),
         (Changed<Interaction>, With<Button>),
     >,
     mut app_exit_events: EventWriter<AppExit>,

@@ -3,6 +3,7 @@ use bevy::{
     prelude::*, //default bevy
 };
 
+#[derive(Resource)]
 pub struct MenuData {
     paused: Entity,
 }
