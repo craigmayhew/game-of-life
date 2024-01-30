@@ -14,12 +14,12 @@ To the official bevy [getting started book](https://bevyengine.org/learn/book/ge
 
 ## Findings
 
-### Conways original 2d rules
-Universes based on the original conways game of life rules have endless entropy when faces and edges are checked for neighbours. If life dies where neighbours are less than 2 or more than 3, and is created where neighbours = 3. There is no stable state, no combination of tetras will remain stable.
+### Conway's original 2d rules
+Universes based on the original Conway's game of life rules have endless entropy when faces and edges are checked for neighbours. If life dies where neighbours are less than 2 or more than 3, and is created where neighbours = 3. There is no stable state, no combination of tetras will remain stable.
 
 ### Other FAQS
 Q: Why didn't you use half a square based pyramid for your tetrahedrons?
-A: This would result in 12 tetrahedrons per cube, which felt too high. I also falsly thought at the time hills tetrahedron could make a cube without mirring any of the tetrahedron. That however turned out to be incorrect and 3 of the tetrahedron have to be mirrored.
+A: This would result in 12 tetrahedrons per cube, which felt too high. I also falsely thought at the time hills tetrahedron could make a cube without mirroring any of the tetrahedron. That however turned out to be incorrect and 3 of the tetrahedron have to be mirrored.
 
 Q: Why tetrahedrons and not cubes?
 A: I thought it might give more interesting automata
