@@ -137,7 +137,6 @@ fn main() {
         ..default()
     }))
     .add_state::<AppState>()
-    //.add_plugins(DefaultPlugins)
     .add_plugin(ObjPlugin)
     .add_plugin(LogDiagnosticsPlugin::default())
     .add_plugin(FrameTimeDiagnosticsPlugin::default())
