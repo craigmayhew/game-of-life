@@ -10,42 +10,31 @@ use crate::{
 
 pub fn run (
     keys: Res<Input<KeyCode>>,
-    mut state: ResMut<State<AppState>>,
+    state: Res<State<AppState>>,
+    mut next_state: ResMut<NextState<AppState>>,
     mut game_speed: ResMut<GameSpeed>,
 ) {
     //controls
     if keys.just_pressed(KeyCode::P) {
         // (un)pause game
-        match state.current() {
+        match &state.0 {
             AppState::InGame => {
-                let res = state.set(AppState::Paused);
-                if let Err(e) = res {
-                    println!("Keyboard System, Error changing state to Paused: {}", e);
-                }
+                next_state.set(AppState::Paused);
             },
             AppState::Paused => {
-                let res = state.set(AppState::InGame);
-                if let Err(e) = res {
-                    println!("Keyboard System, Error changing state to InGame: {}", e);
-                }
+                next_state.set(AppState::InGame);
             },
             _ => {},
         }
     } else if keys.just_pressed(KeyCode::L) {
         // load game
-        if state.current() == &AppState::InGame || state.current() == &AppState::Paused {
-            let res = state.set(AppState::LoadGame);
-            if let Err(e) = res {
-                println!("Keyboard System, Error changing state to LoadGame: {}", e);
-            }
+        if &state.0 == &AppState::InGame || &state.0 == &AppState::Paused {
+            next_state.set(AppState::LoadGame);
         }
     } else if keys.just_pressed(KeyCode::K) {
         // save game
-        if state.current() == &AppState::InGame || state.current() == &AppState::Paused {
-            let res = state.set(AppState::SaveGame);
-            if let Err(e) = res {
-                println!("Keyboard System, Error changing state to SaveGame: {}", e);
-            }
+        if &state.0 == &AppState::InGame || &state.0 == &AppState::Paused {
+            next_state.set(AppState::SaveGame);
         }
     }
     // game tick speed
@@ -58,16 +47,10 @@ pub fn run (
     }
     //access menu
     if keys.just_pressed(KeyCode::Escape) {
-        if state.current() == &AppState::InGame || state.current() == &AppState::Paused {
-            let res = state.set(AppState::Splash);
-            if let Err(e) = res {
-                println!("Keyboard System, Error changing state to Splash: {}", e);
-            }
-        } else if state.current() == &AppState::Splash {
-            let res = state.set(AppState::InGame);
-            if let Err(e) = res {
-                println!("Keyboard System, Error changing state to InGame from Splash: {}", e);
-            }
+        if &state.0 == &AppState::InGame || &state.0 == &AppState::Paused {
+            next_state.set(AppState::Splash);
+        } else if &state.0 == &AppState::Splash {
+            next_state.set(AppState::InGame);
         }
     }
 }

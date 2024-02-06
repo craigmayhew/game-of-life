@@ -35,7 +35,7 @@ pub fn load (
     mut life_entities: Query<Entity, With<Life>>,
     mut commands: Commands,
     mut session: ResMut<SessionResource>,
-    mut state: ResMut<State<AppState>>,
+    mut next_state: ResMut<NextState<AppState>>,
     mut game_to_be_loaded: ResMut<GameFileToLoad>,
 ) {
     let name_of_load_file: String;
@@ -91,20 +91,16 @@ pub fn load (
         },
     }
 
-    // in bevy 0.8 overwrite_set() is needed instead of set() when system is called via on_enter()
-    let res = if &name_of_load_file[0..5] == "test_" {
-        state.overwrite_set(AppState::InGame)
+    if &name_of_load_file[0..5] == "test_" {
+        next_state.set(AppState::InGame)
     }else{
-        state.overwrite_set(AppState::Paused)
+        next_state.set(AppState::Paused)
     };
-    if let Err(e) = res {
-        println!("Saves System, Error changing state to Paused: {}", e);
-    }
 }
 
 pub fn save (
     session: Res<SessionResource>,
-    mut state: ResMut<State<AppState>>,
+    mut next_state: ResMut<NextState<AppState>>,
 ) {
     // save game state
     let mut save = SaveResource {
@@ -141,9 +137,5 @@ pub fn save (
         }
     }
 
-    // in bevy 0.8 overwrite_set() is needed instead of set() when system is called via on_enter()
-    let res = state.overwrite_set(AppState::Paused);
-    if let Err(e) = res {
-        println!("Saves System, Error changing state to Paused: {}", e);
-    }
+    next_state.set(AppState::Paused);
 }

@@ -23,7 +23,7 @@ pub fn enter(mut commands: Commands, asset_server: Res<AssetServer>) {
                 "PAUSED",
                 text_style,
             )
-            .with_text_alignment(TextAlignment::CENTER)
+            .with_text_alignment(TextAlignment::Center)
             .with_style(Style {
                 align_self: AlignSelf::Center,
                 margin: UiRect{left: Val::Auto, right: Val::Auto, top: Val::Auto, bottom: Val::Auto},

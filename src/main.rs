@@ -2,11 +2,11 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 use bevy::{
     prelude::*, //default bevy
-    window::PresentMode, // needed to specify window info
+    window::{PresentMode,PrimaryWindow}, // needed to specify window info
     diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin},
 };
 // these are needed to load an icon
-use bevy::{window::WindowId,winit::WinitWindows};
+use bevy::winit::WinitWindows;
 use winit::window::Icon;
  // used import wavefront obj files
 use bevy_obj::*;
@@ -23,8 +23,9 @@ pub struct GameSpeed {
     last_tick_stamp: f64,
 }
 
-#[derive(Clone, Eq, PartialEq, Debug, Hash, Resource)]
+#[derive(Clone, Eq, Default, PartialEq, Debug, Hash, Resource, States)]
 pub enum AppState {
+    #[default]
     Splash,
     InGame,
     Paused,
@@ -103,9 +104,8 @@ fn setup(
 fn set_window_icon(
     // we have to use `NonSend` here
     windows: NonSend<WinitWindows>,
+    primary_window: Query<Entity, With<PrimaryWindow>>,
 ) {
-    let primary = windows.get_window(WindowId::primary()).unwrap();
-
     // here we use the `image` crate to load our icon data from a png file
     // this is not a very bevy-native solution, but it will do
     let (icon_rgba, icon_width, icon_height) = {
@@ -118,37 +118,25 @@ fn set_window_icon(
     };
 
     let icon = Icon::from_rgba(icon_rgba, icon_width, icon_height).unwrap();
-
+    let primary_entity = primary_window.single();
+    let primary = windows.get_window(primary_entity).unwrap();
     primary.set_window_icon(Some(icon));
 }
 
-use bevy::ecs::schedule::ShouldRun;
-fn run_if_timestep(
-    mut game_speed: ResMut<GameSpeed>,
-    time: Res<Time>,
-  ) -> ShouldRun
-  {
-    if game_speed.last_tick_stamp + (1.0/game_speed.ticks_per_second) < time.elapsed_seconds_f64() {
-        game_speed.last_tick_stamp = time.elapsed_seconds_f64();
-        ShouldRun::Yes
-    } else {
-        ShouldRun::No
-    }
-  }
-
-fn main() {    
+fn main() {
+    use bevy::time::common_conditions::on_timer;
+    use std::time::Duration;
     App::new()
     .add_plugins(DefaultPlugins.set(WindowPlugin {
-        window: WindowDescriptor {
+        primary_window: Some(Window {
             title: "Game of Life".to_string(),
-            width: 1500.,
-            height: 900.,
+            resolution: (1500.0,900.0).into(),
             present_mode: PresentMode::AutoVsync,
             ..default()
-        },
+        }),
         ..default()
     }))
-    .add_state(AppState::Splash)
+    .add_state::<AppState>()
     //.add_plugins(DefaultPlugins)
     .add_plugin(ObjPlugin)
     .add_plugin(LogDiagnosticsPlugin::default())
@@ -160,77 +148,38 @@ fn main() {
     // keyboard input (excluding camera movement)
     .add_system(systems::keyboard::run)
     // life system
-    .add_system_set(
-        SystemSet::new()
-            .with_system(systems::life::run)
-            .with_run_criteria(run_if_timestep)
+    .add_system(
+        systems::life::run.run_if(on_timer(Duration::from_millis(100)))
     )
     // AppState::Splash
-    .add_system_set(
-        SystemSet::on_enter(AppState::Splash)
-            .with_system(systems::menu::setup)
-    )
-    .add_system_set(
-        SystemSet::on_update(AppState::Splash)
-            .with_system(systems::menu::run)
-    )
-    .add_system_set(
-        SystemSet::on_exit(AppState::Splash)
-            .with_system(systems::menu::cleanup)
-    )
+    .add_system(systems::menu::setup.in_schedule(OnEnter(AppState::Splash)))
+    .add_system(systems::menu::run.in_set(OnUpdate(AppState::Splash)))
+    .add_system(systems::menu::cleanup.in_schedule(OnExit(AppState::Splash)))
     // AppState::InGame
-    .add_system_set(
-        SystemSet::on_enter(AppState::InGame)
-            .with_system(systems::hud::enter)
+    .add_system(systems::hud::enter.in_schedule(OnEnter(AppState::InGame)))
+    .add_systems(
+        (systems::hud::run,systems::life::place_life_with_keyboard,systems::camera_movement::move_camera_on_keyboard_input).in_set(OnUpdate(AppState::InGame))
     )
-    .add_system_set(
-        SystemSet::on_update(AppState::InGame)
-            .with_system(systems::hud::run)
-            // Place Life with keyboard
-            .with_system(systems::life::place_life_with_keyboard)
-            // camera system (camera movement controls)
-            .with_system(systems::camera_movement::move_camera_on_keyboard_input)
-    )
-    .add_system_set(
-        SystemSet::on_exit(AppState::InGame)
-            .with_system(systems::hud::cleanup)
-    )
+    .add_system(systems::hud::cleanup.in_schedule(OnExit(AppState::InGame)))
     // AppState::Paused
-    .add_system_set(
-        SystemSet::on_enter(AppState::Paused)
-        .with_system(systems::menu_paused::enter)
-        .with_system(systems::hud::enter)
+    .add_systems(
+        (systems::menu_paused::enter,systems::hud::enter).in_schedule(OnEnter(AppState::Paused))
     )
-    .add_system_set(
-        SystemSet::on_update(AppState::Paused)
-            .with_system(systems::hud::run)
-            // Place Life with keyboard
-            .with_system(systems::life::place_life_with_keyboard)
-            // camera system (camera movement controls)
-            .with_system(systems::camera_movement::move_camera_on_keyboard_input)
+    .add_systems(
+        (systems::camera_movement::move_camera_on_keyboard_input,systems::hud::run,systems::life::place_life_with_keyboard).in_set(OnUpdate(AppState::Paused))
     )
-    .add_system_set(
-        SystemSet::on_exit(AppState::Paused)
-            .with_system(systems::menu_paused::cleanup)
-            .with_system(systems::hud::cleanup)
-    )
+    .add_systems((systems::hud::cleanup,systems::menu_paused::cleanup).in_schedule(OnExit(AppState::Paused)))
     // AppState::NewGame
-    .add_system_set(
-        SystemSet::on_enter(AppState::NewGame)
-        .with_system(systems::life::new_universe)
-        .before(systems::life::run)
+    .add_system(
+        systems::life::new_universe.in_schedule(OnEnter(AppState::NewGame)).before(systems::life::run)
     )
     // AppState::LoadGame
-    .add_system_set(
-        SystemSet::on_enter(AppState::LoadGame)
-        .with_system(systems::saves::load)
-        .before(systems::life::run)
+    .add_system(
+        systems::saves::load.in_schedule(OnEnter(AppState::LoadGame)).before(systems::life::run)
     )
     // AppState::SaveGame
-    .add_system_set(
-        SystemSet::on_enter(AppState::SaveGame)
-        .with_system(systems::saves::save)
-        .before(systems::life::run)
+    .add_system(
+        systems::saves::save.in_schedule(OnEnter(AppState::SaveGame)).before(systems::life::run)
     )
     .run()
 }

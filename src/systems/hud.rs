@@ -27,7 +27,7 @@ pub fn enter(mut commands: Commands, asset_server: Res<AssetServer>) {
                 "Life detected: 0000000",
                 text_style,
             )
-            .with_text_alignment(TextAlignment::TOP_LEFT)
+            .with_text_alignment(TextAlignment::Left)
             .with_style(Style {
                 align_self: AlignSelf::FlexEnd,
                 position_type: PositionType::Absolute,

@@ -82,7 +82,7 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
 }
 
 pub fn run(
-    mut state: ResMut<State<AppState>>,
+    mut next_state: ResMut<NextState<AppState>>,
     mut interaction_query: Query<
         (&Interaction, &mut BackgroundColor, &MenuButtonAction),
         (Changed<Interaction>, With<Button>),
@@ -96,7 +96,7 @@ pub fn run(
                 *color = PRESSED_BUTTON.into();
                 match menu_button_action {
                     MenuButtonAction::Play => {
-                        state.set(AppState::NewGame).unwrap();
+                        next_state.set(AppState::NewGame);
                     },
                     MenuButtonAction::Quit => app_exit_events.send(AppExit),
                 }

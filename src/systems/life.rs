@@ -352,9 +352,10 @@ pub fn new_universe(
     mut life_entities: Query<Entity, With<Life>>,
     mut commands: Commands,
     mut session: ResMut<SessionResource>,
-    mut state: ResMut<State<AppState>>,
+    state: Res<State<AppState>>,
+    mut next_state: ResMut<NextState<AppState>>,
 ) {
-    match state.current() {
+    match state.0 {
         AppState::NewGame => {},
         _ => {return},
     }
@@ -367,11 +368,7 @@ pub fn new_universe(
         commands.entity(ent.to_owned()).despawn();
     }
 
-    // in bevy 0.8 overwrite_set() is needed instead of set() when system is called via on_enter()
-    let res = state.overwrite_set(AppState::InGame);
-    if let Err(e) = res {
-        println!("Life System, Error changing state to InGame from NewGame: {}", e);
-    }
+    next_state.set(AppState::InGame);
 }
 
 pub fn run(
@@ -380,7 +377,7 @@ pub fn run(
     state: Res<State<AppState>>,
 ) {
     // only run code after this point when the state is InGame i.e. not paused
-    match state.current() {
+    match state.0 {
         AppState::InGame => {},
         _ => {return},
     }
@@ -544,7 +541,6 @@ mod tests {
     use bevy_obj::*;// used import wavefront obj files
     use bevy::{
         asset::AssetPlugin,
-        core::CorePlugin,
         core_pipeline::CorePipelinePlugin,
         pbr::PbrPlugin,
         render::RenderPlugin,
@@ -556,16 +552,16 @@ mod tests {
         let mut app = App::new();
             
         app.add_plugins(MinimalPlugins);
-        app.add_plugin(CorePlugin::default());
 
         app.add_plugin(AssetPlugin::default());
         app.add_plugin(WindowPlugin::default());
         app.add_plugin(RenderPlugin::default());
-        app.add_plugin(CorePipelinePlugin::default());
-        app.add_plugin(PbrPlugin::default());
+        //app.add_plugin(CorePipelinePlugin::default());
+        //app.add_plugin(PbrPlugin::default());
         
         app.add_plugin(ObjPlugin);
-        app.add_state(crate::AppState::LoadGame);
+
+        app.add_state::<AppState>().insert_resource(AppState::LoadGame);
 
         //asset server for meshes
         let asset_server = app.world.get_resource::<AssetServer>().expect("expected asset server");
@@ -626,16 +622,14 @@ mod tests {
 
         // Add our systems
         app.add_system(run);
-        app.add_system_set(
-            SystemSet::on_enter(AppState::LoadGame)
-            .with_system(crate::systems::saves::load)
-            .before(run)
+        app.add_system(
+            crate::systems::saves::load.in_schedule(OnEnter(AppState::LoadGame)).before(run)
         );
         app
     }
 
     fn check_universe_state(world: &World,expected_app_state: &AppState,expected_generation: i64,expected_counter: i64) {
-        assert_eq!(world.resource::<State<AppState>>().current(), expected_app_state);
+        assert_eq!(&world.resource::<State<AppState>>().0, expected_app_state);
         assert_eq!(world.resource::<SessionResource>().generation, expected_generation);
         assert_eq!(world.resource::<SessionResource>().counter, expected_counter);
     }
