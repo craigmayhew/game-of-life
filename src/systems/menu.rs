@@ -92,7 +92,7 @@ pub fn run(
     // handle button colour changes on hover, press
     for (interaction, mut color, menu_button_action) in &mut interaction_query {
         match *interaction {
-            Interaction::Clicked => {
+            Interaction::Pressed => {
                 *color = PRESSED_BUTTON.into();
                 match menu_button_action {
                     MenuButtonAction::Play => {
