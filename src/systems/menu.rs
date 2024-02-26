@@ -26,6 +26,7 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     let play_button_style = Style {
         width: Val::Px(250.0),
         height: Val::Px(65.0),
+        bottom: Val::Px(40.0),
         // center button
         margin: UiRect::all(Val::Auto),
         // horizontally center child text
@@ -37,6 +38,7 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     let quit_button_style = Style {
         width: Val::Px(150.0),
         height: Val::Px(65.0),
+        top: Val::Px(40.0),
         // center button
         margin: UiRect::all(Val::Auto),
         // horizontally center child text
