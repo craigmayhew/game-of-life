@@ -1,4 +1,3 @@
-
 use bevy::{
     prelude::*, //default bevy
 };
@@ -19,25 +18,24 @@ pub fn enter(mut commands: Commands, asset_server: Res<AssetServer>) {
     };
     let paused = commands
         .spawn(
-            TextBundle::from_section(
-                "PAUSED",
-                text_style,
-            )
-            .with_text_alignment(TextAlignment::Center)
-            .with_style(Style {
-                align_self: AlignSelf::Center,
-                margin: UiRect{left: Val::Auto, right: Val::Auto, top: Val::Auto, bottom: Val::Auto},
-                ..default()
-            }),
+            TextBundle::from_section("PAUSED", text_style)
+                .with_text_alignment(TextAlignment::Center)
+                .with_style(Style {
+                    align_self: AlignSelf::Center,
+                    margin: UiRect {
+                        left: Val::Auto,
+                        right: Val::Auto,
+                        top: Val::Auto,
+                        bottom: Val::Auto,
+                    },
+                    ..default()
+                }),
         )
         .insert(PausedText)
         .id();
-    commands.insert_resource(MenuData {paused});
+    commands.insert_resource(MenuData { paused });
 }
 
-pub fn cleanup(
-    mut commands: Commands,
-    menu_data: Res<MenuData>
-) {
+pub fn cleanup(mut commands: Commands, menu_data: Res<MenuData>) {
     commands.entity(menu_data.paused).despawn_recursive();
 }

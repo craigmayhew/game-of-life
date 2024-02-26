@@ -1,14 +1,14 @@
 #![feature(let_chains)] // allow if something && let Some(blah) =
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 use bevy::{
-    prelude::*, //default bevy
-    window::{PresentMode,PrimaryWindow}, // needed to specify window info
     diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin},
+    prelude::*,                           //default bevy
+    window::{PresentMode, PrimaryWindow}, // needed to specify window info
 };
 // these are needed to load an icon
 use bevy::winit::WinitWindows;
 use winit::window::Icon;
- // used import wavefront obj files
+// used import wavefront obj files
 use bevy_obj::*;
 
 mod systems;
@@ -77,7 +77,7 @@ fn setup(
             materials.add(StandardMaterial {
                 base_color: Color::rgb(0.2, 0.2, 0.2), // dark grey
                 ..default()
-            })
+            }),
         ],
         life_form_meshes: [
             asset_server.load("mesh/hill-tetrahedron-mirrored.obj"),
@@ -91,7 +91,7 @@ fn setup(
 
     commands.insert_resource(GameSpeed {
         ticks_per_second: 2.0,
-        last_tick_stamp: 0.0
+        last_tick_stamp: 0.0,
     });
 
     //ambient light
@@ -127,64 +127,81 @@ fn main() {
     use bevy::time::common_conditions::on_timer;
     use std::time::Duration;
     App::new()
-    .add_plugins(DefaultPlugins.set(WindowPlugin {
-        primary_window: Some(Window {
-            title: "Game of Life".to_string(),
-            resolution: (1500.0,900.0).into(),
-            present_mode: PresentMode::AutoVsync,
+        .add_plugins(DefaultPlugins.set(WindowPlugin {
+            primary_window: Some(Window {
+                title: "Game of Life".to_string(),
+                resolution: (1500.0, 900.0).into(),
+                present_mode: PresentMode::AutoVsync,
+                ..default()
+            }),
             ..default()
-        }),
-        ..default()
-    }))
-    .add_state::<AppState>()
-    .add_plugins(ObjPlugin)
-    .add_plugins(LogDiagnosticsPlugin::default())
-    .add_plugins(FrameTimeDiagnosticsPlugin::default())
-    .add_systems(Startup, set_window_icon)
-    .add_systems(Startup, systems::camera_movement::setup)
-    .insert_resource(ClearColor(Color::BLACK)) //set the background colour of our window (the universe)
-    .add_systems(Startup, setup)
-    // keyboard input (excluding camera movement)
-    .add_systems(Update, systems::keyboard::run)
-    // life system
-    .add_systems(
-        Update, systems::life::run.run_if(on_timer(Duration::from_millis(100)))
-    )
-    // AppState::Splash
-    .add_systems(OnEnter(AppState::Splash), systems::menu::setup)
-    .add_systems(Update, systems::menu::run.run_if(in_state(AppState::Splash)))
-    .add_systems(OnExit(AppState::Splash), systems::menu::cleanup)
-    // AppState::InGame
-    .add_systems(OnEnter(AppState::InGame), systems::hud::enter)
-    .add_systems(Update,
-        (
-            systems::hud::run,systems::life::place_life_with_keyboard.run_if(in_state(AppState::InGame)),
-            systems::camera_movement::move_camera_on_keyboard_input.run_if(in_state(AppState::InGame))
+        }))
+        .add_state::<AppState>()
+        .add_plugins(ObjPlugin)
+        .add_plugins(LogDiagnosticsPlugin::default())
+        .add_plugins(FrameTimeDiagnosticsPlugin::default())
+        .add_systems(Startup, set_window_icon)
+        .add_systems(Startup, systems::camera_movement::setup)
+        .insert_resource(ClearColor(Color::BLACK)) //set the background colour of our window (the universe)
+        .add_systems(Startup, setup)
+        // keyboard input (excluding camera movement)
+        .add_systems(Update, systems::keyboard::run)
+        // life system
+        .add_systems(
+            Update,
+            systems::life::run.run_if(on_timer(Duration::from_millis(100))),
         )
-    )
-    .add_systems(OnExit(AppState::InGame), systems::hud::cleanup)
-    // AppState::Paused
-    .add_systems(
-        OnEnter(AppState::Paused), (systems::menu_paused::enter,systems::hud::enter)
-    )
-    .add_systems(Update,
-        (
-            systems::camera_movement::move_camera_on_keyboard_input.run_if(in_state(AppState::Paused)),
-            systems::hud::run,systems::life::place_life_with_keyboard.run_if(in_state(AppState::Paused))
+        // AppState::Splash
+        .add_systems(OnEnter(AppState::Splash), systems::menu::setup)
+        .add_systems(
+            Update,
+            systems::menu::run.run_if(in_state(AppState::Splash)),
         )
-    )
-    .add_systems(OnExit(AppState::Paused), (systems::hud::cleanup,systems::menu_paused::cleanup))
-    // AppState::NewGame
-    .add_systems(
-        OnEnter(AppState::NewGame), systems::life::new_universe.before(systems::life::run)
-    )
-    // AppState::LoadGame
-    .add_systems(
-        OnEnter(AppState::LoadGame), systems::saves::load.before(systems::life::run)
-    )
-    // AppState::SaveGame
-    .add_systems(
-        OnEnter(AppState::SaveGame), systems::saves::save.before(systems::life::run)
-    )
-    .run()
+        .add_systems(OnExit(AppState::Splash), systems::menu::cleanup)
+        // AppState::InGame
+        .add_systems(OnEnter(AppState::InGame), systems::hud::enter)
+        .add_systems(
+            Update,
+            (
+                systems::hud::run,
+                systems::life::place_life_with_keyboard.run_if(in_state(AppState::InGame)),
+                systems::camera_movement::move_camera_on_keyboard_input
+                    .run_if(in_state(AppState::InGame)),
+            ),
+        )
+        .add_systems(OnExit(AppState::InGame), systems::hud::cleanup)
+        // AppState::Paused
+        .add_systems(
+            OnEnter(AppState::Paused),
+            (systems::menu_paused::enter, systems::hud::enter),
+        )
+        .add_systems(
+            Update,
+            (
+                systems::camera_movement::move_camera_on_keyboard_input
+                    .run_if(in_state(AppState::Paused)),
+                systems::hud::run,
+                systems::life::place_life_with_keyboard.run_if(in_state(AppState::Paused)),
+            ),
+        )
+        .add_systems(
+            OnExit(AppState::Paused),
+            (systems::hud::cleanup, systems::menu_paused::cleanup),
+        )
+        // AppState::NewGame
+        .add_systems(
+            OnEnter(AppState::NewGame),
+            systems::life::new_universe.before(systems::life::run),
+        )
+        // AppState::LoadGame
+        .add_systems(
+            OnEnter(AppState::LoadGame),
+            systems::saves::load.before(systems::life::run),
+        )
+        // AppState::SaveGame
+        .add_systems(
+            OnEnter(AppState::SaveGame),
+            systems::saves::save.before(systems::life::run),
+        )
+        .run()
 }

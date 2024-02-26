@@ -1,7 +1,6 @@
-
 use bevy::{
     app::AppExit, // detect app exit events
-    prelude::*, //default bevy
+    prelude::*,   //default bevy
 };
 
 use crate::AppState;
@@ -36,7 +35,7 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         ..default()
     };
     let quit_button_style = Style {
-        width: Val::Px(150.0), 
+        width: Val::Px(150.0),
         height: Val::Px(65.0),
         // center button
         margin: UiRect::all(Val::Auto),
@@ -74,13 +73,13 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         })
         .insert(MenuButtonAction::Quit)
         .with_children(|parent| {
-            parent.spawn(TextBundle::from_section(
-                "Quit",
-                button_text_style,
-            ));
+            parent.spawn(TextBundle::from_section("Quit", button_text_style));
         })
         .id();
-    commands.insert_resource(MenuData { button_play, button_quit });
+    commands.insert_resource(MenuData {
+        button_play,
+        button_quit,
+    });
 }
 
 pub fn run(
@@ -99,7 +98,7 @@ pub fn run(
                 match menu_button_action {
                     MenuButtonAction::Play => {
                         next_state.set(AppState::NewGame);
-                    },
+                    }
                     MenuButtonAction::Quit => app_exit_events.send(AppExit),
                 }
             }

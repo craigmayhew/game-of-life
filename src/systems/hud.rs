@@ -2,9 +2,7 @@ use bevy::{
     prelude::*, //default bevy
 };
 
-use crate::{
-    SessionResource,
-};
+use crate::SessionResource;
 
 #[derive(Resource)]
 pub struct HudData {
@@ -23,18 +21,15 @@ pub fn enter(mut commands: Commands, asset_server: Res<AssetServer>) {
     };
     let counters = commands
         .spawn(
-            TextBundle::from_section(
-                "Life detected: 0000000",
-                text_style,
-            )
-            .with_text_alignment(TextAlignment::Left)
-            .with_style(Style {
-                align_self: AlignSelf::FlexEnd,
-                position_type: PositionType::Absolute,
-                bottom: Val::Px(5.0),
-                left: Val::Px(5.0),
-                ..default()
-            }),
+            TextBundle::from_section("Life detected: 0000000", text_style)
+                .with_text_alignment(TextAlignment::Left)
+                .with_style(Style {
+                    align_self: AlignSelf::FlexEnd,
+                    position_type: PositionType::Absolute,
+                    bottom: Val::Px(5.0),
+                    left: Val::Px(5.0),
+                    ..default()
+                }),
         )
         .insert(LifeCounterText)
         .id();
@@ -46,7 +41,10 @@ pub fn run(
     mut life_counter: Query<&mut Text, With<LifeCounterText>>,
 ) {
     for mut text in &mut life_counter {
-        text.sections[0].value = format!("Generation: {:07}\nLife detected: {:07}",&session.generation,&session.counter);
+        text.sections[0].value = format!(
+            "Generation: {:07}\nLife detected: {:07}",
+            &session.generation, &session.counter
+        );
     }
 }
 

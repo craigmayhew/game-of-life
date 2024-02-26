@@ -2,12 +2,9 @@ use bevy::{
     prelude::*, //default bevy
 };
 
-use crate::{
-    AppState,
-    GameSpeed,
-};
+use crate::{AppState, GameSpeed};
 
-pub fn run (
+pub fn run(
     keys: Res<Input<KeyCode>>,
     state: Res<State<AppState>>,
     mut next_state: ResMut<NextState<AppState>>,
@@ -19,11 +16,11 @@ pub fn run (
         match state.get() {
             AppState::InGame => {
                 next_state.set(AppState::Paused);
-            },
+            }
             AppState::Paused => {
                 next_state.set(AppState::InGame);
-            },
-            _ => {},
+            }
+            _ => {}
         }
     } else if keys.just_pressed(KeyCode::L) {
         // load game
