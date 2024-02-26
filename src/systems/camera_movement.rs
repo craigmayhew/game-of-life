@@ -1,6 +1,5 @@
 use bevy::{
     prelude::*, //default bevy
-    input::{keyboard::KeyCode, Input},
 };
 
 use crate::{
