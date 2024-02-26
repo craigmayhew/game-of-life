@@ -355,7 +355,7 @@ pub fn new_universe(
     state: Res<State<AppState>>,
     mut next_state: ResMut<NextState<AppState>>,
 ) {
-    match state.0 {
+    match state.get() {
         AppState::NewGame => {},
         _ => {return},
     }
@@ -377,7 +377,7 @@ pub fn run(
     state: Res<State<AppState>>,
 ) {
     // only run code after this point when the state is InGame i.e. not paused
-    match state.0 {
+    match state.get() {
         AppState::InGame => {},
         _ => {return},
     }

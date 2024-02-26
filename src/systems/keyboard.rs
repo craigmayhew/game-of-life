@@ -17,7 +17,7 @@ pub fn run (
     //controls
     if keys.just_pressed(KeyCode::P) {
         // (un)pause game
-        match &state.0 {
+        match state.get() {
             AppState::InGame => {
                 next_state.set(AppState::Paused);
             },
@@ -28,12 +28,12 @@ pub fn run (
         }
     } else if keys.just_pressed(KeyCode::L) {
         // load game
-        if &state.0 == &AppState::InGame || &state.0 == &AppState::Paused {
+        if state.get() == &AppState::InGame || state.get() == &AppState::Paused {
             next_state.set(AppState::LoadGame);
         }
     } else if keys.just_pressed(KeyCode::K) {
         // save game
-        if &state.0 == &AppState::InGame || &state.0 == &AppState::Paused {
+        if state.get() == &AppState::InGame || state.get() == &AppState::Paused {
             next_state.set(AppState::SaveGame);
         }
     }
@@ -47,9 +47,9 @@ pub fn run (
     }
     //access menu
     if keys.just_pressed(KeyCode::Escape) {
-        if &state.0 == &AppState::InGame || &state.0 == &AppState::Paused {
+        if state.get() == &AppState::InGame || state.get() == &AppState::Paused {
             next_state.set(AppState::Splash);
-        } else if &state.0 == &AppState::Splash {
+        } else if state.get() == &AppState::Splash {
             next_state.set(AppState::InGame);
         }
     }
