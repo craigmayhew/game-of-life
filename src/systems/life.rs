@@ -629,7 +629,7 @@ mod tests {
     }
 
     fn check_universe_state(world: &World,expected_app_state: &AppState,expected_generation: i64,expected_counter: i64) {
-        assert_eq!(&world.resource::<State<AppState>>().0, expected_app_state);
+        assert_eq!(world.resource::<State<AppState>>(), expected_app_state);
         assert_eq!(world.resource::<SessionResource>().generation, expected_generation);
         assert_eq!(world.resource::<SessionResource>().counter, expected_counter);
     }
