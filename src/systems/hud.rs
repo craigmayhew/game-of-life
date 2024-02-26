@@ -31,11 +31,8 @@ pub fn enter(mut commands: Commands, asset_server: Res<AssetServer>) {
             .with_style(Style {
                 align_self: AlignSelf::FlexEnd,
                 position_type: PositionType::Absolute,
-                position: UiRect {
-                    bottom: Val::Px(5.0),
-                    left: Val::Px(5.0),
-                    ..default()
-                },
+                bottom: Val::Px(5.0),
+                left: Val::Px(5.0),
                 ..default()
             }),
         )
