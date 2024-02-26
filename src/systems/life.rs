@@ -997,10 +997,7 @@ mod tests {
         app.insert_resource(game_file_to_load);
 
         // Add our systems
-        app.add_systems(
-            Update,
-            run,
-        );
+        app.add_systems(Update, run);
         app.add_systems(
             OnEnter(AppState::LoadGame),
             crate::systems::saves::load.before(run),
