@@ -25,7 +25,8 @@ pub const PRESSED_BUTTON: Color = Color::rgb(0.9, 0.9, 0.9);
 
 pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     let play_button_style = Style {
-        size: Size::new(Val::Px(250.0), Val::Px(65.0)),
+        width: Val::Px(250.0),
+        height: Val::Px(65.0),
         // center button
         margin: UiRect::all(Val::Auto),
         // horizontally center child text
@@ -35,7 +36,8 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         ..default()
     };
     let quit_button_style = Style {
-        size: Size::new(Val::Px(150.0), Val::Px(65.0)),
+        width: Val::Px(150.0), 
+        height: Val::Px(65.0),
         // center button
         margin: UiRect::all(Val::Auto),
         // horizontally center child text
