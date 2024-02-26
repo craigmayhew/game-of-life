@@ -22,10 +22,19 @@ pub const NORMAL_BUTTON: Color = Color::rgb(0.4, 0.4, 0.4);
 pub const HOVERED_BUTTON: Color = Color::rgb(0.6, 0.6, 0.6);
 pub const PRESSED_BUTTON: Color = Color::rgb(0.9, 0.9, 0.9);
 
+struct ButtonDimensions {
+    height: Val,
+    width: Val,
+}
+
 pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
-    let play_button_style = Style {
-        width: Val::Px(250.0),
+    let button_size = ButtonDimensions {
         height: Val::Px(65.0),
+        width: Val::Px(250.0),
+    };
+    let play_button_style = Style {
+        width: button_size.width,
+        height: button_size.height,
         bottom: Val::Px(40.0),
         // center button
         margin: UiRect::all(Val::Auto),
@@ -36,8 +45,8 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         ..default()
     };
     let quit_button_style = Style {
-        width: Val::Px(150.0),
-        height: Val::Px(65.0),
+        width: button_size.width,
+        height: button_size.height,
         top: Val::Px(40.0),
         // center button
         margin: UiRect::all(Val::Auto),
