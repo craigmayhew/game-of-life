@@ -140,10 +140,10 @@ fn main() {
     .add_plugin(ObjPlugin)
     .add_plugin(LogDiagnosticsPlugin::default())
     .add_plugin(FrameTimeDiagnosticsPlugin::default())
-    .add_startup_system(set_window_icon)
-    .add_startup_system(systems::camera_movement::setup)
+    .add_systems(Startup, set_window_icon)
+    .add_systems(Startup, systems::camera_movement::setup)
     .insert_resource(ClearColor(Color::BLACK)) //set the background colour of our window (the universe)
-    .add_startup_system(setup)
+    .add_systems(Startup, setup)
     // keyboard input (excluding camera movement)
     .add_systems(Update, systems::keyboard::run)
     // life system
