@@ -145,40 +145,46 @@ fn main() {
     .insert_resource(ClearColor(Color::BLACK)) //set the background colour of our window (the universe)
     .add_startup_system(setup)
     // keyboard input (excluding camera movement)
-    .add_system(systems::keyboard::run)
+    .add_systems(Update, systems::keyboard::run)
     // life system
-    .add_system(
-        systems::life::run.run_if(on_timer(Duration::from_millis(100)))
+    .add_systems(
+        Update, systems::life::run.run_if(on_timer(Duration::from_millis(100)))
     )
     // AppState::Splash
-    .add_system(systems::menu::setup.in_schedule(OnEnter(AppState::Splash)))
-    .add_system(systems::menu::run.in_set(OnUpdate(AppState::Splash)))
-    .add_system(systems::menu::cleanup.in_schedule(OnExit(AppState::Splash)))
+    .add_systems(OnEnter(AppState::Splash), systems::menu::setup)
+    .add_systems(Update, systems::menu::run.run_if(in_state(AppState::Splash)))
+    .add_systems(OnExit(AppState::Splash), systems::menu::cleanup)
     // AppState::InGame
-    .add_system(systems::hud::enter.in_schedule(OnEnter(AppState::InGame)))
-    .add_systems(
-        (systems::hud::run,systems::life::place_life_with_keyboard,systems::camera_movement::move_camera_on_keyboard_input).in_set(OnUpdate(AppState::InGame))
+    .add_systems(OnEnter(AppState::InGame), systems::hud::enter)
+    .add_systems(Update,
+        (
+            systems::hud::run,systems::life::place_life_with_keyboard.run_if(in_state(AppState::InGame)),
+            systems::camera_movement::move_camera_on_keyboard_input.run_if(in_state(AppState::InGame))
+        )
     )
-    .add_system(systems::hud::cleanup.in_schedule(OnExit(AppState::InGame)))
+    .add_systems(OnExit(AppState::InGame), systems::hud::cleanup)
     // AppState::Paused
     .add_systems(
-        (systems::menu_paused::enter,systems::hud::enter).in_schedule(OnEnter(AppState::Paused))
+        OnEnter(AppState::Paused), (systems::menu_paused::enter,systems::hud::enter)
     )
-    .add_systems(
-        (systems::camera_movement::move_camera_on_keyboard_input,systems::hud::run,systems::life::place_life_with_keyboard).in_set(OnUpdate(AppState::Paused))
+    .add_systems(Update,
+        (
+            systems::camera_movement::move_camera_on_keyboard_input.run_if(in_state(AppState::Paused)),
+            systems::hud::run,systems::life::place_life_with_keyboard.run_if(in_state(AppState::Paused))
+        )
     )
-    .add_systems((systems::hud::cleanup,systems::menu_paused::cleanup).in_schedule(OnExit(AppState::Paused)))
+    .add_systems(OnExit(AppState::Paused), (systems::hud::cleanup,systems::menu_paused::cleanup))
     // AppState::NewGame
-    .add_system(
-        systems::life::new_universe.in_schedule(OnEnter(AppState::NewGame)).before(systems::life::run)
+    .add_systems(
+        OnEnter(AppState::NewGame), systems::life::new_universe.before(systems::life::run)
     )
     // AppState::LoadGame
-    .add_system(
-        systems::saves::load.in_schedule(OnEnter(AppState::LoadGame)).before(systems::life::run)
+    .add_systems(
+        OnEnter(AppState::LoadGame), systems::saves::load.before(systems::life::run)
     )
     // AppState::SaveGame
-    .add_system(
-        systems::saves::save.in_schedule(OnEnter(AppState::SaveGame)).before(systems::life::run)
+    .add_systems(
+        OnEnter(AppState::SaveGame), systems::saves::save.before(systems::life::run)
     )
     .run()
 }
