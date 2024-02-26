@@ -553,13 +553,13 @@ mod tests {
             
         app.add_plugins(MinimalPlugins);
 
-        app.add_plugin(AssetPlugin::default());
-        app.add_plugin(WindowPlugin::default());
-        app.add_plugin(RenderPlugin::default());
+        app.add_plugins(AssetPlugin::default());
+        app.add_plugins(WindowPlugin::default());
+        app.add_plugins(RenderPlugin::default());
         //app.add_plugin(CorePipelinePlugin::default());
         //app.add_plugin(PbrPlugin::default());
         
-        app.add_plugin(ObjPlugin);
+        app.add_plugins(ObjPlugin);
 
         app.add_state::<AppState>().insert_resource(AppState::LoadGame);
 
