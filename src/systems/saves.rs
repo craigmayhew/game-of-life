@@ -14,7 +14,7 @@ use crate::{
 #[derive(Resource)]
 pub enum GameFileToLoad {
     Some(String),
-    None(),
+    None,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -32,15 +32,14 @@ pub fn load(
     mut next_state: ResMut<NextState<AppState>>,
     mut game_to_be_loaded: ResMut<GameFileToLoad>,
 ) {
-    let name_of_load_file: String;
-    match game_to_be_loaded.as_mut() {
+    let name_of_load_file: String = match game_to_be_loaded.as_mut() {
         GameFileToLoad::Some(file_name) => {
-            name_of_load_file = file_name.to_string();
+            file_name.to_string()
         }
-        GameFileToLoad::None() => {
-            name_of_load_file = "latest".to_string();
+        GameFileToLoad::None => {
+            "latest".to_string()
         }
-    }
+    };
 
     let contents = read_to_string("saves/".to_string() + &name_of_load_file + ".ron")
         .expect("Failed to load save file");

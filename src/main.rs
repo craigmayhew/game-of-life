@@ -87,7 +87,7 @@ fn setup(
     });
 
     //resource used to know which save file to load if/when needed
-    commands.insert_resource(systems::saves::GameFileToLoad::None());
+    commands.insert_resource(systems::saves::GameFileToLoad::None);
 
     commands.insert_resource(GameSpeed {
         ticks_per_second: 2.0,
@@ -97,7 +97,7 @@ fn setup(
     //ambient light
     commands.insert_resource(AmbientLight {
         color: Color::WHITE,
-        brightness: 1.0,
+        brightness: 100.0,
     });
 }
 
@@ -136,7 +136,7 @@ fn main() {
             }),
             ..default()
         }))
-        .add_state::<AppState>()
+        .init_state::<AppState>()
         .add_plugins(ObjPlugin)
         .add_plugins(LogDiagnosticsPlugin::default())
         .add_plugins(FrameTimeDiagnosticsPlugin::default())

@@ -19,7 +19,7 @@ pub fn enter(mut commands: Commands, asset_server: Res<AssetServer>) {
     let paused = commands
         .spawn(
             TextBundle::from_section("PAUSED", text_style)
-                .with_text_alignment(TextAlignment::Center)
+                .with_text_justify(JustifyText::Center)
                 .with_style(Style {
                     align_self: AlignSelf::Center,
                     margin: UiRect {

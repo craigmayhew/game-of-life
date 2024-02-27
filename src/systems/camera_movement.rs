@@ -34,44 +34,44 @@ const ROTATE_SPEED: f32 = std::f32::consts::FRAC_1_PI / 5.0;
 
 pub fn move_camera_on_keyboard_input(
     mut camera: Query<&mut Transform, With<Camera>>,
-    keys: Res<Input<KeyCode>>,
+    keys: Res<ButtonInput<KeyCode>>,
     timer: Res<Time>,
 ) {
     let move_factor = 1000.0 * timer.delta_seconds();
     //let rotation_factor = 500.0 * timer.delta_seconds();
     for mut transform in camera.iter_mut() {
         //rotation
-        if keys.pressed(KeyCode::A) {
+        if keys.pressed(KeyCode::KeyA) {
             // look left
             transform.rotate_local_y(ROTATE_SPEED);
-        } else if keys.pressed(KeyCode::D) {
+        } else if keys.pressed(KeyCode::KeyD) {
             // look right
             transform.rotate_local_y(-ROTATE_SPEED);
         }
         // forward / backward
-        if keys.pressed(KeyCode::W) {
+        if keys.pressed(KeyCode::KeyW) {
             // forward
             let move_cam = transform.forward() * move_factor;
             transform.translation += move_cam;
-        } else if keys.pressed(KeyCode::S) {
+        } else if keys.pressed(KeyCode::KeyS) {
             // backward
             let move_cam = transform.forward() * move_factor;
             transform.translation -= move_cam;
         }
         //movement
-        if keys.pressed(KeyCode::Left) {
+        if keys.pressed(KeyCode::ArrowLeft) {
             // moving left
             let move_cam = transform.left() * move_factor;
             transform.translation += move_cam;
-        } else if keys.pressed(KeyCode::Right) {
+        } else if keys.pressed(KeyCode::ArrowRight) {
             // moving right
             let move_cam = transform.right() * move_factor;
             transform.translation += move_cam;
         }
-        if keys.pressed(KeyCode::Up) {
+        if keys.pressed(KeyCode::ArrowUp) {
             // moving up
             transform.translation.y += move_factor;
-        } else if keys.pressed(KeyCode::Down) {
+        } else if keys.pressed(KeyCode::ArrowDown) {
             // moving down
             transform.translation.y -= move_factor;
         }

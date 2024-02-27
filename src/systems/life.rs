@@ -516,17 +516,17 @@ fn checks(n: &TetraIndex) -> Vec<NeighbourChecks> {
 pub fn place_life_with_keyboard(
     camera: Query<&mut Transform, With<Camera>>,
     mut commands: Commands,
-    keys: Res<Input<KeyCode>>,
+    keys: Res<ButtonInput<KeyCode>>,
     mut session: ResMut<SessionResource>,
 ) {
     // if we hit the right key(s) then generate life in a specific spot in front of the camera
     if keys.any_just_pressed([
-        KeyCode::Key1,
-        KeyCode::Key2,
-        KeyCode::Key3,
-        KeyCode::Key4,
-        KeyCode::Key5,
-        KeyCode::Key6,
+        KeyCode::Digit1,
+        KeyCode::Digit2,
+        KeyCode::Digit3,
+        KeyCode::Digit4,
+        KeyCode::Digit5,
+        KeyCode::Digit6,
         KeyCode::Space,
     ]) {
         for transform in camera.iter() {
@@ -537,15 +537,15 @@ pub fn place_life_with_keyboard(
             let y = xyz_in_front_of_cam.y;
             let z = xyz_in_front_of_cam.z;
             // TODO we need a way of detecting which of 6 tetras needs to created, for now just use the number keys
-            let n = if keys.just_pressed(KeyCode::Key1) {
+            let n = if keys.just_pressed(KeyCode::Digit1) {
                 0
-            } else if keys.just_pressed(KeyCode::Key2) {
+            } else if keys.just_pressed(KeyCode::Digit2) {
                 1
-            } else if keys.just_pressed(KeyCode::Key3) {
+            } else if keys.just_pressed(KeyCode::Digit3) {
                 2
-            } else if keys.just_pressed(KeyCode::Key4) {
+            } else if keys.just_pressed(KeyCode::Digit4) {
                 3
-            } else if keys.just_pressed(KeyCode::Key5) {
+            } else if keys.just_pressed(KeyCode::Digit5) {
                 4
             } else {
                 5
@@ -900,10 +900,7 @@ pub fn run(
 mod tests {
     use super::*;
 
-    use bevy::{
-        asset::AssetPlugin, core_pipeline::CorePipelinePlugin, pbr::PbrPlugin,
-        render::RenderPlugin, window::WindowPlugin,
-    };
+    use bevy::render::RenderPlugin;
     use bevy_obj::*; // used import wavefront obj files
 
     fn initialise_test_universe(save_filename: &str) -> bevy::prelude::App {
@@ -920,7 +917,7 @@ mod tests {
 
         app.add_plugins(ObjPlugin);
 
-        app.add_state::<AppState>()
+        app.init_state::<AppState>()
             .insert_resource(AppState::LoadGame);
 
         //asset server for meshes

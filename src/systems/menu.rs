@@ -110,7 +110,10 @@ pub fn run(
                     MenuButtonAction::Play => {
                         next_state.set(AppState::NewGame);
                     }
-                    MenuButtonAction::Quit => app_exit_events.send(AppExit),
+                    MenuButtonAction::Quit => {
+                        let _ = app_exit_events.send(AppExit);
+                        ()
+                    }
                 }
             }
             Interaction::Hovered => {
