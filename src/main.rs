@@ -19,6 +19,8 @@ const DEFAULT_UNIVERSE_SIZE: usize = 20;
 //meshes
 const MESH_TETRA_BYTES: &'static [u8] = include_bytes!("../assets/mesh/hill-tetrahedron.obj");
 const MESH_TETRA_MIRRORED_BYTES: &'static [u8] = include_bytes!("../assets/mesh/hill-tetrahedron-mirrored.obj");
+//fonts
+const FONT_BYTES: &'static [u8] = include_bytes!("../assets/font/square.ttf");
 
 // Defines the amount of time that should elapse between each physics step.
 #[derive(PartialEq, Debug, Resource)]
