@@ -109,8 +109,39 @@ fn setup(
     //ambient light
     commands.insert_resource(AmbientLight {
         color: Color::WHITE,
-        brightness: 80.0,
+        brightness: 0.1,
     });
+
+    // a nearby sun!
+    commands
+        .spawn(PointLightBundle {
+            transform: Transform::from_xyz(
+                (DEFAULT_UNIVERSE_SIZE >> 1) as f32 * systems::life::LIFE_FORM_SIZE,
+                (DEFAULT_UNIVERSE_SIZE >> 1) as f32 * systems::life::LIFE_FORM_SIZE,
+                (DEFAULT_UNIVERSE_SIZE << 1) as f32 * systems::life::LIFE_FORM_SIZE,
+            ),
+            point_light: PointLight {
+                intensity: 4000000000.0, // lumens
+                color: Color::YELLOW,
+                radius: 10.0,
+                range: 10000000.0,
+                shadows_enabled: true,
+                ..default()
+            },
+            ..default()
+        })
+        .with_children(|builder| {
+            builder.spawn(PbrBundle {
+                mesh: meshes.add(Sphere::new(9.0).mesh().uv(32, 18)),
+                material: materials.add(StandardMaterial {
+                    base_color: Color::YELLOW,
+                    emissive: Color::YELLOW,
+                    diffuse_transmission: 1.0,
+                    ..default()
+                }),
+                ..default()
+            });
+        });
 }
 
 fn set_window_icon(
