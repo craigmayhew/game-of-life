@@ -25,6 +25,13 @@ pub struct SaveResource {
     pub universe_size: usize,
 }
 
+pub fn string_to_game_file_name (file_name:&str) -> GameFileToLoad {
+    match file_name {
+        "" => GameFileToLoad::None,
+        _ => GameFileToLoad::Some(file_name.to_string())
+    }
+}
+
 pub fn load(
     mut life_entities: Query<Entity, With<Life>>,
     mut commands: Commands,

@@ -87,7 +87,7 @@ fn setup(
     });
 
     //resource used to know which save file to load if/when needed
-    commands.insert_resource(systems::saves::GameFileToLoad::None);
+    commands.insert_resource(systems::saves::string_to_game_file_name(""));
 
     commands.insert_resource(GameSpeed {
         ticks_per_second: 2.0,
