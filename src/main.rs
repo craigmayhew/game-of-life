@@ -16,6 +16,10 @@ mod systems;
 // default universe size if none specified
 const DEFAULT_UNIVERSE_SIZE: usize = 20;
 
+//meshes
+const MESH_TETRA_BYTES: &'static [u8] = include_bytes!("../assets/mesh/hill-tetrahedron.obj");
+const MESH_TETRA_MIRRORED_BYTES: &'static [u8] = include_bytes!("../assets/mesh/hill-tetrahedron-mirrored.obj");
+
 // Defines the amount of time that should elapse between each physics step.
 #[derive(PartialEq, Debug, Resource)]
 pub struct GameSpeed {
@@ -46,9 +50,15 @@ pub struct SessionResource {
 
 fn setup(
     mut commands: Commands,
-    asset_server: Res<AssetServer>,
     mut materials: ResMut<Assets<StandardMaterial>>,
+    mut meshes: ResMut<Assets<Mesh>>,
 ) {
+    let mesh = bevy_obj::load_obj_from_bytes(MESH_TETRA_BYTES).expect("load_obj_from_bytes() failed");
+    let tetrahedron_mesh_handle = meshes.add(mesh);
+    let mesh = bevy_obj::load_obj_from_bytes(MESH_TETRA_MIRRORED_BYTES).expect("load_obj_from_bytes() failed");
+    let tetrahedron_mirrored_mesh_handle = meshes.add(mesh);
+
+    //load materials and assets
     commands.insert_resource(SessionResource {
         life: systems::life::dead_universe(),
         counter: 0,
@@ -80,8 +90,8 @@ fn setup(
             }),
         ],
         life_form_meshes: [
-            asset_server.load("mesh/hill-tetrahedron-mirrored.obj"),
-            asset_server.load("mesh/hill-tetrahedron.obj"),
+            tetrahedron_mesh_handle,
+            tetrahedron_mirrored_mesh_handle,
         ],
         universe_size: DEFAULT_UNIVERSE_SIZE,
     });
