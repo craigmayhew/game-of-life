@@ -1,10 +1,13 @@
 use bevy::{
     prelude::*, //default bevy
+    render::camera::{Exposure, PhysicalCameraParameters}, // camera exposure added in bevy 0.13
 };
 
 use crate::{systems::life::LIFE_FORM_SIZE, DEFAULT_UNIVERSE_SIZE};
 
-pub fn setup(mut commands: Commands) {
+pub fn setup(
+    mut commands: Commands,
+) {
     commands.spawn(Camera3dBundle {
         projection: PerspectiveProjection {
             near: 0.1,
@@ -13,6 +16,11 @@ pub fn setup(mut commands: Commands) {
             fov: std::f32::consts::FRAC_PI_3,
         }
         .into(),
+        exposure: Exposure::from_physical_camera(PhysicalCameraParameters {
+            aperture_f_stops: 1.0,
+            shutter_speed_s: 1.0 / 100.0,
+            sensitivity_iso: 100.0,
+        }),
         transform: Transform::from_xyz(
             DEFAULT_UNIVERSE_SIZE as f32 * LIFE_FORM_SIZE / 2.0,
             DEFAULT_UNIVERSE_SIZE as f32 * LIFE_FORM_SIZE / 2.0,

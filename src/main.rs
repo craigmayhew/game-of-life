@@ -109,7 +109,7 @@ fn setup(
     //ambient light
     commands.insert_resource(AmbientLight {
         color: Color::WHITE,
-        brightness: 100.0,
+        brightness: 80.0,
     });
 }
 
