@@ -121,7 +121,7 @@ fn setup(
                 0.0,
             ),
             point_light: PointLight {
-                //intensity: f32::MAX/1_000_000_000_000.0, // lumens
+                intensity: f32::MAX/1_000_000_000_000.0, // lumens
                 color: Color::YELLOW,
                 radius: 100.0,
                 range: 10_000_000.0,
