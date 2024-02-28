@@ -74,7 +74,7 @@ pub struct Life;
 #[derive(Clone, Copy)]
 pub enum LifeDataContainer {
     Alive(Entity),
-    Dead(bool),
+    Dead,
 }
 
 #[derive(Clone, Copy)]
@@ -574,10 +574,10 @@ pub fn place_life_with_keyboard(
                         //if alive currently
                         commands.entity(ent.to_owned()).despawn();
                         session.life[n][x as usize][y as usize][z as usize] =
-                            LifeDataContainer::Dead(true);
+                            LifeDataContainer::Dead;
                         session.counter -= 1;
                     }
-                    LifeDataContainer::Dead(_) => {
+                    LifeDataContainer::Dead => {
                         // if dead currently
                         // Place a life form
                         let transform_new_life: bevy::prelude::Transform =
@@ -606,7 +606,7 @@ pub fn dead_universe() -> Vec<Vec<Vec<Vec<LifeDataContainer>>>> {
     vec![
         vec![
             vec![
-                vec![LifeDataContainer::Dead(true); crate::DEFAULT_UNIVERSE_SIZE];
+                vec![LifeDataContainer::Dead; crate::DEFAULT_UNIVERSE_SIZE];
                 crate::DEFAULT_UNIVERSE_SIZE
             ];
             crate::DEFAULT_UNIVERSE_SIZE
@@ -692,7 +692,7 @@ pub fn run(
         let mut next_gen = vec![
             vec![
                 vec![
-                    vec![LifeDataContainer::Dead(true); session.universe_size];
+                    vec![LifeDataContainer::Dead; session.universe_size];
                     session.universe_size
                 ];
                 session.universe_size
@@ -853,7 +853,7 @@ pub fn run(
                                 //if alive in last gen
                                 if neighbours > 3 || neighbours == 1 || neighbours == 0 {
                                     commands.entity(ent.to_owned()).despawn();
-                                    next_gen[n][x][y][z] = LifeDataContainer::Dead(true);
+                                    next_gen[n][x][y][z] = LifeDataContainer::Dead;
 
                                     session.counter -= 1;
                                 } else {
@@ -861,7 +861,7 @@ pub fn run(
                                     next_gen[n][x][y][z] = last_gen[n][x][y][z];
                                 }
                             }
-                            LifeDataContainer::Dead(_) => {
+                            LifeDataContainer::Dead => {
                                 // if dead in last gen
                                 //if neighbours = 3 then become alive
                                 if neighbours == 3 {

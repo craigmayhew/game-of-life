@@ -60,7 +60,7 @@ pub fn load(
             session.life = vec![
                 vec![
                     vec![
-                        vec![LifeDataContainer::Dead(true); data.universe_size];
+                        vec![LifeDataContainer::Dead; data.universe_size];
                         data.universe_size
                     ];
                     data.universe_size
@@ -91,7 +91,7 @@ pub fn load(
                                         .id(),
                                 );
                             } else {
-                                session.life[n][x][y][z] = LifeDataContainer::Dead(true);
+                                session.life[n][x][y][z] = LifeDataContainer::Dead;
                             }
                         }
                     }
