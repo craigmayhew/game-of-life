@@ -1,4 +1,8 @@
 use bevy::{
+    core_pipeline::{
+        bloom::BloomSettings, // for bloom
+        tonemapping::Tonemapping, // for bloom
+    },
     prelude::*, //default bevy
     render::camera::{Exposure, PhysicalCameraParameters}, // camera exposure added in bevy 0.13
 };
@@ -8,34 +12,42 @@ use crate::{systems::life::LIFE_FORM_SIZE, DEFAULT_UNIVERSE_SIZE};
 pub fn setup(
     mut commands: Commands,
 ) {
-    commands.spawn(Camera3dBundle {
-        projection: PerspectiveProjection {
-            near: 0.1,
-            far: 100_000_000.0,
-            aspect_ratio: 16.0 / 9.0,
-            fov: std::f32::consts::FRAC_PI_3,
-        }
-        .into(),
-        exposure: Exposure::from_physical_camera(PhysicalCameraParameters {
-            aperture_f_stops: 1.0,
-            shutter_speed_s: 1.0 / 100.0,
-            sensitivity_iso: 100.0,
-        }),
-        transform: Transform::from_xyz(
-            (DEFAULT_UNIVERSE_SIZE >> 1) as f32 * LIFE_FORM_SIZE,
-            (DEFAULT_UNIVERSE_SIZE >> 1) as f32 * LIFE_FORM_SIZE,
-            (DEFAULT_UNIVERSE_SIZE << 1) as f32 * LIFE_FORM_SIZE,
-        )
-        .looking_at(
-            Vec3::new(
+    commands.spawn((
+        Camera3dBundle {
+            camera: Camera {
+                hdr: true, // HDR is required for bloom
+                ..default()
+            },
+            tonemapping: Tonemapping::TonyMcMapface, // Using a tonemapper that desaturates to white is recommended
+            projection: PerspectiveProjection {
+                near: 0.1,
+                far: 100_000_000.0,
+                aspect_ratio: 16.0 / 9.0,
+                fov: std::f32::consts::FRAC_PI_3,
+            }
+            .into(),
+            exposure: Exposure::from_physical_camera(PhysicalCameraParameters {
+                aperture_f_stops: 1.0,
+                shutter_speed_s: 1.0 / 100.0,
+                sensitivity_iso: 100.0,
+            }),
+            transform: Transform::from_xyz(
                 (DEFAULT_UNIVERSE_SIZE >> 1) as f32 * LIFE_FORM_SIZE,
                 (DEFAULT_UNIVERSE_SIZE >> 1) as f32 * LIFE_FORM_SIZE,
-                0.0,
+                (DEFAULT_UNIVERSE_SIZE << 1) as f32 * LIFE_FORM_SIZE,
+            )
+            .looking_at(
+                Vec3::new(
+                    (DEFAULT_UNIVERSE_SIZE >> 1) as f32 * LIFE_FORM_SIZE,
+                    (DEFAULT_UNIVERSE_SIZE >> 1) as f32 * LIFE_FORM_SIZE,
+                    0.0,
+                ),
+                Vec3::Y,
             ),
-            Vec3::Y,
-        ),
-        ..default()
-    });
+            ..default()
+        },
+        BloomSettings::default() // 3. Enable bloom for the camera
+    ));
 }
 
 const ROTATE_SPEED: f32 = std::f32::consts::FRAC_1_PI / 5.0;
