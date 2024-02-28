@@ -45,7 +45,40 @@ pub fn setup(mut commands: Commands) {
             ..default()
         },
         BloomSettings::default(), // 3. Enable bloom for the camera
-    ));
+    ))
+    // add the ships lights that are fixed to the camera
+    .with_children(|builder| {
+        builder
+        .spawn(SpotLightBundle  {
+            transform: Transform::from_xyz(50.0, 0.0, 0.0),
+            spot_light: SpotLight {
+                color: Color::WHITE,
+                inner_angle: 0.1,
+                intensity: 1_000_000_000.0, // lumens
+                outer_angle: 0.5,
+                radius: 1.0,
+                range: 10_000.0,
+                shadows_enabled: true,
+                ..default()
+            },
+            ..default()
+        });
+        builder
+        .spawn(SpotLightBundle  {
+            transform: Transform::from_xyz(-50.0, 0.0, 0.0),
+            spot_light: SpotLight {
+                color: Color::WHITE,
+                inner_angle: 0.1,
+                intensity: 1_000_000_000.0, // lumens
+                outer_angle: 0.5,
+                radius: 1.0,
+                range: 10_000.0,
+                shadows_enabled: true,
+                ..default()
+            },
+            ..default()
+        });
+    });
 }
 
 const ROTATE_SPEED: f32 = std::f32::consts::FRAC_1_PI / 5.0;
