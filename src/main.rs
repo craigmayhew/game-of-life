@@ -116,15 +116,15 @@ fn setup(
     commands
         .spawn(PointLightBundle {
             transform: Transform::from_xyz(
-                (DEFAULT_UNIVERSE_SIZE >> 1) as f32 * systems::life::LIFE_FORM_SIZE,
-                (DEFAULT_UNIVERSE_SIZE >> 1) as f32 * systems::life::LIFE_FORM_SIZE,
-                (DEFAULT_UNIVERSE_SIZE << 1) as f32 * systems::life::LIFE_FORM_SIZE,
+                10_000_000.0,
+                0.0,
+                0.0,
             ),
             point_light: PointLight {
-                intensity: 4000000000.0, // lumens
+                //intensity: f32::MAX/1_000_000_000_000.0, // lumens
                 color: Color::YELLOW,
-                radius: 10.0,
-                range: 10000000.0,
+                radius: 100.0,
+                range: 10_000_000.0,
                 shadows_enabled: true,
                 ..default()
             },
@@ -132,7 +132,7 @@ fn setup(
         })
         .with_children(|builder| {
             builder.spawn(PbrBundle {
-                mesh: meshes.add(Sphere::new(9.0).mesh().uv(32, 18)),
+                mesh: meshes.add(Sphere::new(900_000.0).mesh().uv(32, 18)),
                 material: materials.add(StandardMaterial {
                     base_color: Color::YELLOW,
                     emissive: Color::YELLOW,

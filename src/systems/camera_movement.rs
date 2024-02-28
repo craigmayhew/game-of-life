@@ -11,7 +11,7 @@ pub fn setup(
     commands.spawn(Camera3dBundle {
         projection: PerspectiveProjection {
             near: 0.1,
-            far: 10000.0,
+            far: 100_000_000.0,
             aspect_ratio: 16.0 / 9.0,
             fov: std::f32::consts::FRAC_PI_3,
         }
