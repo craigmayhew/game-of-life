@@ -6,7 +6,7 @@ A unique take on the game of life
 ### 2024 Update
 This project is a unique take on the game of life that gave me an excuse to try some 3D rust programming back in 2019 and 2020 using [Amethyst](https://github.com/amethyst/amethyst). In 2022 it was rewritten in [Bevy](https://github.com/bevyengine/bevy). Game mechanics are mostly working as of version 0.8.
 
-Version 0.9 is in the works and will include lighting effects, stellar bodies and cleaner code. There is still work to be done on the game machanics.
+Version 0.9 is in the works and will include lighting effects, stellar objects and cleaner code. There is still work to be done on the game mechanics.
 
 ### Design Patterns
 This Game of Life uses the [Bevy](https://github.com/bevyengine/bevy) framework and so utilises the [Entity Component System](https://en.wikipedia.org/wiki/Entity_component_system) paradigm and benefits from Automatic Parameter Resolution for each [System](https://bevy-cheatbook.github.io/programming/systems.html).
