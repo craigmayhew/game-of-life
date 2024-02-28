@@ -68,7 +68,7 @@ pub fn load(
                 6
             ];
 
-            // so we can spawn new ones form the save file
+            // so we can spawn new ones from the save file
             for tetra_index in TETRA_INDEXES {
                 let n: usize = tetra_index as usize;
                 for (x, vec2) in data.life[n].iter().enumerate() {
