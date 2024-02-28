@@ -11,11 +11,11 @@ Version 0.9 is in the works and will include lighting effects, stellar bodies an
 ### Design Patterns
 This Game of Life uses the [Bevy](https://github.com/bevyengine/bevy) framework and so utilises the [Entity Component System](https://en.wikipedia.org/wiki/Entity_component_system) paradigm and benefits from Automatic Parameter Resolution for each [System](https://bevy-cheatbook.github.io/programming/systems.html).
 
-## Thanks
-To the [bevy cheat book](https://bevy-cheatbook.github.io/). 
-To Hill for his work on the tetrahedron. 
-To AmionSky's [plugin for wavefront files](https://github.com/AmionSky/bevy_obj/tree/master/example). 
-To the official bevy [getting started book](https://bevyengine.org/learn/book/getting-started/resources/). 
+## Thank you
+ - To the [bevy cheat book](https://bevy-cheatbook.github.io/). 
+ - To Hill for his work on the tetrahedron. 
+ - To AmionSky's [plugin for wavefront files](https://github.com/AmionSky/bevy_obj/tree/master/example). 
+ - To the official bevy [getting started book](https://bevyengine.org/learn/book/getting-started/resources/). 
 
 ## Findings
 
@@ -48,6 +48,7 @@ Volume = sqrt(
 ) / 12
 ```
 Where U,V,W are the edges of the base triangle and u,v,w are the remaining edges. If we put in the following values U= V= W= u= v= w= we get the answer 111111. A cube of sides length 1111 has volume 1111^3 = 3333. Our tetrahedron fits in 333/1111 times exactly.
+
 
 ### Internal angles
 
