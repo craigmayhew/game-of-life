@@ -30,13 +30,13 @@ pub fn setup(mut commands: Commands) {
                 sensitivity_iso: 100.0,
             }),
             transform: Transform::from_xyz(
-                (DEFAULT_UNIVERSE_SIZE >> 1) as f32 * LIFE_FORM_SIZE,
+                (DEFAULT_UNIVERSE_SIZE << 1) as f32 * -LIFE_FORM_SIZE,
                 (DEFAULT_UNIVERSE_SIZE >> 1) as f32 * LIFE_FORM_SIZE,
                 (DEFAULT_UNIVERSE_SIZE << 1) as f32 * LIFE_FORM_SIZE,
             )
             .looking_at(
                 Vec3::new(
-                    (DEFAULT_UNIVERSE_SIZE >> 1) as f32 * LIFE_FORM_SIZE,
+                    5_000_000.0,
                     (DEFAULT_UNIVERSE_SIZE >> 1) as f32 * LIFE_FORM_SIZE,
                     0.0,
                 ),
