@@ -10,10 +10,7 @@ pub struct MenuData {
 #[derive(Component)]
 pub struct PausedText;
 
-pub fn enter(
-    mut commands: Commands,
-    mut fonts: ResMut<Assets<Font>>,
-) {
+pub fn enter(mut commands: Commands, mut fonts: ResMut<Assets<Font>>) {
     let font = Font::try_from_bytes(crate::FONT_BYTES.into()).unwrap();
     let font_handle = fonts.add(font);
     let text_style = TextStyle {

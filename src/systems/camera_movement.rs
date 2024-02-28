@@ -1,17 +1,15 @@
 use bevy::{
     core_pipeline::{
-        bloom::BloomSettings, // for bloom
+        bloom::BloomSettings,     // for bloom
         tonemapping::Tonemapping, // for bloom
     },
-    prelude::*, //default bevy
+    prelude::*,                                           //default bevy
     render::camera::{Exposure, PhysicalCameraParameters}, // camera exposure added in bevy 0.13
 };
 
 use crate::{systems::life::LIFE_FORM_SIZE, DEFAULT_UNIVERSE_SIZE};
 
-pub fn setup(
-    mut commands: Commands,
-) {
+pub fn setup(mut commands: Commands) {
     commands.spawn((
         Camera3dBundle {
             camera: Camera {
@@ -46,7 +44,7 @@ pub fn setup(
             ),
             ..default()
         },
-        BloomSettings::default() // 3. Enable bloom for the camera
+        BloomSettings::default(), // 3. Enable bloom for the camera
     ));
 }
 

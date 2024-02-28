@@ -13,10 +13,7 @@ pub struct HudData {
 #[derive(Component)]
 pub struct LifeCounterText;
 
-pub fn enter(
-    mut commands: Commands,
-    mut fonts: ResMut<Assets<Font>>,
-) {
+pub fn enter(mut commands: Commands, mut fonts: ResMut<Assets<Font>>) {
     let font = Font::try_from_bytes(crate::FONT_BYTES.into()).unwrap();
     let font_handle = fonts.add(font);
 

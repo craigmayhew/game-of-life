@@ -18,7 +18,8 @@ const DEFAULT_UNIVERSE_SIZE: usize = 20;
 
 //meshes
 const MESH_TETRA_BYTES: &'static [u8] = include_bytes!("../assets/mesh/hill-tetrahedron.obj");
-const MESH_TETRA_MIRRORED_BYTES: &'static [u8] = include_bytes!("../assets/mesh/hill-tetrahedron-mirrored.obj");
+const MESH_TETRA_MIRRORED_BYTES: &'static [u8] =
+    include_bytes!("../assets/mesh/hill-tetrahedron-mirrored.obj");
 //fonts
 const FONT_BYTES: &'static [u8] = include_bytes!("../assets/font/square.ttf");
 
@@ -55,9 +56,11 @@ fn setup(
     mut materials: ResMut<Assets<StandardMaterial>>,
     mut meshes: ResMut<Assets<Mesh>>,
 ) {
-    let mesh = bevy_obj::load_obj_from_bytes(MESH_TETRA_BYTES).expect("load_obj_from_bytes() failed");
+    let mesh =
+        bevy_obj::load_obj_from_bytes(MESH_TETRA_BYTES).expect("load_obj_from_bytes() failed");
     let tetrahedron_mesh_handle = meshes.add(mesh);
-    let mesh = bevy_obj::load_obj_from_bytes(MESH_TETRA_MIRRORED_BYTES).expect("load_obj_from_bytes() failed");
+    let mesh = bevy_obj::load_obj_from_bytes(MESH_TETRA_MIRRORED_BYTES)
+        .expect("load_obj_from_bytes() failed");
     let tetrahedron_mirrored_mesh_handle = meshes.add(mesh);
 
     //load materials and assets
@@ -91,10 +94,7 @@ fn setup(
                 ..default()
             }),
         ],
-        life_form_meshes: [
-            tetrahedron_mesh_handle,
-            tetrahedron_mirrored_mesh_handle,
-        ],
+        life_form_meshes: [tetrahedron_mesh_handle, tetrahedron_mirrored_mesh_handle],
         universe_size: DEFAULT_UNIVERSE_SIZE,
     });
 
@@ -115,13 +115,9 @@ fn setup(
     // a nearby sun!
     commands
         .spawn(PointLightBundle {
-            transform: Transform::from_xyz(
-                10_000_000.0,
-                0.0,
-                0.0,
-            ),
+            transform: Transform::from_xyz(10_000_000.0, 0.0, 0.0),
             point_light: PointLight {
-                intensity: f32::MAX/1_000_000_000_000.0, // lumens
+                intensity: f32::MAX / 1_000_000_000_000.0, // lumens
                 color: Color::YELLOW,
                 radius: 100.0,
                 range: 10_000_000.0,

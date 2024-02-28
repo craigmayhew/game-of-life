@@ -27,10 +27,7 @@ struct ButtonDimensions {
     width: Val,
 }
 
-pub fn setup(
-    mut commands: Commands,
-    mut fonts: ResMut<Assets<Font>>,
-) {
+pub fn setup(mut commands: Commands, mut fonts: ResMut<Assets<Font>>) {
     let button_size = ButtonDimensions {
         height: Val::Px(65.0),
         width: Val::Px(250.0),
@@ -59,7 +56,7 @@ pub fn setup(
         align_items: AlignItems::Center,
         ..default()
     };
-    
+
     let font = Font::try_from_bytes(crate::FONT_BYTES.into()).unwrap();
     let font_handle = fonts.add(font);
 
