@@ -44,7 +44,7 @@ pub fn setup(mut commands: Commands) {
             ),
             ..default()
         },
-        BloomSettings::default(), // 3. Enable bloom for the camera
+        BloomSettings::default(), // Enable bloom for the camera
     ))
     // add the ships lights that are fixed to the camera
     .with_children(|builder| {
@@ -89,7 +89,6 @@ pub fn move_camera_on_keyboard_input(
     timer: Res<Time>,
 ) {
     let move_factor = 1000.0 * timer.delta_seconds();
-    //let rotation_factor = 500.0 * timer.delta_seconds();
     for mut transform in camera.iter_mut() {
         //rotation
         if keys.pressed(KeyCode::KeyA) {
