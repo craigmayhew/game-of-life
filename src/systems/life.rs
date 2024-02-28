@@ -817,35 +817,12 @@ pub fn run(
                         }
 
                         // CHECK 5 NEIGHBOURS IN SAME CUBE
-                        if n != 0
-                            && let LifeDataContainer::Alive(_) = last_gen[0][x][y][z]
-                        {
-                            neighbours += 1
-                        }
-                        if n != 1
-                            && let LifeDataContainer::Alive(_) = last_gen[1][x][y][z]
-                        {
-                            neighbours += 1
-                        }
-                        if n != 2
-                            && let LifeDataContainer::Alive(_) = last_gen[2][x][y][z]
-                        {
-                            neighbours += 1
-                        }
-                        if n != 3
-                            && let LifeDataContainer::Alive(_) = last_gen[3][x][y][z]
-                        {
-                            neighbours += 1
-                        }
-                        if n != 4
-                            && let LifeDataContainer::Alive(_) = last_gen[4][x][y][z]
-                        {
-                            neighbours += 1
-                        }
-                        if n != 5
-                            && let LifeDataContainer::Alive(_) = last_gen[5][x][y][z]
-                        {
-                            neighbours += 1
+                        for m in 0..=5 {
+                            if n != m
+                                && let LifeDataContainer::Alive(_) = last_gen[m][x][y][z]
+                            {
+                                neighbours += 1
+                            }
                         }
 
                         match entity_life {
