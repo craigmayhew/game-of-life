@@ -22,6 +22,8 @@ const MESH_TETRA_MIRRORED_BYTES: &'static [u8] =
     include_bytes!("../assets/mesh/hill-tetrahedron-mirrored.obj");
 //fonts
 const FONT_BYTES: &'static [u8] = include_bytes!("../assets/font/square.ttf");
+// application icon
+const ICON: &'static [u8] = include_bytes!("../assets/hills-tetrahedron.png");
 
 // Defines the amount of time that should elapse between each physics step.
 #[derive(PartialEq, Debug, Resource)]
@@ -148,9 +150,7 @@ fn set_window_icon(
     // here we use the `image` crate to load our icon data from a png file
     // this is not a very bevy-native solution, but it will do
     let (icon_rgba, icon_width, icon_height) = {
-        let image = image::open("assets/hills-tetrahedron.png")
-            .expect("Failed to open icon path")
-            .into_rgba8();
+        let image = image::load_from_memory(ICON).expect("Error loading logo image").to_rgba8();
         let (width, height) = image.dimensions();
         let rgba = image.into_raw();
         (rgba, width, height)
