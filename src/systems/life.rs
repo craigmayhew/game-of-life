@@ -536,30 +536,19 @@ pub fn place_life_with_keyboard(
             let x = xyz_in_front_of_cam.x;
             let y = xyz_in_front_of_cam.y;
             let z = xyz_in_front_of_cam.z;
-            // TODO we need a way of detecting which of 6 tetras needs to created, for now just use the number keys
-            let n = if keys.just_pressed(KeyCode::Digit1) {
-                0
+            // TODO we need a way of detecting which of 6 tetras needs to be created, for now just use the number keys
+            let (n,tetra_index) = if keys.just_pressed(KeyCode::Digit1) {
+                (0, TetraIndex::Zero)
             } else if keys.just_pressed(KeyCode::Digit2) {
-                1
+                (1, TetraIndex::One)
             } else if keys.just_pressed(KeyCode::Digit3) {
-                2
+                (2, TetraIndex::Two)
             } else if keys.just_pressed(KeyCode::Digit4) {
-                3
+                (3, TetraIndex::Three)
             } else if keys.just_pressed(KeyCode::Digit5) {
-                4
+                (4, TetraIndex::Four)
             } else {
-                5
-            };
-
-            //TODO it doesn't seem very safe to have the if elseif else above and then convert to this
-            let tetra_index = match n {
-                0 => TetraIndex::Zero,
-                1 => TetraIndex::One,
-                2 => TetraIndex::Two,
-                3 => TetraIndex::Three,
-                4 => TetraIndex::Four,
-                5 => TetraIndex::Five,
-                _ => TetraIndex::Five,
+                (5, TetraIndex::Five)
             };
 
             if x > 0.0
