@@ -530,12 +530,9 @@ pub fn place_life_with_keyboard(
         KeyCode::Space,
     ]) {
         for transform in camera.iter() {
-            let xyz_in_front_of_cam =
+            let spawn_at =
                 (transform.translation + (transform.forward() * 1500.0)) / LIFE_FORM_SIZE;
 
-            let x = xyz_in_front_of_cam.x;
-            let y = xyz_in_front_of_cam.y;
-            let z = xyz_in_front_of_cam.z;
             // TODO we need a way of detecting which of 6 tetras needs to be created, for now just use the number keys
             let (n,tetra_index) = if keys.just_pressed(KeyCode::Digit1) {
                 (0, TetraIndex::Zero)
@@ -551,18 +548,18 @@ pub fn place_life_with_keyboard(
                 (5, TetraIndex::Five)
             };
 
-            if x > 0.0
-                && x < session.universe_size as f32
-                && y > 0.0
-                && y < session.universe_size as f32
-                && z > 0.0
-                && z < session.universe_size as f32
+            if spawn_at.x > 0.0
+                && spawn_at.x < session.universe_size as f32
+                && spawn_at.y > 0.0
+                && spawn_at.y < session.universe_size as f32
+                && spawn_at.z > 0.0
+                && spawn_at.z < session.universe_size as f32
             {
-                match session.life[n][x as usize][y as usize][z as usize] {
+                match session.life[n][spawn_at.x as usize][spawn_at.y as usize][spawn_at.z as usize] {
                     LifeDataContainer::Alive(ent) => {
                         //if alive currently
                         commands.entity(ent.to_owned()).despawn();
-                        session.life[n][x as usize][y as usize][z as usize] =
+                        session.life[n][spawn_at.x as usize][spawn_at.y as usize][spawn_at.z as usize] =
                             LifeDataContainer::Dead;
                         session.counter -= 1;
                     }
@@ -570,8 +567,8 @@ pub fn place_life_with_keyboard(
                         // if dead currently
                         // Place a life form
                         let transform_new_life: bevy::prelude::Transform =
-                            create_life_xyz(&tetra_index, x as usize, y as usize, z as usize);
-                        session.life[n][x as usize][y as usize][z as usize] =
+                            create_life_xyz(&tetra_index, spawn_at.x as usize, spawn_at.y as usize, spawn_at.z as usize);
+                        session.life[n][spawn_at.x as usize][spawn_at.y as usize][spawn_at.z as usize] =
                             LifeDataContainer::Alive(
                                 commands
                                     .spawn(PbrBundle {
