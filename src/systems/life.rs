@@ -627,14 +627,7 @@ pub fn new_universe(
 pub fn run(
     mut commands: Commands,
     mut session: ResMut<SessionResource>,
-    state: Res<State<AppState>>,
 ) {
-    // only run code after this point when the state is InGame i.e. not paused
-    match state.get() {
-        AppState::InGame => {}
-        _ => return,
-    }
-
     // first generation, generate random life
     if session.generation == 1 {
         let life_to_create: Vec<Vec<Vec<Vec<LifeDataContainer>>>> = session.life.clone();

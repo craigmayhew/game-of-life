@@ -190,7 +190,9 @@ fn main() {
         // life system
         .add_systems(
             Update,
-            systems::life::run.run_if(on_timer(Duration::from_millis(100))),
+            systems::life::run
+                .run_if(on_timer(Duration::from_millis(100)))
+                .run_if(in_state(AppState::InGame)),
         )
         // AppState::Splash
         .add_systems(OnEnter(AppState::Splash), systems::menu::setup)
