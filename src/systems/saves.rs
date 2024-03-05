@@ -57,16 +57,14 @@ pub fn load(
             }
 
             // resize the universe to match the load file
-            session.life = vec![
+            session.life =
                 vec![
                     vec![
-                        vec![LifeDataContainer::Dead; data.universe_size];
+                        vec![vec![LifeDataContainer::Dead; data.universe_size]; data.universe_size];
                         data.universe_size
                     ];
-                    data.universe_size
+                    6
                 ];
-                6
-            ];
 
             // so we can spawn new ones from the save file
             for tetra_index in TETRA_INDEXES {

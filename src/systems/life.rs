@@ -534,7 +534,7 @@ pub fn place_life_with_keyboard(
                 (transform.translation + (transform.forward() * 1500.0)) / LIFE_FORM_SIZE;
 
             // TODO we need a way of detecting which of 6 tetras needs to be created, for now just use the number keys
-            let (n,tetra_index) = if keys.just_pressed(KeyCode::Digit1) {
+            let (n, tetra_index) = if keys.just_pressed(KeyCode::Digit1) {
                 (0, TetraIndex::Zero)
             } else if keys.just_pressed(KeyCode::Digit2) {
                 (1, TetraIndex::One)
@@ -555,31 +555,36 @@ pub fn place_life_with_keyboard(
                 && spawn_at.z > 0.0
                 && spawn_at.z < session.universe_size as f32
             {
-                match session.life[n][spawn_at.x as usize][spawn_at.y as usize][spawn_at.z as usize] {
+                match session.life[n][spawn_at.x as usize][spawn_at.y as usize][spawn_at.z as usize]
+                {
                     LifeDataContainer::Alive(ent) => {
                         //if alive currently
                         commands.entity(ent.to_owned()).despawn();
-                        session.life[n][spawn_at.x as usize][spawn_at.y as usize][spawn_at.z as usize] =
-                            LifeDataContainer::Dead;
+                        session.life[n][spawn_at.x as usize][spawn_at.y as usize]
+                            [spawn_at.z as usize] = LifeDataContainer::Dead;
                         session.counter -= 1;
                     }
                     LifeDataContainer::Dead => {
                         // if dead currently
                         // Place a life form
-                        let transform_new_life: bevy::prelude::Transform =
-                            create_life_xyz(&tetra_index, spawn_at.x as usize, spawn_at.y as usize, spawn_at.z as usize);
-                        session.life[n][spawn_at.x as usize][spawn_at.y as usize][spawn_at.z as usize] =
-                            LifeDataContainer::Alive(
-                                commands
-                                    .spawn(PbrBundle {
-                                        mesh: session.life_form_meshes[n % 2].clone(),
-                                        material: session.life_form_materials[n].clone(),
-                                        transform: transform_new_life,
-                                        ..Default::default()
-                                    })
-                                    .insert(Life)
-                                    .id(),
-                            );
+                        let transform_new_life: bevy::prelude::Transform = create_life_xyz(
+                            &tetra_index,
+                            spawn_at.x as usize,
+                            spawn_at.y as usize,
+                            spawn_at.z as usize,
+                        );
+                        session.life[n][spawn_at.x as usize][spawn_at.y as usize]
+                            [spawn_at.z as usize] = LifeDataContainer::Alive(
+                            commands
+                                .spawn(PbrBundle {
+                                    mesh: session.life_form_meshes[n % 2].clone(),
+                                    material: session.life_form_materials[n].clone(),
+                                    transform: transform_new_life,
+                                    ..Default::default()
+                                })
+                                .insert(Life)
+                                .id(),
+                        );
                         session.counter += 1;
                     }
                 }
@@ -624,10 +629,7 @@ pub fn new_universe(
     next_state.set(AppState::InGame);
 }
 
-pub fn run(
-    mut commands: Commands,
-    mut session: ResMut<SessionResource>,
-) {
+pub fn run(mut commands: Commands, mut session: ResMut<SessionResource>) {
     // first generation, generate random life
     if session.generation == 1 {
         let life_to_create: Vec<Vec<Vec<Vec<LifeDataContainer>>>> = session.life.clone();
