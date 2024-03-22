@@ -6,7 +6,7 @@ use bevy::{
 use crate::AppState;
 
 #[derive(Resource)]
-pub struct MenuData {
+pub struct MenuEntities {
     button_play: Entity,
     button_quit: Entity,
 }
@@ -91,7 +91,7 @@ pub fn setup(mut commands: Commands, mut fonts: ResMut<Assets<Font>>) {
             parent.spawn(TextBundle::from_section("Quit", button_text_style));
         })
         .id();
-    commands.insert_resource(MenuData {
+    commands.insert_resource(MenuEntities {
         button_play,
         button_quit,
     });
@@ -130,7 +130,12 @@ pub fn run(
     }
 }
 
-pub fn cleanup(mut commands: Commands, menu_data: Res<MenuData>) {
-    commands.entity(menu_data.button_play).despawn_recursive();
-    commands.entity(menu_data.button_quit).despawn_recursive();
+/// Called when existing MENU state
+pub fn cleanup(mut commands: Commands, menu_entities: Res<MenuEntities>) {
+    commands
+        .entity(menu_entities.button_play)
+        .despawn_recursive();
+    commands
+        .entity(menu_entities.button_quit)
+        .despawn_recursive();
 }
