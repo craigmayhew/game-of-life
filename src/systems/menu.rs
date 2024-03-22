@@ -38,10 +38,9 @@ pub fn setup(mut commands: Commands, mut fonts: ResMut<Assets<Font>>) {
         height: Val::Px(65.0),
         width: Val::Px(250.0),
     };
-    let play_button_style = Style {
+    let button_style = Style {
         width: button_size.width,
         height: button_size.height,
-        bottom: Val::Px(40.0),
         // center button
         margin: UiRect::all(Val::Auto),
         // horizontally center child text
@@ -50,18 +49,10 @@ pub fn setup(mut commands: Commands, mut fonts: ResMut<Assets<Font>>) {
         align_items: AlignItems::Center,
         ..default()
     };
-    let quit_button_style = Style {
-        width: button_size.width,
-        height: button_size.height,
-        top: Val::Px(40.0),
-        // center button
-        margin: UiRect::all(Val::Auto),
-        // horizontally center child text
-        justify_content: JustifyContent::Center,
-        // vertically center child text
-        align_items: AlignItems::Center,
-        ..default()
-    };
+    let mut play_button_style = button_style.clone();
+    play_button_style.bottom = Val::Px(40.0);
+    let mut quit_button_style = button_style.clone();
+    quit_button_style.top = Val::Px(40.0);
 
     let font = Font::try_from_bytes(crate::FONT_BYTES.into()).unwrap();
     let font_handle = fonts.add(font);
