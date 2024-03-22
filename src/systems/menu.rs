@@ -5,28 +5,34 @@ use bevy::{
 
 use crate::AppState;
 
+/// Menu entities (buttons)
 #[derive(Resource)]
 pub struct MenuEntities {
     button_play: Entity,
     button_quit: Entity,
 }
 
-// All actions that can be triggered from a menu button click
+/// All actions that can be triggered from a menu button click
 #[derive(Component)]
 pub enum MenuButtonAction {
     Play,
     Quit,
 }
 
+/// Normal button colour
 pub const NORMAL_BUTTON: Color = Color::rgb(0.4, 0.4, 0.4);
+/// Hover button colour
 pub const HOVERED_BUTTON: Color = Color::rgb(0.6, 0.6, 0.6);
+/// Press button colour
 pub const PRESSED_BUTTON: Color = Color::rgb(0.9, 0.9, 0.9);
 
+/// Dimensions of menu button
 struct ButtonDimensions {
     height: Val,
     width: Val,
 }
 
+/// Called when entering MENU state
 pub fn setup(mut commands: Commands, mut fonts: ResMut<Assets<Font>>) {
     let button_size = ButtonDimensions {
         height: Val::Px(65.0),
@@ -97,6 +103,7 @@ pub fn setup(mut commands: Commands, mut fonts: ResMut<Assets<Font>>) {
     });
 }
 
+/// Called when in MENU state
 pub fn run(
     mut next_state: ResMut<NextState<AppState>>,
     mut interaction_query: Query<
@@ -130,7 +137,7 @@ pub fn run(
     }
 }
 
-/// Called when existing MENU state
+/// Called when exiting MENU state
 pub fn cleanup(mut commands: Commands, menu_entities: Res<MenuEntities>) {
     commands
         .entity(menu_entities.button_play)
