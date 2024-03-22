@@ -5,6 +5,22 @@ use bevy::{
 
 use crate::AppState;
 
+macro_rules! button {
+    ($btn_style:expr, $txt_style:expr, $commands:expr, $action:expr, $text:expr) => {
+        $commands
+            .spawn(ButtonBundle {
+                style: $btn_style,
+                background_color: NORMAL_BUTTON.into(),
+                ..default()
+            })
+            .insert($action)
+            .with_children(|parent| {
+                parent.spawn(TextBundle::from_section($text, $txt_style.clone()));
+            })
+            .id()
+    };
+}
+
 /// Menu entities (buttons)
 #[derive(Resource)]
 pub struct MenuEntities {
