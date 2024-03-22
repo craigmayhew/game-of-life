@@ -25,6 +25,9 @@ macro_rules! button {
 #[derive(Resource)]
 pub struct MenuEntities {
     button_play: Entity,
+    button_load: Entity,
+    button_save: Entity,
+    button_cred: Entity,
     button_quit: Entity,
 }
 
@@ -32,6 +35,9 @@ pub struct MenuEntities {
 #[derive(Component)]
 pub enum MenuButtonAction {
     Play,
+    Load,
+    Save,
+    Cred,
     Quit,
 }
 
@@ -55,10 +61,16 @@ pub fn setup(mut commands: Commands, mut fonts: ResMut<Assets<Font>>) {
         align_items: AlignItems::Center,
         ..default()
     };
-    let mut play_button_style = button_style.clone();
-    play_button_style.bottom = Val::Px(40.0);
-    let mut quit_button_style = button_style.clone();
-    quit_button_style.top = Val::Px(40.0);
+    let mut button_play_style = button_style.clone();
+    let mut button_load_style = button_style.clone();
+    let mut button_save_style = button_style.clone();
+    let mut button_cred_style = button_style.clone();
+    let mut button_quit_style = button_style.clone();
+    button_play_style.top = Val::Px(-180.0);
+    button_load_style.top = Val::Px(-100.0);
+    button_save_style.top = Val::Px(-20.0);
+    button_cred_style.top = Val::Px(60.0);
+    button_quit_style.top = Val::Px(140.0);
 
     let font = Font::try_from_bytes(crate::FONT_BYTES.into()).unwrap();
     let font_handle = fonts.add(font);
@@ -68,34 +80,48 @@ pub fn setup(mut commands: Commands, mut fonts: ResMut<Assets<Font>>) {
         font_size: 40.0,
         color: Color::rgb(0.9, 0.9, 0.9),
     };
-    let button_play = commands
-        .spawn(ButtonBundle {
-            style: play_button_style,
-            background_color: NORMAL_BUTTON.into(),
-            ..default()
-        })
-        .insert(MenuButtonAction::Play)
-        .with_children(|parent| {
-            parent.spawn(TextBundle::from_section(
-                "New Game",
-                button_text_style.clone(),
-            ));
-        })
-        .id();
 
-    let button_quit = commands
-        .spawn(ButtonBundle {
-            style: quit_button_style,
-            background_color: NORMAL_BUTTON.into(),
-            ..default()
-        })
-        .insert(MenuButtonAction::Quit)
-        .with_children(|parent| {
-            parent.spawn(TextBundle::from_section("Quit", button_text_style));
-        })
-        .id();
+    let button_play = button!(
+        button_play_style,
+        button_text_style,
+        commands,
+        MenuButtonAction::Play,
+        "New Game"
+    );
+    let button_load = button!(
+        button_load_style,
+        button_text_style,
+        commands,
+        MenuButtonAction::Load,
+        "Load Game"
+    );
+    let button_save = button!(
+        button_save_style,
+        button_text_style,
+        commands,
+        MenuButtonAction::Save,
+        "Save Game"
+    );
+    let button_cred = button!(
+        button_cred_style,
+        button_text_style,
+        commands,
+        MenuButtonAction::Cred,
+        "Credits"
+    );
+    let button_quit = button!(
+        button_quit_style,
+        button_text_style,
+        commands,
+        MenuButtonAction::Quit,
+        "Quit Game"
+    );
+
     commands.insert_resource(MenuEntities {
         button_play,
+        button_load,
+        button_save,
+        button_cred,
         button_quit,
     });
 }
@@ -122,6 +148,10 @@ pub fn run(
                         let _ = app_exit_events.send(AppExit);
                         ()
                     }
+                    _ => {
+                        let _ = app_exit_events.send(AppExit);
+                        ()
+                    }
                 }
             }
             Interaction::Hovered => {
@@ -138,6 +168,15 @@ pub fn run(
 pub fn cleanup(mut commands: Commands, menu_entities: Res<MenuEntities>) {
     commands
         .entity(menu_entities.button_play)
+        .despawn_recursive();
+    commands
+        .entity(menu_entities.button_load)
+        .despawn_recursive();
+    commands
+        .entity(menu_entities.button_save)
+        .despawn_recursive();
+    commands
+        .entity(menu_entities.button_cred)
         .despawn_recursive();
     commands
         .entity(menu_entities.button_quit)
