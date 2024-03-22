@@ -26,21 +26,11 @@ pub const HOVERED_BUTTON: Color = Color::rgb(0.6, 0.6, 0.6);
 /// Press button colour
 pub const PRESSED_BUTTON: Color = Color::rgb(0.9, 0.9, 0.9);
 
-/// Dimensions of menu button
-struct ButtonDimensions {
-    height: Val,
-    width: Val,
-}
-
 /// Called when entering MENU state
 pub fn setup(mut commands: Commands, mut fonts: ResMut<Assets<Font>>) {
-    let button_size = ButtonDimensions {
-        height: Val::Px(65.0),
-        width: Val::Px(250.0),
-    };
     let button_style = Style {
-        width: button_size.width,
-        height: button_size.height,
+        width: Val::Px(250.0),
+        height: Val::Px(65.0),
         // center button
         margin: UiRect::all(Val::Auto),
         // horizontally center child text
