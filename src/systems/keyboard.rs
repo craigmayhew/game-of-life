@@ -47,7 +47,7 @@ pub fn run(
     //access menu
     if keys.just_pressed(KeyCode::Escape) {
         match state.get() {
-            &AppState::InGame | &AppState::Paused => {
+            &AppState::Credits | &AppState::InGame | &AppState::Paused => {
                 next_state.set(AppState::Splash);
             }
             &AppState::Splash => {
