@@ -44,6 +44,7 @@ pub fn run(
             &AppState::Splash => {
                 // Only allow Esc key to set the game running if we have already got a game in progress
                 // This prevents the Esc key from starting a fresh game from the splash screen
+                // TODO: A more elegant solution would be to have an AppState::Splash and a AppState::Menu to differentiate rather than this if statement, which then requires reading the session resource
                 if session.generation > 1 {
                     next_state.set(AppState::InGame);
                 }
