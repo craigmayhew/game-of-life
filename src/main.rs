@@ -36,6 +36,7 @@ pub struct GameSpeed {
 pub enum AppState {
     #[default]
     Splash,
+    Credits,
     InGame,
     Paused,
     LoadGame,
@@ -230,6 +231,23 @@ fn main() {
         .add_systems(
             OnExit(AppState::Paused),
             (systems::hud::cleanup, systems::menu_paused::cleanup),
+        )
+        // AppState::Credits
+        .add_systems(
+            OnEnter(AppState::Credits),
+            (systems::menu_credits::enter, systems::hud::enter),
+        )
+        .add_systems(
+            Update,
+            (
+                systems::camera_movement::move_camera_on_keyboard_input
+                    .run_if(in_state(AppState::Credits)),
+                systems::hud::run,
+            ),
+        )
+        .add_systems(
+            OnExit(AppState::Credits),
+            (systems::hud::cleanup, systems::menu_credits::cleanup),
         )
         // AppState::NewGame
         .add_systems(

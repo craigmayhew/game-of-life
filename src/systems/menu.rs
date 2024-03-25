@@ -141,6 +141,9 @@ pub fn run(
             Interaction::Pressed => {
                 *color = PRESSED_BUTTON.into();
                 match menu_button_action {
+                    MenuButtonAction::Cred => {
+                        next_state.set(AppState::Credits);
+                    }
                     MenuButtonAction::Load => {
                         
                     }
