@@ -141,14 +141,16 @@ pub fn run(
             Interaction::Pressed => {
                 *color = PRESSED_BUTTON.into();
                 match menu_button_action {
+                    MenuButtonAction::Load => {
+                        
+                    }
                     MenuButtonAction::Play => {
                         next_state.set(AppState::NewGame);
                     }
-                    MenuButtonAction::Quit => {
-                        let _ = app_exit_events.send(AppExit);
-                        ()
+                    MenuButtonAction::Save => {
+                        
                     }
-                    _ => {
+                    MenuButtonAction::Quit => {
                         let _ = app_exit_events.send(AppExit);
                         ()
                     }
