@@ -2,11 +2,12 @@ use bevy::{
     prelude::*, //default bevy
 };
 
-use crate::{AppState, GameSpeed};
+use crate::{AppState, GameSpeed, SessionResource};
 
 pub fn run(
     keys: Res<ButtonInput<KeyCode>>,
     state: Res<State<AppState>>,
+    session: Res<SessionResource>,
     mut next_state: ResMut<NextState<AppState>>,
     mut game_speed: ResMut<GameSpeed>,
 ) {
@@ -51,7 +52,11 @@ pub fn run(
                 next_state.set(AppState::Splash);
             }
             &AppState::Splash => {
-                next_state.set(AppState::InGame);
+                // Only allow Esc key to set the game running if we have already got a game in progress
+                // This prevents the Esc key from starting a fresh game from the splash screen
+                if session.generation > 1 {
+                    next_state.set(AppState::InGame);
+                }
             }
             _ => {}
         }
