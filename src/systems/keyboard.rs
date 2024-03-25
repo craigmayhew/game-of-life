@@ -46,10 +46,14 @@ pub fn run(
     }
     //access menu
     if keys.just_pressed(KeyCode::Escape) {
-        if state.get() == &AppState::InGame || state.get() == &AppState::Paused {
-            next_state.set(AppState::Splash);
-        } else if state.get() == &AppState::Splash {
-            next_state.set(AppState::InGame);
+        match state.get() {
+            &AppState::InGame | &AppState::Paused => {
+                next_state.set(AppState::Splash);
+            }
+            &AppState::Splash => {
+                next_state.set(AppState::InGame);
+            }
+            _ => {}
         }
     }
 }
