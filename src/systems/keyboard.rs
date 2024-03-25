@@ -23,16 +23,6 @@ pub fn run(
             }
             _ => {}
         }
-    } else if keys.just_pressed(KeyCode::KeyL) {
-        // load game
-        if state.get() == &AppState::InGame || state.get() == &AppState::Paused {
-            next_state.set(AppState::LoadGame);
-        }
-    } else if keys.just_pressed(KeyCode::KeyK) {
-        // save game
-        if state.get() == &AppState::InGame || state.get() == &AppState::Paused {
-            next_state.set(AppState::SaveGame);
-        }
     }
     // game tick speed
     if keys.just_pressed(KeyCode::NumpadAdd) || keys.just_pressed(KeyCode::PageUp) {

@@ -145,13 +145,13 @@ pub fn run(
                         next_state.set(AppState::Credits);
                     }
                     MenuButtonAction::Load => {
-                        
+                        next_state.set(AppState::LoadGame);
                     }
                     MenuButtonAction::Play => {
                         next_state.set(AppState::NewGame);
                     }
                     MenuButtonAction::Save => {
-                        
+                        next_state.set(AppState::SaveGame);
                     }
                     MenuButtonAction::Quit => {
                         let _ = app_exit_events.send(AppExit);
