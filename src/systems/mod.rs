@@ -6,3 +6,4 @@ pub mod menu;
 pub mod menu_credits;
 pub mod menu_paused;
 pub mod saves;
+pub mod sound;

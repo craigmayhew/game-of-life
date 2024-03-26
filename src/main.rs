@@ -24,6 +24,8 @@ const MESH_TETRA_MIRRORED_BYTES: &'static [u8] =
 const FONT_BYTES: &'static [u8] = include_bytes!("../assets/font/square.ttf");
 // application icon
 const ICON: &'static [u8] = include_bytes!("../assets/hills-tetrahedron.png");
+// sounds
+const SOUND_BG_LOOP: &'static [u8] = include_bytes!("../assets/sound/ambient_loop.ogg");
 
 // Defines the amount of time that should elapse between each physics step.
 #[derive(PartialEq, Debug, Resource)]
@@ -184,6 +186,7 @@ fn main() {
         .add_plugins(FrameTimeDiagnosticsPlugin::default())
         .add_systems(Startup, set_window_icon)
         .add_systems(Startup, systems::camera_movement::setup)
+        .add_systems(Startup, systems::sound::setup)
         .insert_resource(ClearColor(Color::BLACK)) //set the background colour of our window (the universe)
         .add_systems(Startup, setup)
         // keyboard input (excluding camera movement)
