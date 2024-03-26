@@ -35,6 +35,7 @@ pub fn update(
     mut commands: Commands,
     sound_resources: ResMut<SoundResource>,
     music_entities: Query<Entity, With<BackgroundMusic>>,
+    music_controller: Query<&AudioSink, With<BackgroundMusic>>,
 ) {
     // if we don't yet have a background music entity, then spawn one
     if music_entities.iter().count() == 0 {
@@ -48,10 +49,17 @@ pub fn update(
                     paused: false,
                     spatial: false,
                     spatial_scale: None,
-                    volume: Volume::new(1.0),
+                    volume: Volume::new(0.0),
                 },
             },
             BackgroundMusic,
         ));
+    } else {
+        // TODO: There must be a better way to do this than if statements every tick?
+        if let Ok(sink) = music_controller.get_single() {
+            if sink.volume() < 1.0 {
+                sink.set_volume(sink.volume() + 0.0001);
+            }
+        }
     }
 }
