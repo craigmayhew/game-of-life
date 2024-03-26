@@ -1,9 +1,11 @@
 use bevy::{
     app::AppExit, // detect app exit events
+    audio::PlaybackMode,
     prelude::*,   //default bevy
 };
 
 use crate::AppState;
+use crate::systems::sound::SoundResource;
 
 macro_rules! button {
     ($btn_style:expr, $txt_style:expr, $commands:expr, $action:expr, $text:expr) => {
@@ -128,18 +130,31 @@ pub fn setup(mut commands: Commands, mut fonts: ResMut<Assets<Font>>) {
 
 /// Called when in MENU state
 pub fn run(
+    mut commands: Commands,
     mut next_state: ResMut<NextState<AppState>>,
     mut interaction_query: Query<
         (&Interaction, &mut BackgroundColor, &MenuButtonAction),
         (Changed<Interaction>, With<Button>),
     >,
     mut app_exit_events: EventWriter<AppExit>,
+    sound_resources: ResMut<SoundResource>,
 ) {
     // handle button colour changes on hover, press
     for (interaction, mut color, menu_button_action) in &mut interaction_query {
         match *interaction {
             Interaction::Pressed => {
                 *color = PRESSED_BUTTON.into();
+                // spawn hover click effect
+                commands.spawn((
+                    AudioBundle {
+                        source: sound_resources.button_click.clone(),
+                        settings: PlaybackSettings {
+                            mode: PlaybackMode::Despawn,
+                            ..default()
+                        },
+                    },
+                ));
+                // make sure he app goes to next state
                 match menu_button_action {
                     MenuButtonAction::Cred => {
                         next_state.set(AppState::Credits);
@@ -161,6 +176,17 @@ pub fn run(
             }
             Interaction::Hovered => {
                 *color = HOVERED_BUTTON.into();
+                
+                // spawn hover sound effect
+                commands.spawn((
+                    AudioBundle {
+                        source: sound_resources.button_hover.clone(),
+                        settings: PlaybackSettings {
+                            mode: PlaybackMode::Despawn,
+                            ..default()
+                        },
+                    },
+                ));
             }
             Interaction::None => {
                 *color = NORMAL_BUTTON.into();

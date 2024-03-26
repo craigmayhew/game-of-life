@@ -26,6 +26,8 @@ const FONT_BYTES: &'static [u8] = include_bytes!("../assets/font/square.ttf");
 const ICON: &'static [u8] = include_bytes!("../assets/hills-tetrahedron.png");
 // sounds
 const SOUND_BG_LOOP: &'static [u8] = include_bytes!("../assets/sound/ambient_loop.ogg");
+const SOUND_BUTTON_CLICK: &'static [u8] = include_bytes!("../assets/sound/button_click.ogg");
+const SOUND_BUTTON_HOVER: &'static [u8] = include_bytes!("../assets/sound/button_over.ogg");
 
 // Defines the amount of time that should elapse between each physics step.
 #[derive(PartialEq, Debug, Resource)]
@@ -197,6 +199,11 @@ fn main() {
             systems::life::run
                 .run_if(on_timer(Duration::from_millis(100)))
                 .run_if(in_state(AppState::InGame)),
+        )
+        // sound system
+        .add_systems(
+            Update,
+            systems::sound::update,
         )
         // AppState::Splash
         .add_systems(OnEnter(AppState::Splash), systems::menu::setup)
