@@ -669,16 +669,6 @@ pub fn run(mut commands: Commands, mut session: ResMut<SessionResource>) {
     } else if session.counter > 1 {
         // while there is life
         let last_gen: Vec<Vec<Vec<Vec<LifeDataContainer>>>> = session.life.clone();
-        let mut next_gen = vec![
-            vec![
-                vec![
-                    vec![LifeDataContainer::Dead; session.universe_size];
-                    session.universe_size
-                ];
-                session.universe_size
-            ];
-            6
-        ];
         /*
         white touches dark blue and dark grey in the same xyz and light blue in the y below
         red touches light grey and light blue in same xyz and the dark grey in the y above
@@ -810,12 +800,11 @@ pub fn run(mut commands: Commands, mut session: ResMut<SessionResource>) {
                                 //if alive in last gen
                                 if neighbours > 3 || neighbours == 1 || neighbours == 0 {
                                     commands.entity(ent.to_owned()).despawn();
-                                    next_gen[n][x][y][z] = LifeDataContainer::Dead;
+                                    session.life[n][x][y][z] = LifeDataContainer::Dead;
 
                                     session.counter -= 1;
                                 } else {
-                                    //continue to be alive
-                                    next_gen[n][x][y][z] = last_gen[n][x][y][z];
+                                    // continue to be alive
                                 }
                             }
                             LifeDataContainer::Dead => {
@@ -826,7 +815,7 @@ pub fn run(mut commands: Commands, mut session: ResMut<SessionResource>) {
                                         create_life_xyz(&tetra_index, x, y, z);
 
                                     // make the life form exist!
-                                    next_gen[n][x][y][z] = LifeDataContainer::Alive(
+                                    session.life[n][x][y][z] = LifeDataContainer::Alive(
                                         commands
                                             .spawn(PbrBundle {
                                                 mesh: session.life_form_meshes[n % 2].clone(),
@@ -847,8 +836,6 @@ pub fn run(mut commands: Commands, mut session: ResMut<SessionResource>) {
                 }
             }
         }
-
-        session.life = next_gen;
     }
     
     session.generation += 1;
