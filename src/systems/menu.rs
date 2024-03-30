@@ -1,3 +1,4 @@
+use bevy::audio::Volume;
 use bevy::{
     app::AppExit, // detect app exit events
     audio::PlaybackMode,
@@ -150,6 +151,7 @@ pub fn run(
                         source: sound_resources.button_click.clone(),
                         settings: PlaybackSettings {
                             mode: PlaybackMode::Despawn,
+                            volume: Volume::new(0.75),
                             ..default()
                         },
                     },
@@ -183,6 +185,7 @@ pub fn run(
                         source: sound_resources.button_hover.clone(),
                         settings: PlaybackSettings {
                             mode: PlaybackMode::Despawn,
+                            volume: Volume::new(0.75),
                             ..default()
                         },
                     },
