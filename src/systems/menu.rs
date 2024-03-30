@@ -2,11 +2,11 @@ use bevy::audio::Volume;
 use bevy::{
     app::AppExit, // detect app exit events
     audio::PlaybackMode,
-    prelude::*,   //default bevy
+    prelude::*, //default bevy
 };
 
-use crate::AppState;
 use crate::systems::sound::SoundResource;
+use crate::AppState;
 
 macro_rules! button {
     ($btn_style:expr, $txt_style:expr, $commands:expr, $action:expr, $text:expr) => {
@@ -146,16 +146,14 @@ pub fn run(
             Interaction::Pressed => {
                 *color = PRESSED_BUTTON.into();
                 // spawn hover click effect
-                commands.spawn((
-                    AudioBundle {
-                        source: sound_resources.button_click.clone(),
-                        settings: PlaybackSettings {
-                            mode: PlaybackMode::Despawn,
-                            volume: Volume::new(0.75),
-                            ..default()
-                        },
+                commands.spawn((AudioBundle {
+                    source: sound_resources.button_click.clone(),
+                    settings: PlaybackSettings {
+                        mode: PlaybackMode::Despawn,
+                        volume: Volume::new(0.75),
+                        ..default()
                     },
-                ));
+                },));
                 // make sure he app goes to next state
                 match menu_button_action {
                     MenuButtonAction::Cred => {
@@ -178,18 +176,16 @@ pub fn run(
             }
             Interaction::Hovered => {
                 *color = HOVERED_BUTTON.into();
-                
+
                 // spawn hover sound effect
-                commands.spawn((
-                    AudioBundle {
-                        source: sound_resources.button_hover.clone(),
-                        settings: PlaybackSettings {
-                            mode: PlaybackMode::Despawn,
-                            volume: Volume::new(0.75),
-                            ..default()
-                        },
+                commands.spawn((AudioBundle {
+                    source: sound_resources.button_hover.clone(),
+                    settings: PlaybackSettings {
+                        mode: PlaybackMode::Despawn,
+                        volume: Volume::new(0.75),
+                        ..default()
                     },
-                ));
+                },));
             }
             Interaction::None => {
                 *color = NORMAL_BUTTON.into();
