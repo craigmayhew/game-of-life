@@ -666,9 +666,9 @@ pub fn run(mut commands: Commands, mut session: ResMut<SessionResource>) {
                 }
             }
         }
-    } else if session.counter > 1 {
-        // while there is life
+    } else if session.counter > 1 { // while there is life
         let last_gen: Vec<Vec<Vec<Vec<LifeDataContainer>>>> = session.life.clone();
+
         /*
         white touches dark blue and dark grey in the same xyz and light blue in the y below
         red touches light grey and light blue in same xyz and the dark grey in the y above
