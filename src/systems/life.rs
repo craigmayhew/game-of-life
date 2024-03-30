@@ -666,7 +666,6 @@ pub fn run(mut commands: Commands, mut session: ResMut<SessionResource>) {
                 }
             }
         }
-        session.generation = 2;
     } else if session.counter > 1 {
         // while there is life
         let last_gen: Vec<Vec<Vec<Vec<LifeDataContainer>>>> = session.life.clone();
@@ -850,8 +849,9 @@ pub fn run(mut commands: Commands, mut session: ResMut<SessionResource>) {
         }
 
         session.life = next_gen;
-        session.generation += 1;
     }
+    
+    session.generation += 1;
 }
 
 #[cfg(test)]
