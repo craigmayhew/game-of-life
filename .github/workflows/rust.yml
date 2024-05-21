@@ -16,9 +16,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Update Ubuntu
-      run: |
-        apt-get update
-        apt-get install libasound2-dev
+    - name: Install dependencies
+      run: sudo apt-get update && sudo apt-get install -y libasound2-dev
     - name: Build
       run: cargo build --verbose
