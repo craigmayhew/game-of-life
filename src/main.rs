@@ -201,10 +201,7 @@ fn main() {
                 .run_if(in_state(AppState::InGame)),
         )
         // sound system
-        .add_systems(
-            Update,
-            systems::sound::update,
-        )
+        .add_systems(Update, systems::sound::update)
         // AppState::Splash
         .add_systems(OnEnter(AppState::Splash), systems::menu::setup)
         .add_systems(
