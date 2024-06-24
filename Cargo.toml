@@ -3,6 +3,7 @@ name = "game-of-life"
 version = "0.9.0"
 authors = ["Craig Mayhew <craig@mayhew.io>"]
 edition = "2021"
+publish = false # Prevent crate publishing, as game-of-life is neither a library nor a developer tool.
 
 [dependencies]
 bevy = "0.13.0"
