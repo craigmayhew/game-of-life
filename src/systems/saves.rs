@@ -2,13 +2,13 @@ use bevy::{
     prelude::*, //default bevy
 };
 use serde::{Deserialize, Serialize};
-use std::fs::{read_to_string, File};
+use std::fs::{File, read_to_string};
 use std::io::prelude::*;
 use std::time::SystemTime;
 
 use crate::{
-    systems::life::{create_life_xyz, Life, LifeDataContainer, TETRA_INDEXES},
     AppState, SessionResource,
+    systems::life::{Life, LifeDataContainer, TETRA_INDEXES, create_life_xyz},
 };
 
 #[derive(Resource)]

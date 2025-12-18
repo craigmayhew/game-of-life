@@ -5,8 +5,8 @@ use bevy::{
     prelude::*, //default bevy
 };
 
-use crate::systems::sound::SoundResource;
 use crate::AppState;
+use crate::systems::sound::SoundResource;
 
 macro_rules! button {
     ($btn_style:expr, $txt_style:expr, $commands:expr, $action:expr, $text:expr) => {
