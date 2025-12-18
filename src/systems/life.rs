@@ -33,27 +33,27 @@ pub fn create_life_xyz(n: &TetraIndex, x: usize, y: usize, z: usize) -> bevy::pr
     match n {
         TetraIndex::Zero => {
             //white
-            transform_new_life.rotate_x(std::f32::consts::PI * 0.75);
+            transform_new_life.rotate_x(3.0 * std::f32::consts::FRAC_PI_4);
             transform_new_life.rotate_y(std::f32::consts::FRAC_PI_2);
             transform_new_life.rotate_z(std::f32::consts::PI);
         }
         TetraIndex::One => {
             //red
-            transform_new_life.rotate_x(std::f32::consts::PI * 1.75);
+            transform_new_life.rotate_x(-std::f32::consts::FRAC_PI_4);
             transform_new_life.rotate_y(0.0);
             transform_new_life.rotate_z(std::f32::consts::FRAC_PI_2);
         }
         TetraIndex::Two => {
             //light blue and dark blue
-            transform_new_life.rotate_x(std::f32::consts::PI * 0.25);
-            transform_new_life.rotate_y(std::f32::consts::PI * 1.5);
+            transform_new_life.rotate_x(std::f32::consts::FRAC_PI_4);
+            transform_new_life.rotate_y(-std::f32::consts::FRAC_PI_2);
             transform_new_life.rotate_z(std::f32::consts::PI);
         }
         TetraIndex::Three => {
             //light blue and dark blue
-            transform_new_life.rotate_x(std::f32::consts::PI * 0.25);
+            transform_new_life.rotate_x(std::f32::consts::FRAC_PI_4);
             transform_new_life.rotate_y(0.0);
-            transform_new_life.rotate_z(std::f32::consts::PI * 1.5);
+            transform_new_life.rotate_z(-std::f32::consts::FRAC_PI_2);
         }
         TetraIndex::Four | TetraIndex::Five => {
             //light grey and dark grey
