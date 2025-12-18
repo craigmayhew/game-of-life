@@ -7,7 +7,7 @@ use bevy::{
     render::camera::{Exposure, PhysicalCameraParameters}, // camera exposure added in bevy 0.13
 };
 
-use crate::{systems::life::LIFE_FORM_SIZE, DEFAULT_UNIVERSE_SIZE};
+use crate::{DEFAULT_UNIVERSE_SIZE, systems::life::LIFE_FORM_SIZE};
 
 pub fn setup(mut commands: Commands) {
     commands
