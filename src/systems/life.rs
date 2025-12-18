@@ -26,10 +26,8 @@ pub fn create_life_xyz(n: &TetraIndex, x: usize, y: usize, z: usize) -> bevy::pr
             );
         }
     }
-    //TODO consider if n == 0 and n == 1 could/should actually be identical blocks
-    //NOTES: We seem to be doing all of this in eigths of a turn i.e. 0.25 PI
-    //       This suggests our shape starts out at an angle. Confirmed by viewing obj file.
-    //BETTER TODO: Replace most of this code with 6 correctly rotated obj files
+
+    //TODO: Replace rotations with 6 correctly rotated obj files
     match n {
         TetraIndex::Zero => {
             //white
