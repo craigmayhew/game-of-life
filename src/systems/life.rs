@@ -6,12 +6,6 @@ use crate::{AppState, SessionResource};
 
 pub const LIFE_FORM_SIZE: f32 = 150.0;
 
-#[derive(Default)]
-pub struct LifeTag;
-
-#[derive(Default)]
-pub struct LifeSystem {}
-
 pub fn create_life_xyz(n: &TetraIndex, x: usize, y: usize, z: usize) -> bevy::prelude::Transform {
     // position the life form in 3d space
     let mut transform_new_life: Transform;
