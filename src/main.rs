@@ -1,4 +1,3 @@
-#![feature(let_chains)] // allow if something && let Some(blah) =
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 use bevy::{
     diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin},
@@ -14,7 +13,7 @@ use bevy_obj::*;
 mod systems;
 
 // default universe size if none specified
-const DEFAULT_UNIVERSE_SIZE: usize = 20;
+const DEFAULT_UNIVERSE_SIZE: usize = 10;
 
 // meshes
 const MESH_TETRA_BYTES: &'static [u8] = include_bytes!("../assets/mesh/hill-tetrahedron.obj");
@@ -214,7 +213,7 @@ fn main() {
         .add_systems(
             Update,
             (
-                systems::hud::run,
+                systems::hud::run.run_if(in_state(AppState::InGame)),
                 systems::life::place_life_with_keyboard.run_if(in_state(AppState::InGame)),
                 systems::camera_movement::move_camera_on_keyboard_input
                     .run_if(in_state(AppState::InGame)),
@@ -231,7 +230,7 @@ fn main() {
             (
                 systems::camera_movement::move_camera_on_keyboard_input
                     .run_if(in_state(AppState::Paused)),
-                systems::hud::run,
+                systems::hud::run.run_if(in_state(AppState::Paused)),
                 systems::life::place_life_with_keyboard.run_if(in_state(AppState::Paused)),
             ),
         )
@@ -249,7 +248,7 @@ fn main() {
             (
                 systems::camera_movement::move_camera_on_keyboard_input
                     .run_if(in_state(AppState::Credits)),
-                systems::hud::run,
+                systems::hud::run.run_if(in_state(AppState::Credits)),
             ),
         )
         .add_systems(

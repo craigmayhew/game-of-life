@@ -615,7 +615,10 @@ pub fn new_universe(
 ) {
     match state.get() {
         AppState::NewGame => {}
-        _ => return,
+        s => {
+            println!("WARNING App State was not NewGame, it was {:?}", s);
+            return;
+        }
     }
     session.counter = 0;
     session.generation = 1;
@@ -630,6 +633,7 @@ pub fn new_universe(
 }
 
 pub fn run(mut commands: Commands, mut session: ResMut<SessionResource>) {
+    println!("running life!");
     // first generation, generate random life
     if session.generation == 1 {
         let life_to_create: Vec<Vec<Vec<Vec<LifeDataContainer>>>> = session.life.clone();
@@ -846,6 +850,7 @@ pub fn run(mut commands: Commands, mut session: ResMut<SessionResource>) {
 mod tests {
     use super::*;
 
+    use bevy::core_pipeline::CorePipelinePlugin;
     use bevy::render::RenderPlugin;
     use bevy_obj::*; // used import wavefront obj files
 
@@ -853,97 +858,125 @@ mod tests {
         // Setup app
         let mut app = App::new();
 
-        app.add_plugins(MinimalPlugins);
-
-        app.add_plugins(AssetPlugin::default());
-        app.add_plugins(WindowPlugin::default());
-        app.add_plugins(RenderPlugin::default());
-        //app.add_plugin(CorePipelinePlugin::default());
-        //app.add_plugin(PbrPlugin::default());
-
-        app.add_plugins(ObjPlugin);
+        app.add_plugins((
+            MinimalPlugins,
+            AssetPlugin::default(),
+            WindowPlugin::default(),
+            RenderPlugin::default(),
+        ));
 
         app.init_state::<AppState>()
-            .insert_resource(AppState::LoadGame);
+            .insert_state(AppState::LoadGame);
 
-        //asset server for meshes
+        app.init_asset::<StandardMaterial>();
+
+        // Asset server for meshes
         let asset_server = app
             .world
             .get_resource::<AssetServer>()
             .expect("expected asset server");
 
-        //load meshes
-        let tetrahedron_mirrored = asset_server.load("mesh/hill-tetrahedron-mirrored.obj");
-        let tetrahedron = asset_server.load("mesh/hill-tetrahedron.obj");
+        // Load meshes
+        let mesh = bevy_obj::load_obj_from_bytes(crate::MESH_TETRA_MIRRORED_BYTES)
+            .expect("load_obj_from_bytes() failed");
+        let tetrahedron_mirrored_mesh_handle = asset_server.add(mesh);
+        let mesh = bevy_obj::load_obj_from_bytes(crate::MESH_TETRA_BYTES)
+            .expect("load_obj_from_bytes() failed");
+        let tetrahedron_mesh_handle = asset_server.add(mesh);
 
-        //materials
-        let mut materials = app
-            .world
-            .get_resource_mut::<Assets<StandardMaterial>>()
-            .expect("expected standard materials");
+        // Materials
         let material_handles = [
-            materials
+            asset_server
                 .add(StandardMaterial {
-                    base_color: Color::rgb(0.0, 1.0, 0.0), // white -> green
+                    base_color: Color::rgb(0.0, 1.0, 0.0),
                     ..default()
                 })
                 .clone(),
-            materials
+            asset_server
                 .add(StandardMaterial {
-                    base_color: Color::rgb(0.6, 0.2, 0.2), // red
+                    base_color: Color::rgb(0.6, 0.2, 0.2),
                     ..default()
                 })
                 .clone(),
-            materials
+            asset_server
                 .add(StandardMaterial {
-                    base_color: Color::rgb(0.5, 0.5, 1.0), // light blue
+                    base_color: Color::rgb(0.5, 0.5, 1.0),
                     ..default()
                 })
                 .clone(),
-            materials
+            asset_server
                 .add(StandardMaterial {
-                    base_color: Color::rgb(0.1, 0.1, 0.7), // dark blue
+                    base_color: Color::rgb(0.1, 0.1, 0.7),
                     ..default()
                 })
                 .clone(),
-            materials
+            asset_server
                 .add(StandardMaterial {
-                    base_color: Color::rgb(1.0, 1.0, 0.0), // light grey -> yellow
+                    base_color: Color::rgb(1.0, 1.0, 0.0),
                     ..default()
                 })
                 .clone(),
-            materials
+            asset_server
                 .add(StandardMaterial {
-                    base_color: Color::rgb(0.2, 0.2, 0.2), // dark grey
+                    base_color: Color::rgb(0.2, 0.2, 0.2),
                     ..default()
                 })
                 .clone(),
         ];
 
-        //new session resource
+        // New session resource
         let session = SessionResource {
             life: dead_universe(),
             counter: 0,
             generation: 1,
             life_form_materials: material_handles,
-            life_form_meshes: [tetrahedron_mirrored.clone(), tetrahedron.clone()],
+            life_form_meshes: [
+                tetrahedron_mirrored_mesh_handle.clone(),
+                tetrahedron_mesh_handle.clone(),
+            ],
             universe_size: 10,
         };
 
-        //new load game resource so we can load our test universe
+        // New load game resource
         let game_file_to_load =
             crate::systems::saves::GameFileToLoad::Some(save_filename.to_string());
 
-        // Add session resource
+        // Add resources
         app.insert_resource(session);
-        // add our test case save file to be loaded up
         app.insert_resource(game_file_to_load);
 
-        // Add our systems
-        app.add_systems(Update, run);
+        /*let sound_resources = crate::systems::sound::SoundResource {
+            music: asset_server.add(AudioSource {
+                bytes: crate::SOUND_BG_LOOP.into(),
+            }),
+            button_click: asset_server.add(AudioSource {
+                bytes: crate::SOUND_BUTTON_CLICK.into(),
+            }),
+            button_hover: asset_server.add(AudioSource {
+                bytes: crate::SOUND_BUTTON_HOVER.into(),
+            }),
+        };
+
+        app.insert_resource(sound_resources);*/
+
+        // Setup systems
+        app.add_systems(Startup, crate::setup);
+        app.add_systems(Startup, crate::systems::camera_movement::setup);
+        //app.add_systems(Startup, crate::systems::sound::setup);
+
+        // Add state transition systems
+        app.add_systems(OnEnter(AppState::Splash), crate::systems::saves::load);
         app.add_systems(
             OnEnter(AppState::LoadGame),
             crate::systems::saves::load.before(run),
+        );
+        app.add_systems(OnEnter(AppState::InGame), run);
+        app.add_systems(Update, run);
+
+        // Debugging statements
+        println!(
+            "App initialized with state: {:?}",
+            app.world.get_resource::<State<AppState>>()
         );
         app
     }
