@@ -93,36 +93,6 @@ pub const TETRA_INDEXES: [TetraIndex; 6] = [
     TetraIndex::Five,
 ];
 
-use std::ops::Index;
-impl Index<TetraIndex> for TetraIndex {
-    type Output = usize;
-
-    fn index(&self, tetraindex: TetraIndex) -> &Self::Output {
-        match tetraindex {
-            TetraIndex::Zero => &0,
-            TetraIndex::One => &1,
-            TetraIndex::Two => &2,
-            TetraIndex::Three => &3,
-            TetraIndex::Four => &4,
-            TetraIndex::Five => &5,
-        }
-    }
-}
-impl Index<TetraIndex> for Vec<Vec<Vec<LifeDataContainer>>> {
-    type Output = usize;
-
-    fn index(&self, tetraindex: TetraIndex) -> &Self::Output {
-        match tetraindex {
-            TetraIndex::Zero => &0,
-            TetraIndex::One => &1,
-            TetraIndex::Two => &2,
-            TetraIndex::Three => &3,
-            TetraIndex::Four => &4,
-            TetraIndex::Five => &5,
-        }
-    }
-}
-
 pub enum Axis {
     XPos,
     XNeg,
