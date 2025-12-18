@@ -51,9 +51,9 @@ pub fn create_life_xyz(n: &TetraIndex, x: usize, y: usize, z: usize) -> bevy::pr
         }
         TetraIndex::Three => {
             //light blue and dark blue
-            transform_new_life.rotate_x(std::f32::consts::PI * 0.75);
+            transform_new_life.rotate_x(std::f32::consts::PI * 0.25);
             transform_new_life.rotate_y(0.0);
-            transform_new_life.rotate_z(0.0);
+            transform_new_life.rotate_z(std::f32::consts::PI * 1.5);
         }
         TetraIndex::Four | TetraIndex::Five => {
             //light grey and dark grey
