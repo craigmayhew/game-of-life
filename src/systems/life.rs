@@ -1030,6 +1030,12 @@ mod tests {
         let mut app = initialise_test_universe("test_03");
         check_universe_state(&app.world, &AppState::LoadGame, 1, 0);
         app.update();
+        app.add_systems(
+            Update,
+            run.run_if(bevy::ecs::schedule::common_conditions::in_state(
+                AppState::InGame,
+            )),
+        );
         check_universe_state(&app.world, &AppState::InGame, 2, 3);
         app.update();
         // at this point we have one solid cube of 6 lifeforms
