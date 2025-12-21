@@ -750,11 +750,11 @@ pub fn run(mut commands: Commands, mut session: ResMut<SessionResource>) {
                                     check_z = check_z.wrapping_sub(1)
                                 }
                                 Axis::YNegZPos => {
-                                    check_y += 1;
+                                    check_y = check_y.wrapping_sub(1);
                                     check_z += 1
                                 }
                                 Axis::YNegZNeg => {
-                                    check_y += 1;
+                                    check_y = check_y.wrapping_sub(1);
                                     check_z = check_z.wrapping_sub(1)
                                 }
                             }
