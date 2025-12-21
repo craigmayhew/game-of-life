@@ -26,10 +26,8 @@ pub fn create_life_xyz(n: &TetraIndex, x: usize, y: usize, z: usize) -> bevy::pr
             );
         }
     }
-    //TODO consider if n == 0 and n == 1 could/should actually be identical blocks
-    //NOTES: We seem to be doing all of this in eigths of a turn i.e. 0.25 PI
-    //       This suggests our shape starts out at an angle. Confirmed by viewing obj file.
-    //BETTER TODO: Replace most of this code with 6 correctly rotated obj files
+
+    //TODO: Replace rotations with 6 correctly rotated obj files
     match n {
         TetraIndex::Zero => {
             //white
@@ -94,36 +92,6 @@ pub const TETRA_INDEXES: [TetraIndex; 6] = [
     TetraIndex::Four,
     TetraIndex::Five,
 ];
-
-use std::ops::Index;
-impl Index<TetraIndex> for TetraIndex {
-    type Output = usize;
-
-    fn index(&self, tetraindex: TetraIndex) -> &Self::Output {
-        match tetraindex {
-            TetraIndex::Zero => &0,
-            TetraIndex::One => &1,
-            TetraIndex::Two => &2,
-            TetraIndex::Three => &3,
-            TetraIndex::Four => &4,
-            TetraIndex::Five => &5,
-        }
-    }
-}
-impl Index<TetraIndex> for Vec<Vec<Vec<LifeDataContainer>>> {
-    type Output = usize;
-
-    fn index(&self, tetraindex: TetraIndex) -> &Self::Output {
-        match tetraindex {
-            TetraIndex::Zero => &0,
-            TetraIndex::One => &1,
-            TetraIndex::Two => &2,
-            TetraIndex::Three => &3,
-            TetraIndex::Four => &4,
-            TetraIndex::Five => &5,
-        }
-    }
-}
 
 pub enum Axis {
     XPos,
@@ -675,12 +643,21 @@ pub fn run(mut commands: Commands, mut session: ResMut<SessionResource>) {
         let last_gen: Vec<Vec<Vec<Vec<LifeDataContainer>>>> = session.life.clone();
 
         /*
-        white touches dark blue and dark grey in the same xyz and light blue in the y below
-        red touches light grey and light blue in same xyz and the dark grey in the y above
-        light blue touches red and dark blue in the same xyz and white in the y above
-        dark blue touches light blue and white in same xyz and red and dark grey either side (need to check if thats x or z)
-        light grey touches dark grey and red in the same xyz and light blue and white either side (need to check if thats x or z)
-        dark grey touches light grey and white in the same xyz and red in the y below
+        Neighbour graph implemented by checks():
+        - Faces:
+            white (Zero) faces: light blue (Two) at y-1, light grey (Four) at z-1
+            red (One) faces: dark grey (Five) at y+1, dark blue (Three) at z+1
+            light blue (Two) faces: light grey (Four) at x+1, white (Zero) at y+1
+            dark blue (Three) faces: dark grey (Five) at x+1, red (One) at z-1
+            light grey (Four) faces: light blue (Two) at x-1, white (Zero) at z+1
+            dark grey (Five) faces: dark blue (Three) at x-1, red (One) at y-1
+        - Edges (unique neighbor indices by edges; single- and double-axis, corners excluded):
+            white (Zero) edges: One, Two, Three, Four, Five
+            red (One) edges: Zero, Two, Three, Four, Five
+            light blue (Two) edges: Zero, One, Three, Four, Five
+            dark blue (Three) edges: Zero, One, Two, Four, Five
+            light grey (Four) edges: Zero, One, Two, Three, Five
+            dark grey (Five) edges: Zero, One, Two, Three, Four
         */
 
         for tetra_index in [
