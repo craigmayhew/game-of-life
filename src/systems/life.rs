@@ -1030,6 +1030,79 @@ mod tests {
         //
         check_universe_state(&app.world, &AppState::InGame, 7, 0);
     }
+
+    #[test]
+    fn test_osc4_period10_persists_and_repeats() {
+        // Load the known 4-live period-10 oscillator (3x3x3 universe)
+        let mut app = initialise_test_universe("test_osc4_period10");
+        check_universe_state(&app.world, &AppState::LoadGame, 1, 0);
+
+        // Run load
+        app.update();
+
+        // Add life system and ensure we start from the loaded state
+        app.add_systems(
+            Update,
+            run.run_if(bevy::ecs::schedule::common_conditions::in_state(
+                AppState::InGame,
+            )),
+        );
+
+        // After load, we should be InGame with generation=2 and counter=4 (from the save)
+        check_universe_state(&app.world, &AppState::InGame, 2, 4);
+
+        // Snapshot function that ignores entity IDs and captures alive pattern
+        fn snapshot(world: &bevy::prelude::World) -> Vec<u8> {
+            let session = world.resource::<SessionResource>();
+            let us = session.universe_size;
+            let mut k = Vec::with_capacity(6 * us * us * us);
+            for n in 0..6 {
+                for x in 0..us {
+                    for y in 0..us {
+                        for z in 0..us {
+                            let alive = matches!(
+                                session.life[n][x][y][z],
+                                LifeDataContainer::Alive(_)
+                            );
+                            k.push(alive as u8);
+                        }
+                    }
+                }
+            }
+            k
+        }
+
+        // Detect the actual cycle period from the loaded seed (which may be in a transient state)
+        use std::collections::HashMap;
+        let mut seen: HashMap<Vec<u8>, usize> = HashMap::new();
+        let mut period_found: Option<usize> = None;
+
+        // Insert the initial signature at step 0
+        let mut sig = snapshot(&app.world);
+        seen.insert(sig.clone(), 0);
+
+        for step in 1..=200 {
+            // advance one generation
+            app.update();
+
+            // population non-zero
+            let counter = app.world.resource::<SessionResource>().counter;
+            assert!(counter > 0, "population reached zero at step {}", step);
+
+            // capture signature and check for repeat
+            sig = snapshot(&app.world);
+            if let Some(prev_step) = seen.get(&sig) {
+                let period = step - prev_step;
+                period_found = Some(period);
+                break;
+            } else {
+                seen.insert(sig.clone(), step);
+            }
+        }
+
+        let period = period_found.expect("no repeat detected within 200 steps");
+        assert_eq!(period, 10, "expected period 10, got {}", period);
+    }
 }
 
 #[cfg(test)]
