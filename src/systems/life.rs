@@ -750,11 +750,11 @@ pub fn run(mut commands: Commands, mut session: ResMut<SessionResource>) {
                                     check_z = check_z.wrapping_sub(1)
                                 }
                                 Axis::YNegZPos => {
-                                    check_y += 1;
+                                    check_y = check_y.wrapping_sub(1);
                                     check_z += 1
                                 }
                                 Axis::YNegZNeg => {
-                                    check_y += 1;
+                                    check_y = check_y.wrapping_sub(1);
                                     check_z = check_z.wrapping_sub(1)
                                 }
                             }
@@ -850,25 +850,17 @@ pub fn run(mut commands: Commands, mut session: ResMut<SessionResource>) {
 mod tests {
     use super::*;
 
-    use bevy::core_pipeline::CorePipelinePlugin;
-    use bevy::render::RenderPlugin;
-    use bevy_obj::*; // used import wavefront obj files
-
     fn initialise_test_universe(save_filename: &str) -> bevy::prelude::App {
         // Setup app
         let mut app = App::new();
 
-        app.add_plugins((
-            MinimalPlugins,
-            AssetPlugin::default(),
-            WindowPlugin::default(),
-            RenderPlugin::default(),
-        ));
+        app.add_plugins((MinimalPlugins, AssetPlugin::default()));
 
         app.init_state::<AppState>()
             .insert_state(AppState::LoadGame);
 
         app.init_asset::<StandardMaterial>();
+        app.init_asset::<bevy::prelude::Mesh>();
 
         // Asset server for meshes
         let asset_server = app
@@ -945,33 +937,11 @@ mod tests {
         app.insert_resource(session);
         app.insert_resource(game_file_to_load);
 
-        /*let sound_resources = crate::systems::sound::SoundResource {
-            music: asset_server.add(AudioSource {
-                bytes: crate::SOUND_BG_LOOP.into(),
-            }),
-            button_click: asset_server.add(AudioSource {
-                bytes: crate::SOUND_BUTTON_CLICK.into(),
-            }),
-            button_hover: asset_server.add(AudioSource {
-                bytes: crate::SOUND_BUTTON_HOVER.into(),
-            }),
-        };
-
-        app.insert_resource(sound_resources);*/
-
-        // Setup systems
-        app.add_systems(Startup, crate::setup);
-        app.add_systems(Startup, crate::systems::camera_movement::setup);
-        //app.add_systems(Startup, crate::systems::sound::setup);
+        // No startup systems in headless tests
 
         // Add state transition systems
-        app.add_systems(OnEnter(AppState::Splash), crate::systems::saves::load);
-        app.add_systems(
-            OnEnter(AppState::LoadGame),
-            crate::systems::saves::load.before(run),
-        );
-        app.add_systems(OnEnter(AppState::InGame), run);
-        app.add_systems(Update, run);
+        app.add_systems(OnEnter(AppState::LoadGame), crate::systems::saves::load);
+        // Life system will be registered by each test after the first update into InGame
 
         // Debugging statements
         println!(
@@ -1007,6 +977,12 @@ mod tests {
         let mut app = initialise_test_universe("test_01");
         check_universe_state(&app.world, &AppState::LoadGame, 1, 0);
         app.update();
+        app.add_systems(
+            Update,
+            run.run_if(bevy::ecs::schedule::common_conditions::in_state(
+                AppState::InGame,
+            )),
+        );
         check_universe_state(&app.world, &AppState::InGame, 2, 2);
         app.update();
         check_universe_state(&app.world, &AppState::InGame, 3, 0);
@@ -1021,6 +997,12 @@ mod tests {
         let mut app = initialise_test_universe("test_02");
         check_universe_state(&app.world, &AppState::LoadGame, 1, 0);
         app.update();
+        app.add_systems(
+            Update,
+            run.run_if(bevy::ecs::schedule::common_conditions::in_state(
+                AppState::InGame,
+            )),
+        );
         check_universe_state(&app.world, &AppState::InGame, 2, 3);
         app.update();
         // at this point we have one solid cube of 6 lifeforms
@@ -1048,6 +1030,12 @@ mod tests {
         let mut app = initialise_test_universe("test_03");
         check_universe_state(&app.world, &AppState::LoadGame, 1, 0);
         app.update();
+        app.add_systems(
+            Update,
+            run.run_if(bevy::ecs::schedule::common_conditions::in_state(
+                AppState::InGame,
+            )),
+        );
         check_universe_state(&app.world, &AppState::InGame, 2, 3);
         app.update();
         // at this point we have one solid cube of 6 lifeforms
