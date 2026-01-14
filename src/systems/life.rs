@@ -1060,10 +1060,8 @@ mod tests {
                 for x in 0..us {
                     for y in 0..us {
                         for z in 0..us {
-                            let alive = matches!(
-                                session.life[n][x][y][z],
-                                LifeDataContainer::Alive(_)
-                            );
+                            let alive =
+                                matches!(session.life[n][x][y][z], LifeDataContainer::Alive(_));
                             k.push(alive as u8);
                         }
                     }
