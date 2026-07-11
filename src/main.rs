@@ -32,7 +32,27 @@ const SOUND_BUTTON_HOVER: &'static [u8] = include_bytes!("../assets/sound/button
 #[derive(PartialEq, Debug, Resource)]
 pub struct GameSpeed {
     ticks_per_second: f64,
-    last_tick_stamp: f64,
+}
+
+impl GameSpeed {
+    fn tick_due(&self, current_time: f64, last_tick_stamp: f64) -> bool {
+        current_time - last_tick_stamp >= 1.0 / self.ticks_per_second
+    }
+}
+
+fn game_tick_due(
+    time: Res<Time>,
+    game_speed: Res<GameSpeed>,
+    mut last_tick_stamp: Local<f64>,
+) -> bool {
+    let current_time = time.elapsed_seconds_f64();
+
+    if !game_speed.tick_due(current_time, *last_tick_stamp) {
+        return false;
+    }
+
+    *last_tick_stamp = current_time;
+    true
 }
 
 #[derive(Clone, Eq, Default, PartialEq, Debug, Hash, Resource, States)]
@@ -109,7 +129,6 @@ fn setup(
 
     commands.insert_resource(GameSpeed {
         ticks_per_second: 2.0,
-        last_tick_stamp: 0.0,
     });
 
     //ambient light
@@ -169,8 +188,6 @@ fn set_window_icon(
 }
 
 fn main() {
-    use bevy::time::common_conditions::on_timer;
-    use std::time::Duration;
     App::new()
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
@@ -196,8 +213,9 @@ fn main() {
         .add_systems(
             Update,
             systems::life::run
-                .run_if(on_timer(Duration::from_millis(100)))
-                .run_if(in_state(AppState::InGame)),
+                .run_if(game_tick_due)
+                .run_if(in_state(AppState::InGame))
+                .after(systems::keyboard::run),
         )
         // sound system
         .add_systems(Update, systems::sound::update)
@@ -271,4 +289,35 @@ fn main() {
             systems::saves::save.before(systems::life::run),
         )
         .run()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn game_speed_uses_configured_tick_rate() {
+        let game_speed = GameSpeed {
+            ticks_per_second: 2.0,
+        };
+
+        assert!(!game_speed.tick_due(0.49, 0.0));
+        assert!(game_speed.tick_due(0.5, 0.0));
+        assert!(!game_speed.tick_due(0.99, 0.5));
+        assert!(game_speed.tick_due(1.0, 0.5));
+    }
+
+    #[test]
+    fn game_speed_change_affects_next_tick() {
+        let mut game_speed = GameSpeed {
+            ticks_per_second: 2.0,
+        };
+
+        assert!(game_speed.tick_due(0.5, 0.0));
+
+        game_speed.ticks_per_second = 4.0;
+
+        assert!(!game_speed.tick_due(0.74, 0.5));
+        assert!(game_speed.tick_due(0.75, 0.5));
+    }
 }

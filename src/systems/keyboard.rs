@@ -25,7 +25,10 @@ pub fn run(
         }
     }
     // game tick speed
-    if keys.just_pressed(KeyCode::NumpadAdd) || keys.just_pressed(KeyCode::PageUp) {
+    if keys.just_pressed(KeyCode::Equal)
+        || keys.just_pressed(KeyCode::NumpadAdd)
+        || keys.just_pressed(KeyCode::PageUp)
+    {
         game_speed.ticks_per_second += 1.0;
     } else if keys.just_pressed(KeyCode::Minus)
         || keys.just_pressed(KeyCode::NumpadSubtract)
