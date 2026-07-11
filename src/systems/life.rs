@@ -592,9 +592,38 @@ pub fn new_universe(
     session.generation = 1;
     session.life = dead_universe();
     session.universe_size = crate::DEFAULT_UNIVERSE_SIZE;
+
     // unspawn every single life entity
     for ent in life_entities.iter_mut() {
         commands.entity(ent.to_owned()).despawn();
+    }
+
+    // Random seeding belongs to new-game creation. Simulation ticks must only
+    // evolve the current universe so loaded generation-one saves remain intact.
+    for tetra_index in TETRA_INDEXES {
+        let n = tetra_index as usize;
+        for x in 0..session.universe_size {
+            for y in 0..session.universe_size {
+                for z in 0..session.universe_size {
+                    if rand::random::<bool>() {
+                        continue;
+                    }
+
+                    let entity = commands
+                        .spawn(PbrBundle {
+                            mesh: session.life_form_meshes[n % 2].clone(),
+                            material: session.life_form_materials[n].clone(),
+                            transform: create_life_xyz(&tetra_index, x, y, z),
+                            ..default()
+                        })
+                        .insert(Life)
+                        .id();
+
+                    session.life[n][x][y][z] = LifeDataContainer::Alive(entity);
+                    session.counter += 1;
+                }
+            }
+        }
     }
 
     next_state.set(AppState::InGame);
@@ -602,43 +631,7 @@ pub fn new_universe(
 
 pub fn run(mut commands: Commands, mut session: ResMut<SessionResource>) {
     println!("running life!");
-    // first generation, generate random life
-    if session.generation == 1 {
-        let life_to_create: Vec<Vec<Vec<Vec<LifeDataContainer>>>> = session.life.clone();
-        for tetra_index in TETRA_INDEXES {
-            let n: usize = tetra_index as usize;
-            for (x, vec2) in life_to_create[n].iter().enumerate() {
-                for (y, vec3) in vec2.iter().enumerate() {
-                    for (z, _empty_entity_id) in vec3.iter().enumerate() {
-                        //randomly generate initial life in the universe
-                        if rand::random::<bool>() {
-                            //create no life here
-                            continue;
-                        }
-
-                        let transform_new_life: bevy::prelude::Transform =
-                            create_life_xyz(&tetra_index, x, y, z);
-
-                        // make the life form exist!
-                        session.life[n][x][y][z] = LifeDataContainer::Alive(
-                            commands
-                                .spawn(PbrBundle {
-                                    mesh: session.life_form_meshes[n % 2].clone(),
-                                    material: session.life_form_materials[n].clone(),
-                                    transform: transform_new_life,
-                                    ..Default::default()
-                                })
-                                .insert(Life)
-                                .id(),
-                        );
-
-                        //increment life counter
-                        session.counter += 1;
-                    }
-                }
-            }
-        }
-    } else if session.counter > 0 {
+    if session.counter > 0 {
         // while there is life
         let last_gen: Vec<Vec<Vec<Vec<LifeDataContainer>>>> = session.life.clone();
 
@@ -943,6 +936,24 @@ mod tests {
             world.resource::<SessionResource>().counter,
             expected_counter
         );
+    }
+
+    #[test]
+    fn test_loaded_generation_one_is_evolved_without_reseeding() {
+        let mut app = initialise_test_universe("test_01");
+        app.update();
+        check_universe_state(&app.world, &AppState::InGame, 2, 2);
+
+        app.world.resource_mut::<SessionResource>().generation = 1;
+        app.add_systems(
+            Update,
+            run.run_if(bevy::ecs::schedule::common_conditions::in_state(
+                AppState::InGame,
+            )),
+        );
+        app.update();
+
+        check_universe_state(&app.world, &AppState::InGame, 2, 0);
     }
 
     #[test]
