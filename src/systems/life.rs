@@ -608,6 +608,14 @@ pub fn new_universe(
     next_state.set(AppState::InGame);
 }
 
+fn survives(neighbours: usize) -> bool {
+    (2..=4).contains(&neighbours)
+}
+
+fn is_born(neighbours: usize) -> bool {
+    neighbours == 6
+}
+
 pub fn run(mut commands: Commands, mut session: ResMut<SessionResource>) {
     println!("running life!");
     if session.counter > 0 {
@@ -751,20 +759,15 @@ pub fn run(mut commands: Commands, mut session: ResMut<SessionResource>) {
 
                         match entity_life {
                             LifeDataContainer::Alive(ent) => {
-                                //if alive in last gen
-                                if neighbours > 3 || neighbours == 1 || neighbours == 0 {
+                                if !survives(neighbours) {
                                     commands.entity(ent.to_owned()).despawn();
                                     session.life[n][x][y][z] = LifeDataContainer::Dead;
 
                                     session.counter -= 1;
-                                } else {
-                                    // continue to be alive
                                 }
                             }
                             LifeDataContainer::Dead => {
-                                // if dead in last gen
-                                //if neighbours = 3 then become alive
-                                if neighbours == 3 {
+                                if is_born(neighbours) {
                                     let transform_new_life: bevy::prelude::Transform =
                                         create_life_xyz(&tetra_index, x, y, z);
 
@@ -798,6 +801,14 @@ pub fn run(mut commands: Commands, mut session: ResMut<SessionResource>) {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn rules_are_b6_s234() {
+        for neighbours in 0..=18 {
+            assert_eq!(is_born(neighbours), neighbours == 6);
+            assert_eq!(survives(neighbours), (2..=4).contains(&neighbours));
+        }
+    }
 
     #[test]
     fn hard_coded_life_form_rotations_are_normalized() {
@@ -962,11 +973,11 @@ mod tests {
         check_universe_state(&app.world, &AppState::InGame, 3, 0);
     }
     #[test]
-    fn test_life_012_in_same_cube_breeds() {
+    fn test_life_012_in_same_cube_survives_without_births() {
         /* TEST DESCRIPTION
            Start State: 3 tetras indexed 0,1,2 in the same cube
-           Expect: 3 to become a cube of 6t.
-                   6 to die and create 12t.
+           Expect: all 3 survive with two neighbours; dead cells with three neighbours
+                   remain dead under B6/S234.
         */
         let mut app = initialise_test_universe("test_02");
         check_universe_state(&app.world, &AppState::LoadGame, 1, 0);
@@ -979,27 +990,16 @@ mod tests {
         );
         check_universe_state(&app.world, &AppState::InGame, 2, 3);
         app.update();
-        // at this point we have one solid cube of 6 lifeforms
-        check_universe_state(&app.world, &AppState::InGame, 3, 6);
+        check_universe_state(&app.world, &AppState::InGame, 3, 3);
         app.update();
-        // at this point we have twelve lifeforms that exist from the faces of the starting cube
-        check_universe_state(&app.world, &AppState::InGame, 4, 12);
-        app.update();
-        //
-        check_universe_state(&app.world, &AppState::InGame, 5, 36);
-        app.update();
-        //
-        check_universe_state(&app.world, &AppState::InGame, 6, 12);
-        app.update();
-        //
-        check_universe_state(&app.world, &AppState::InGame, 7, 0);
+        check_universe_state(&app.world, &AppState::InGame, 4, 3);
     }
     #[test]
-    fn test_life_345_in_same_cube_breeds() {
+    fn test_life_345_in_same_cube_survives_without_births() {
         /* TEST DESCRIPTION
            Start State: 3 tetras indexed 3,4,5 in the same cube
-           Expect: 3 to become a cube of 6t.
-                   6 to die and create 12t.
+           Expect: all 3 survive with two neighbours; dead cells with three neighbours
+                   remain dead under B6/S234.
         */
         let mut app = initialise_test_universe("test_03");
         check_universe_state(&app.world, &AppState::LoadGame, 1, 0);
@@ -1012,19 +1012,8 @@ mod tests {
         );
         check_universe_state(&app.world, &AppState::InGame, 2, 3);
         app.update();
-        // at this point we have one solid cube of 6 lifeforms
-        check_universe_state(&app.world, &AppState::InGame, 3, 6);
+        check_universe_state(&app.world, &AppState::InGame, 3, 3);
         app.update();
-        // at this point we have twelve lifeforms that exist from the faces of the starting cube
-        check_universe_state(&app.world, &AppState::InGame, 4, 12);
-        app.update();
-        //
-        check_universe_state(&app.world, &AppState::InGame, 5, 36);
-        app.update();
-        //
-        check_universe_state(&app.world, &AppState::InGame, 6, 12);
-        app.update();
-        //
-        check_universe_state(&app.world, &AppState::InGame, 7, 0);
+        check_universe_state(&app.world, &AppState::InGame, 4, 3);
     }
 }
