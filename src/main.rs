@@ -74,7 +74,6 @@ pub struct SessionResource {
     pub generation: i64,
     pub life_form_materials: [bevy::prelude::Handle<StandardMaterial>; 6], //stores handles to the 6 life form tetras
     pub life_form_meshes: [bevy::prelude::Handle<Mesh>; 2], //stores handles to the two life form meshes
-    pub life_form_rotations: [bevy::prelude::Quat; 6],
     pub universe_size: usize,
 }
 
@@ -122,7 +121,6 @@ fn setup(
             }),
         ],
         life_form_meshes: [tetrahedron_mesh_handle, tetrahedron_mirrored_mesh_handle],
-        life_form_rotations: systems::life::life_form_rotations(),
         universe_size: DEFAULT_UNIVERSE_SIZE,
     });
 

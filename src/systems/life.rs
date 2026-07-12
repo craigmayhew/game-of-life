@@ -6,50 +6,17 @@ use crate::{AppState, SessionResource};
 
 pub const LIFE_FORM_SIZE: f32 = 150.0;
 
-fn life_form_rotation(x: f32, y: f32, z: f32) -> Quat {
-    let mut transform = Transform::IDENTITY;
-    transform.rotate_x(x);
-    transform.rotate_y(y);
-    transform.rotate_z(z);
-    transform.rotation
-}
+// Ordered by TetraIndex discriminant; preserves the former X -> Y -> Z rotations.
+const LIFE_FORM_ROTATIONS: [Quat; 6] = [
+    Quat::from_xyzw(-0.27059808, 0.65328145, 0.27059808, 0.65328145),
+    Quat::from_xyzw(-0.27059805, -0.27059805, 0.65328145, 0.65328145),
+    Quat::from_xyzw(0.65328145, 0.27059808, 0.65328145, -0.27059808),
+    Quat::from_xyzw(0.27059805, -0.27059805, -0.65328145, 0.65328145),
+    Quat::from_xyzw(-1.6727626e-8, 0.9238795, -0.38268346, -4.0384055e-8),
+    Quat::from_xyzw(-1.6727626e-8, 0.9238795, -0.38268346, -4.0384055e-8),
+];
 
-pub fn life_form_rotations() -> [Quat; 6] {
-    let four_and_five = life_form_rotation(std::f32::consts::FRAC_PI_4, std::f32::consts::PI, 0.0);
-
-    [
-        life_form_rotation(
-            3.0 * std::f32::consts::FRAC_PI_4,
-            std::f32::consts::FRAC_PI_2,
-            std::f32::consts::PI,
-        ),
-        life_form_rotation(
-            -std::f32::consts::FRAC_PI_4,
-            0.0,
-            std::f32::consts::FRAC_PI_2,
-        ),
-        life_form_rotation(
-            std::f32::consts::FRAC_PI_4,
-            -std::f32::consts::FRAC_PI_2,
-            std::f32::consts::PI,
-        ),
-        life_form_rotation(
-            std::f32::consts::FRAC_PI_4,
-            0.0,
-            -std::f32::consts::FRAC_PI_2,
-        ),
-        four_and_five,
-        four_and_five,
-    ]
-}
-
-pub fn create_life_xyz(
-    n: &TetraIndex,
-    x: usize,
-    y: usize,
-    z: usize,
-    rotation: Quat,
-) -> bevy::prelude::Transform {
+pub fn create_life_xyz(n: &TetraIndex, x: usize, y: usize, z: usize) -> bevy::prelude::Transform {
     // position the life form in 3d space
     let translation;
     match n {
@@ -72,7 +39,7 @@ pub fn create_life_xyz(
 
     Transform {
         translation,
-        rotation,
+        rotation: LIFE_FORM_ROTATIONS[*n as usize],
         scale: Vec3::splat(LIFE_FORM_SIZE),
     }
 }
@@ -552,7 +519,6 @@ pub fn place_life_with_keyboard(
                             spawn_at.x as usize,
                             spawn_at.y as usize,
                             spawn_at.z as usize,
-                            session.life_form_rotations[n],
                         );
                         session.life[n][spawn_at.x as usize][spawn_at.y as usize]
                             [spawn_at.z as usize] = LifeDataContainer::Alive(
@@ -626,13 +592,7 @@ pub fn new_universe(
                         .spawn(PbrBundle {
                             mesh: session.life_form_meshes[n % 2].clone(),
                             material: session.life_form_materials[n].clone(),
-                            transform: create_life_xyz(
-                                &tetra_index,
-                                x,
-                                y,
-                                z,
-                                session.life_form_rotations[n],
-                            ),
+                            transform: create_life_xyz(&tetra_index, x, y, z),
                             ..default()
                         })
                         .insert(Life)
@@ -806,13 +766,7 @@ pub fn run(mut commands: Commands, mut session: ResMut<SessionResource>) {
                                 //if neighbours = 3 then become alive
                                 if neighbours == 3 {
                                     let transform_new_life: bevy::prelude::Transform =
-                                        create_life_xyz(
-                                            &tetra_index,
-                                            x,
-                                            y,
-                                            z,
-                                            session.life_form_rotations[n],
-                                        );
+                                        create_life_xyz(&tetra_index, x, y, z);
 
                                     // make the life form exist!
                                     session.life[n][x][y][z] = LifeDataContainer::Alive(
@@ -844,6 +798,13 @@ pub fn run(mut commands: Commands, mut session: ResMut<SessionResource>) {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn hard_coded_life_form_rotations_are_normalized() {
+        for rotation in LIFE_FORM_ROTATIONS {
+            assert!(rotation.is_normalized());
+        }
+    }
 
     fn initialise_test_universe(save_filename: &str) -> bevy::prelude::App {
         // Setup app
@@ -921,7 +882,6 @@ mod tests {
                 tetrahedron_mirrored_mesh_handle.clone(),
                 tetrahedron_mesh_handle.clone(),
             ],
-            life_form_rotations: life_form_rotations(),
             universe_size: 10,
         };
 
