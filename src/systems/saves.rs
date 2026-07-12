@@ -73,8 +73,13 @@ pub fn load(
                     for (y, vec3) in vec2.iter().enumerate() {
                         for (z, alive_or_not) in vec3.iter().enumerate() {
                             if alive_or_not == &1 {
-                                let transform_new_life: bevy::prelude::Transform =
-                                    create_life_xyz(&tetra_index, x, y, z);
+                                let transform_new_life: bevy::prelude::Transform = create_life_xyz(
+                                    &tetra_index,
+                                    x,
+                                    y,
+                                    z,
+                                    session.life_form_rotations[n],
+                                );
 
                                 // make the life form exist!
                                 session.life[n][x][y][z] = LifeDataContainer::Alive(

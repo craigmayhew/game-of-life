@@ -6,20 +6,63 @@ use crate::{AppState, SessionResource};
 
 pub const LIFE_FORM_SIZE: f32 = 150.0;
 
-pub fn create_life_xyz(n: &TetraIndex, x: usize, y: usize, z: usize) -> bevy::prelude::Transform {
+fn life_form_rotation(x: f32, y: f32, z: f32) -> Quat {
+    let mut transform = Transform::IDENTITY;
+    transform.rotate_x(x);
+    transform.rotate_y(y);
+    transform.rotate_z(z);
+    transform.rotation
+}
+
+pub fn life_form_rotations() -> [Quat; 6] {
+    let four_and_five = life_form_rotation(std::f32::consts::FRAC_PI_4, std::f32::consts::PI, 0.0);
+
+    [
+        life_form_rotation(
+            3.0 * std::f32::consts::FRAC_PI_4,
+            std::f32::consts::FRAC_PI_2,
+            std::f32::consts::PI,
+        ),
+        life_form_rotation(
+            -std::f32::consts::FRAC_PI_4,
+            0.0,
+            std::f32::consts::FRAC_PI_2,
+        ),
+        life_form_rotation(
+            std::f32::consts::FRAC_PI_4,
+            -std::f32::consts::FRAC_PI_2,
+            std::f32::consts::PI,
+        ),
+        life_form_rotation(
+            std::f32::consts::FRAC_PI_4,
+            0.0,
+            -std::f32::consts::FRAC_PI_2,
+        ),
+        four_and_five,
+        four_and_five,
+    ]
+}
+
+pub fn create_life_xyz(
+    n: &TetraIndex,
+    x: usize,
+    y: usize,
+    z: usize,
+    rotation: Quat,
+) -> bevy::prelude::Transform {
     // position the life form in 3d space
-    let mut transform_new_life: Transform;
+    let translation;
     match n {
         TetraIndex::Two | TetraIndex::Three => {
             // position the life form in 3d space
-            transform_new_life = Transform::from_xyz(
+            translation = Vec3::new(
                 (x as f32 - 1.0) * LIFE_FORM_SIZE,
                 (y as f32 + 1.0) * LIFE_FORM_SIZE,
                 (z as f32 - 1.0) * LIFE_FORM_SIZE,
             );
         }
         TetraIndex::Zero | TetraIndex::One | TetraIndex::Four | TetraIndex::Five => {
-            transform_new_life = Transform::from_xyz(
+            translation = Vec3::new(
                 (x as f32) * LIFE_FORM_SIZE,
                 (y as f32) * LIFE_FORM_SIZE,
                 (z as f32) * LIFE_FORM_SIZE,
@@ -27,42 +70,11 @@ pub fn create_life_xyz(n: &TetraIndex, x: usize, y: usize, z: usize) -> bevy::pr
         }
     }
 
-    //TODO: Replace rotations with 6 correctly rotated obj files
-    match n {
-        TetraIndex::Zero => {
-            //white
-            transform_new_life.rotate_x(3.0 * std::f32::consts::FRAC_PI_4);
-            transform_new_life.rotate_y(std::f32::consts::FRAC_PI_2);
-            transform_new_life.rotate_z(std::f32::consts::PI);
-        }
-        TetraIndex::One => {
-            //red
-            transform_new_life.rotate_x(-std::f32::consts::FRAC_PI_4);
-            transform_new_life.rotate_y(0.0);
-            transform_new_life.rotate_z(std::f32::consts::FRAC_PI_2);
-        }
-        TetraIndex::Two => {
-            //light blue and dark blue
-            transform_new_life.rotate_x(std::f32::consts::FRAC_PI_4);
-            transform_new_life.rotate_y(-std::f32::consts::FRAC_PI_2);
-            transform_new_life.rotate_z(std::f32::consts::PI);
-        }
-        TetraIndex::Three => {
-            //light blue and dark blue
-            transform_new_life.rotate_x(std::f32::consts::FRAC_PI_4);
-            transform_new_life.rotate_y(0.0);
-            transform_new_life.rotate_z(-std::f32::consts::FRAC_PI_2);
-        }
-        TetraIndex::Four | TetraIndex::Five => {
-            //light grey and dark grey
-            transform_new_life.rotate_x(std::f32::consts::FRAC_PI_4);
-            transform_new_life.rotate_y(std::f32::consts::PI);
-            transform_new_life.rotate_z(0.0);
-        }
+    Transform {
+        translation,
+        rotation,
+        scale: Vec3::splat(LIFE_FORM_SIZE),
     }
-
-    //set size of tetrahedrons and return
-    transform_new_life.with_scale(Vec3::new(LIFE_FORM_SIZE, LIFE_FORM_SIZE, LIFE_FORM_SIZE))
 }
 
 #[derive(Component)]
@@ -540,6 +552,7 @@ pub fn place_life_with_keyboard(
                             spawn_at.x as usize,
                             spawn_at.y as usize,
                             spawn_at.z as usize,
+                            session.life_form_rotations[n],
                         );
                         session.life[n][spawn_at.x as usize][spawn_at.y as usize]
                             [spawn_at.z as usize] = LifeDataContainer::Alive(
@@ -613,7 +626,13 @@ pub fn new_universe(
                         .spawn(PbrBundle {
                             mesh: session.life_form_meshes[n % 2].clone(),
                             material: session.life_form_materials[n].clone(),
-                            transform: create_life_xyz(&tetra_index, x, y, z),
+                            transform: create_life_xyz(
+                                &tetra_index,
+                                x,
+                                y,
+                                z,
+                                session.life_form_rotations[n],
+                            ),
                             ..default()
                         })
                         .insert(Life)
@@ -787,7 +806,13 @@ pub fn run(mut commands: Commands, mut session: ResMut<SessionResource>) {
                                 //if neighbours = 3 then become alive
                                 if neighbours == 3 {
                                     let transform_new_life: bevy::prelude::Transform =
-                                        create_life_xyz(&tetra_index, x, y, z);
+                                        create_life_xyz(
+                                            &tetra_index,
+                                            x,
+                                            y,
+                                            z,
+                                            session.life_form_rotations[n],
+                                        );
 
                                     // make the life form exist!
                                     session.life[n][x][y][z] = LifeDataContainer::Alive(
@@ -896,6 +921,7 @@ mod tests {
                 tetrahedron_mirrored_mesh_handle.clone(),
                 tetrahedron_mesh_handle.clone(),
             ],
+            life_form_rotations: life_form_rotations(),
             universe_size: 10,
         };
 
