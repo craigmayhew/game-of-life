@@ -93,6 +93,13 @@ pub const TETRA_INDEXES: [TetraIndex; 6] = [
     TetraIndex::Five,
 ];
 
+pub fn order_life_form_meshes<T>(normal: T, mirrored: T) -> [T; 2] {
+    // The even tetra types use the normal mesh and the odd types use the
+    // mirrored mesh. This chirality order is required for the six transformed
+    // tetrahedra to form a consistent tessellation.
+    [normal, mirrored]
+}
+
 pub enum Axis {
     XPos,
     XNeg,
@@ -892,10 +899,10 @@ mod tests {
             counter: 0,
             generation: 1,
             life_form_materials: material_handles,
-            life_form_meshes: [
-                tetrahedron_mirrored_mesh_handle.clone(),
+            life_form_meshes: order_life_form_meshes(
                 tetrahedron_mesh_handle.clone(),
-            ],
+                tetrahedron_mirrored_mesh_handle.clone(),
+            ),
             universe_size: 10,
         };
 

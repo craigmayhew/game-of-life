@@ -120,7 +120,10 @@ fn setup(
                 ..default()
             }),
         ],
-        life_form_meshes: [tetrahedron_mesh_handle, tetrahedron_mirrored_mesh_handle],
+        life_form_meshes: systems::life::order_life_form_meshes(
+            tetrahedron_mesh_handle,
+            tetrahedron_mirrored_mesh_handle,
+        ),
         universe_size: DEFAULT_UNIVERSE_SIZE,
     });
 
