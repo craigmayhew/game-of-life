@@ -6,20 +6,30 @@ use crate::{AppState, SessionResource};
 
 pub const LIFE_FORM_SIZE: f32 = 150.0;
 
+// Ordered by TetraIndex discriminant
+const LIFE_FORM_ROTATIONS: [Quat; 6] = [
+    Quat::from_xyzw(-0.27059808, 0.65328145, 0.27059808, 0.65328145),
+    Quat::from_xyzw(-0.27059805, -0.27059805, 0.65328145, 0.65328145),
+    Quat::from_xyzw(0.65328145, 0.27059808, 0.65328145, -0.27059808),
+    Quat::from_xyzw(0.27059805, -0.27059805, -0.65328145, 0.65328145),
+    Quat::from_xyzw(-1.6727626e-8, 0.9238795, -0.38268346, -4.0384055e-8),
+    Quat::from_xyzw(-1.6727626e-8, 0.9238795, -0.38268346, -4.0384055e-8),
+];
+
 pub fn create_life_xyz(n: &TetraIndex, x: usize, y: usize, z: usize) -> bevy::prelude::Transform {
     // position the life form in 3d space
-    let mut transform_new_life: Transform;
+    let translation;
     match n {
         TetraIndex::Two | TetraIndex::Three => {
             // position the life form in 3d space
-            transform_new_life = Transform::from_xyz(
+            translation = Vec3::new(
                 (x as f32 - 1.0) * LIFE_FORM_SIZE,
                 (y as f32 + 1.0) * LIFE_FORM_SIZE,
                 (z as f32 - 1.0) * LIFE_FORM_SIZE,
             );
         }
         TetraIndex::Zero | TetraIndex::One | TetraIndex::Four | TetraIndex::Five => {
-            transform_new_life = Transform::from_xyz(
+            translation = Vec3::new(
                 (x as f32) * LIFE_FORM_SIZE,
                 (y as f32) * LIFE_FORM_SIZE,
                 (z as f32) * LIFE_FORM_SIZE,
@@ -27,42 +37,11 @@ pub fn create_life_xyz(n: &TetraIndex, x: usize, y: usize, z: usize) -> bevy::pr
         }
     }
 
-    //TODO: Replace rotations with 6 correctly rotated obj files
-    match n {
-        TetraIndex::Zero => {
-            //white
-            transform_new_life.rotate_x(3.0 * std::f32::consts::FRAC_PI_4);
-            transform_new_life.rotate_y(std::f32::consts::FRAC_PI_2);
-            transform_new_life.rotate_z(std::f32::consts::PI);
-        }
-        TetraIndex::One => {
-            //red
-            transform_new_life.rotate_x(-std::f32::consts::FRAC_PI_4);
-            transform_new_life.rotate_y(0.0);
-            transform_new_life.rotate_z(std::f32::consts::FRAC_PI_2);
-        }
-        TetraIndex::Two => {
-            //light blue and dark blue
-            transform_new_life.rotate_x(std::f32::consts::FRAC_PI_4);
-            transform_new_life.rotate_y(-std::f32::consts::FRAC_PI_2);
-            transform_new_life.rotate_z(std::f32::consts::PI);
-        }
-        TetraIndex::Three => {
-            //light blue and dark blue
-            transform_new_life.rotate_x(std::f32::consts::FRAC_PI_4);
-            transform_new_life.rotate_y(0.0);
-            transform_new_life.rotate_z(-std::f32::consts::FRAC_PI_2);
-        }
-        TetraIndex::Four | TetraIndex::Five => {
-            //light grey and dark grey
-            transform_new_life.rotate_x(std::f32::consts::FRAC_PI_4);
-            transform_new_life.rotate_y(std::f32::consts::PI);
-            transform_new_life.rotate_z(0.0);
-        }
+    Transform {
+        translation,
+        rotation: LIFE_FORM_ROTATIONS[*n as usize],
+        scale: Vec3::splat(LIFE_FORM_SIZE),
     }
-
-    //set size of tetrahedrons and return
-    transform_new_life.with_scale(Vec3::new(LIFE_FORM_SIZE, LIFE_FORM_SIZE, LIFE_FORM_SIZE))
 }
 
 #[derive(Component)]
@@ -587,6 +566,13 @@ mod tests {
                 })
             })
             .count()
+    }
+
+    #[test]
+    fn hard_coded_life_form_rotations_are_normalized() {
+        for rotation in LIFE_FORM_ROTATIONS {
+            assert!(rotation.is_normalized());
+        }
     }
 
     fn initialise_test_universe(save_filename: &str) -> bevy::prelude::App {
