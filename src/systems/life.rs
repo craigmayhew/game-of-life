@@ -100,6 +100,7 @@ pub fn order_life_form_meshes<T>(normal: T, mirrored: T) -> [T; 2] {
     [normal, mirrored]
 }
 
+#[derive(Clone, Copy)]
 pub enum Axis {
     XPos,
     XNeg,
@@ -120,9 +121,39 @@ pub enum Axis {
     YNegZPos,
     YNegZNeg,
 }
+
+impl Axis {
+    const fn offset(self) -> (i32, i32, i32) {
+        match self {
+            Axis::XPos => (1, 0, 0),
+            Axis::XNeg => (-1, 0, 0),
+            Axis::YPos => (0, 1, 0),
+            Axis::YNeg => (0, -1, 0),
+            Axis::ZPos => (0, 0, 1),
+            Axis::ZNeg => (0, 0, -1),
+            Axis::XPosYPos => (1, 1, 0),
+            Axis::XPosYNeg => (1, -1, 0),
+            Axis::XNegYPos => (-1, 1, 0),
+            Axis::XNegYNeg => (-1, -1, 0),
+            Axis::XPosZPos => (1, 0, 1),
+            Axis::XPosZNeg => (1, 0, -1),
+            Axis::XNegZPos => (-1, 0, 1),
+            Axis::XNegZNeg => (-1, 0, -1),
+            Axis::YPosZPos => (0, 1, 1),
+            Axis::YPosZNeg => (0, 1, -1),
+            Axis::YNegZPos => (0, -1, 1),
+            Axis::YNegZNeg => (0, -1, -1),
+        }
+    }
+}
+
 pub struct NeighbourChecks {
     n: TetraIndex,
     axis: Axis,
+}
+
+fn wrapped_coordinate(coordinate: usize, offset: i32, universe_size: usize) -> usize {
+    (coordinate as i64 + i64::from(offset)).rem_euclid(universe_size as i64) as usize
 }
 
 fn checks(n: &TetraIndex) -> Vec<NeighbourChecks> {
@@ -675,92 +706,11 @@ pub fn run(mut commands: Commands, mut session: ResMut<SessionResource>) {
                         let mut neighbours: usize = 0;
 
                         for check in checks(&tetra_index).iter() {
-                            let mut check_x = x;
-                            let mut check_y = y;
-                            let mut check_z = z;
+                            let (offset_x, offset_y, offset_z) = check.axis.offset();
+                            let check_x = wrapped_coordinate(x, offset_x, session.universe_size);
+                            let check_y = wrapped_coordinate(y, offset_y, session.universe_size);
+                            let check_z = wrapped_coordinate(z, offset_z, session.universe_size);
 
-                            match &check.axis {
-                                Axis::XPos => check_x += 1,
-                                Axis::XNeg => check_x = check_x.wrapping_sub(1),
-                                Axis::YPos => check_y += 1,
-                                Axis::YNeg => check_y = check_y.wrapping_sub(1),
-                                Axis::ZPos => check_z += 1,
-                                Axis::ZNeg => check_z = check_z.wrapping_sub(1),
-                                Axis::XPosYPos => {
-                                    check_x += 1;
-                                    check_y += 1
-                                }
-                                Axis::XPosYNeg => {
-                                    check_x += 1;
-                                    check_y = check_y.wrapping_sub(1)
-                                }
-                                Axis::XNegYPos => {
-                                    check_x = check_x.wrapping_sub(1);
-                                    check_y += 1
-                                }
-                                Axis::XNegYNeg => {
-                                    check_x = check_x.wrapping_sub(1);
-                                    check_y = check_y.wrapping_sub(1)
-                                }
-                                Axis::XPosZPos => {
-                                    check_x += 1;
-                                    check_z += 1
-                                }
-                                Axis::XPosZNeg => {
-                                    check_x += 1;
-                                    check_z = check_z.wrapping_sub(1)
-                                }
-                                Axis::XNegZPos => {
-                                    check_x = check_x.wrapping_sub(1);
-                                    check_z += 1
-                                }
-                                Axis::XNegZNeg => {
-                                    check_x = check_x.wrapping_sub(1);
-                                    check_z = check_z.wrapping_sub(1)
-                                }
-                                Axis::YPosZPos => {
-                                    check_y += 1;
-                                    check_z += 1
-                                }
-                                Axis::YPosZNeg => {
-                                    check_y += 1;
-                                    check_z = check_z.wrapping_sub(1)
-                                }
-                                Axis::YNegZPos => {
-                                    check_y = check_y.wrapping_sub(1);
-                                    check_z += 1
-                                }
-                                Axis::YNegZNeg => {
-                                    check_y = check_y.wrapping_sub(1);
-                                    check_z = check_z.wrapping_sub(1)
-                                }
-                            }
-
-                            // handle overflow
-                            //TODO: in universe size 256 this may not be needed
-                            if check_x == session.universe_size {
-                                check_x = 0;
-                            }
-                            if check_y == session.universe_size {
-                                check_y = 0;
-                            }
-                            if check_z == session.universe_size {
-                                check_z = 0;
-                            }
-
-                            // handle underflow
-                            //TODO: in universe size 256 this may not be needed
-                            if check_x > session.universe_size {
-                                check_x = session.universe_size - 1;
-                            }
-                            if check_y > session.universe_size {
-                                check_y = session.universe_size - 1;
-                            }
-                            if check_z > session.universe_size {
-                                check_z = session.universe_size - 1;
-                            }
-
-                            // check if the neighbour is alive, and if so increment neighbours!
                             if let LifeDataContainer::Alive(_) =
                                 last_gen[check.n as usize][check_x][check_y][check_z]
                             {
