@@ -6,7 +6,7 @@ use crate::{AppState, SessionResource};
 
 pub const LIFE_FORM_SIZE: f32 = 150.0;
 
-// Ordered by TetraIndex discriminant; preserves the former X -> Y -> Z rotations.
+// Ordered by TetraIndex discriminant
 const LIFE_FORM_ROTATIONS: [Quat; 6] = [
     Quat::from_xyzw(-0.27059808, 0.65328145, 0.27059808, 0.65328145),
     Quat::from_xyzw(-0.27059805, -0.27059805, 0.65328145, 0.65328145),
