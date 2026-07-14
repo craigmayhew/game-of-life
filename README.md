@@ -25,6 +25,10 @@ Universes based on the original Conway's game of life rules have endless entropy
 ### Adjusted rules that allow stable and oscillating states
 If the rules are adjusted so life dies where neighbours are less than 3 or more than 4, and is created where neighbours = 4. There are stable states and oscillating states.
 
+## Simulation Findings
+Tests have been written that search for oscillating patterns
+`cargo test -- --ignored --nocapture`
+
 ## Mathematical Proofs
 
 WIP
@@ -63,6 +67,3 @@ A: This would result in 12 tetrahedrons per cube, which felt too high. I also fa
 
 Q: Why tetrahedrons and not cubes?
 A: I thought it might give more interesting automata
-
-
-

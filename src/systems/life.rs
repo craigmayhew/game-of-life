@@ -1027,4 +1027,1061 @@ mod tests {
         //
         check_universe_state(&app.world, &AppState::InGame, 7, 0);
     }
+
+    #[test]
+    fn test_osc4_period10_persists_and_repeats() {
+        // Load the known 4-live period-10 oscillator (3x3x3 universe)
+        let mut app = initialise_test_universe("test_osc4_period10");
+        check_universe_state(&app.world, &AppState::LoadGame, 1, 0);
+
+        // Run load
+        app.update();
+
+        // Add life system and ensure we start from the loaded state
+        app.add_systems(
+            Update,
+            run.run_if(bevy::ecs::schedule::common_conditions::in_state(
+                AppState::InGame,
+            )),
+        );
+
+        // After load, we should be InGame with generation=2 and counter=4 (from the save)
+        check_universe_state(&app.world, &AppState::InGame, 2, 4);
+
+        // Snapshot function that ignores entity IDs and captures alive pattern
+        fn snapshot(world: &bevy::prelude::World) -> Vec<u8> {
+            let session = world.resource::<SessionResource>();
+            let us = session.universe_size;
+            let mut k = Vec::with_capacity(6 * us * us * us);
+            for n in 0..6 {
+                for x in 0..us {
+                    for y in 0..us {
+                        for z in 0..us {
+                            let alive =
+                                matches!(session.life[n][x][y][z], LifeDataContainer::Alive(_));
+                            k.push(alive as u8);
+                        }
+                    }
+                }
+            }
+            k
+        }
+
+        // Detect the actual cycle period from the loaded seed (which may be in a transient state)
+        use std::collections::HashMap;
+        let mut seen: HashMap<Vec<u8>, usize> = HashMap::new();
+        let mut period_found: Option<usize> = None;
+
+        // Insert the initial signature at step 0
+        let mut sig = snapshot(&app.world);
+        seen.insert(sig.clone(), 0);
+
+        for step in 1..=200 {
+            // advance one generation
+            app.update();
+
+            // population non-zero
+            let counter = app.world.resource::<SessionResource>().counter;
+            assert!(counter > 0, "population reached zero at step {}", step);
+
+            // capture signature and check for repeat
+            sig = snapshot(&app.world);
+            if let Some(prev_step) = seen.get(&sig) {
+                let period = step - prev_step;
+                period_found = Some(period);
+                break;
+            } else {
+                seen.insert(sig.clone(), step);
+            }
+        }
+
+        let period = period_found.expect("no repeat detected within 200 steps");
+        assert_eq!(period, 10, "expected period 10, got {}", period);
+    }
+}
+
+#[cfg(test)]
+mod experiments {
+    #[test]
+    #[ignore = "experiment, not a test; run with --ignored"]
+    fn enumerate_oscillations_3x3x3_up_to_2() {
+        // Enumerate seeds in a 3x3x3 universe with up to 2 live tetras and
+        // detect period-k oscillations under the current rules.
+        const SIZE: i32 = 3;
+        const MAX_STEPS: usize = 9;
+
+        type State = [[[[bool; 3]; 3]; 3]; 6];
+
+        fn empty() -> State {
+            [[[[false; 3]; 3]; 3]; 6]
+        }
+
+        fn idx_to_coords(idx: usize) -> (usize, usize, usize, usize) {
+            let n = idx / 27;
+            let r = idx % 27;
+            let x = r / 9;
+            let r2 = r % 9;
+            let y = r2 / 3;
+            let z = r2 % 3;
+            (n, x, y, z)
+        }
+
+        fn wrap(a: i32) -> usize {
+            let mut v = a % SIZE;
+            if v < 0 {
+                v += SIZE;
+            }
+            v as usize
+        }
+
+        fn next(state: &State, checks_all: &[Vec<super::NeighbourChecks>; 6]) -> State {
+            let mut out = empty();
+            for (ni, checks_vec) in checks_all.iter().enumerate() {
+                for x in 0..3 {
+                    for y in 0..3 {
+                        for z in 0..3 {
+                            let mut neighbours: usize = 0;
+
+                            for check in checks_vec.iter() {
+                                let (mut cx, mut cy, mut cz) = (x as i32, y as i32, z as i32);
+                                match check.axis {
+                                    super::Axis::XPos => cx += 1,
+                                    super::Axis::XNeg => cx -= 1,
+                                    super::Axis::YPos => cy += 1,
+                                    super::Axis::YNeg => cy -= 1,
+                                    super::Axis::ZPos => cz += 1,
+                                    super::Axis::ZNeg => cz -= 1,
+                                    super::Axis::XPosYPos => {
+                                        cx += 1;
+                                        cy += 1
+                                    }
+                                    super::Axis::XPosYNeg => {
+                                        cx += 1;
+                                        cy -= 1
+                                    }
+                                    super::Axis::XNegYPos => {
+                                        cx -= 1;
+                                        cy += 1
+                                    }
+                                    super::Axis::XNegYNeg => {
+                                        cx -= 1;
+                                        cy -= 1
+                                    }
+                                    super::Axis::XPosZPos => {
+                                        cx += 1;
+                                        cz += 1
+                                    }
+                                    super::Axis::XPosZNeg => {
+                                        cx += 1;
+                                        cz -= 1
+                                    }
+                                    super::Axis::XNegZPos => {
+                                        cx -= 1;
+                                        cz += 1
+                                    }
+                                    super::Axis::XNegZNeg => {
+                                        cx -= 1;
+                                        cz -= 1
+                                    }
+                                    super::Axis::YPosZPos => {
+                                        cy += 1;
+                                        cz += 1
+                                    }
+                                    super::Axis::YPosZNeg => {
+                                        cy += 1;
+                                        cz -= 1
+                                    }
+                                    super::Axis::YNegZPos => {
+                                        cy -= 1;
+                                        cz += 1
+                                    }
+                                    super::Axis::YNegZNeg => {
+                                        cy -= 1;
+                                        cz -= 1
+                                    }
+                                }
+
+                                let (cx, cy, cz) = (wrap(cx), wrap(cy), wrap(cz));
+                                let nn = check.n as usize;
+                                if state[nn][cx][cy][cz] {
+                                    neighbours += 1;
+                                }
+                            }
+
+                            // same-xyz neighbours (all other five tetras)
+                            for m in 0..6 {
+                                if m != ni && state[m][x][y][z] {
+                                    neighbours += 1;
+                                }
+                            }
+
+                            let alive = state[ni][x][y][z];
+                            out[ni][x][y][z] = if alive {
+                                neighbours == 2 || neighbours == 3
+                            } else {
+                                neighbours == 3
+                            };
+                        }
+                    }
+                }
+            }
+            out
+        }
+
+        fn key(state: &State) -> Vec<u8> {
+            let mut k = Vec::with_capacity(6 * 27);
+            for n in 0..6 {
+                for x in 0..3 {
+                    for y in 0..3 {
+                        for z in 0..3 {
+                            k.push(state[n][x][y][z] as u8);
+                        }
+                    }
+                }
+            }
+            k
+        }
+
+        let checks_all: [Vec<super::NeighbourChecks>; 6] = [
+            super::checks(&super::TetraIndex::Zero),
+            super::checks(&super::TetraIndex::One),
+            super::checks(&super::TetraIndex::Two),
+            super::checks(&super::TetraIndex::Three),
+            super::checks(&super::TetraIndex::Four),
+            super::checks(&super::TetraIndex::Five),
+        ];
+
+        let total_cells = 6 * 27;
+        let mut found = 0usize;
+
+        // 0-lives seed
+        {
+            let mut st = empty();
+            let mut seen = std::collections::HashMap::<Vec<u8>, usize>::new();
+            seen.insert(key(&st), 0);
+
+            for step in 1..=MAX_STEPS {
+                st = next(&st, &checks_all);
+                let k = key(&st);
+                if let Some(prev) = seen.get(&k) {
+                    let period = step - prev;
+                    println!("seed 0-lives oscillates with period {}", period);
+                    found += 1;
+                    break;
+                }
+                seen.insert(k, step);
+
+                // all dead?
+                let all_dead = (0..6).all(|n| {
+                    (0..3).all(|x| (0..3).all(|y| (0..3).all(|z| st[n][x][y][z] == false)))
+                });
+                if all_dead {
+                    break;
+                }
+            }
+        }
+
+        // 1-live seeds
+        for i in 0..total_cells {
+            let mut st = empty();
+            let (n, x, y, z) = idx_to_coords(i);
+            st[n][x][y][z] = true;
+            let mut seen = std::collections::HashMap::<Vec<u8>, usize>::new();
+            seen.insert(key(&st), 0);
+
+            let mut cur = st;
+            for step in 1..=MAX_STEPS {
+                cur = next(&cur, &checks_all);
+                let k = key(&cur);
+                if let Some(prev) = seen.get(&k) {
+                    let period = step - prev;
+                    println!("seed 1 at idx {} oscillates period {}", i, period);
+                    found += 1;
+                    break;
+                }
+                seen.insert(k, step);
+
+                let all_dead = (0..6).all(|n| {
+                    (0..3).all(|x| (0..3).all(|y| (0..3).all(|z| cur[n][x][y][z] == false)))
+                });
+                if all_dead {
+                    break;
+                }
+            }
+        }
+
+        // 2-live seeds
+        for i in 0..total_cells {
+            for j in (i + 1)..total_cells {
+                let mut st = empty();
+                let (n1, x1, y1, z1) = idx_to_coords(i);
+                let (n2, x2, y2, z2) = idx_to_coords(j);
+                st[n1][x1][y1][z1] = true;
+                st[n2][x2][y2][z2] = true;
+
+                let mut seen = std::collections::HashMap::<Vec<u8>, usize>::new();
+                seen.insert(key(&st), 0);
+
+                let mut cur = st;
+                for step in 1..=MAX_STEPS {
+                    cur = next(&cur, &checks_all);
+                    let k = key(&cur);
+                    if let Some(prev) = seen.get(&k) {
+                        let period = step - prev;
+                        println!("seed 2 at idxs ({}, {}) oscillates period {}", i, j, period);
+                        found += 1;
+                        break;
+                    }
+                    seen.insert(k, step);
+
+                    let all_dead = (0..6).all(|n| {
+                        (0..3).all(|x| (0..3).all(|y| (0..3).all(|z| cur[n][x][y][z] == false)))
+                    });
+                    if all_dead {
+                        break;
+                    }
+                }
+            }
+        }
+
+        println!("Found {} oscillating seeds (period ≤ {})", found, MAX_STEPS);
+        // Exploratory enumeration; don't fail CI even if none found
+        assert!(true);
+    }
+
+    #[test]
+    #[ignore = "experiment, not a test; run with --ignored"]
+    fn enumerate_oscillations_3x3x3_4_and_5_same_xyz() {
+        // Enumerate 4- and 5-live seeds restricted to the same (x,y,z) cell across tetra indices.
+        // This keeps the search small while probing rich interactions via same-xyz neighbors.
+        const SIZE: i32 = 3;
+        const MAX_STEPS: usize = 8;
+
+        type State = [[[[bool; 3]; 3]; 3]; 6];
+
+        fn empty() -> State {
+            [[[[false; 3]; 3]; 3]; 6]
+        }
+
+        fn wrap(a: i32) -> usize {
+            let mut v = a % SIZE;
+            if v < 0 {
+                v += SIZE;
+            }
+            v as usize
+        }
+
+        fn next(state: &State, checks_all: &[Vec<super::NeighbourChecks>; 6]) -> State {
+            let mut out = empty();
+            for (ni, checks_vec) in checks_all.iter().enumerate() {
+                for x in 0..3 {
+                    for y in 0..3 {
+                        for z in 0..3 {
+                            let mut neighbours: usize = 0;
+
+                            for check in checks_vec.iter() {
+                                let (mut cx, mut cy, mut cz) = (x as i32, y as i32, z as i32);
+                                match check.axis {
+                                    super::Axis::XPos => cx += 1,
+                                    super::Axis::XNeg => cx -= 1,
+                                    super::Axis::YPos => cy += 1,
+                                    super::Axis::YNeg => cy -= 1,
+                                    super::Axis::ZPos => cz += 1,
+                                    super::Axis::ZNeg => cz -= 1,
+                                    super::Axis::XPosYPos => {
+                                        cx += 1;
+                                        cy += 1;
+                                    }
+                                    super::Axis::XPosYNeg => {
+                                        cx += 1;
+                                        cy -= 1;
+                                    }
+                                    super::Axis::XNegYPos => {
+                                        cx -= 1;
+                                        cy += 1;
+                                    }
+                                    super::Axis::XNegYNeg => {
+                                        cx -= 1;
+                                        cy -= 1;
+                                    }
+                                    super::Axis::XPosZPos => {
+                                        cx += 1;
+                                        cz += 1;
+                                    }
+                                    super::Axis::XPosZNeg => {
+                                        cx += 1;
+                                        cz -= 1;
+                                    }
+                                    super::Axis::XNegZPos => {
+                                        cx -= 1;
+                                        cz += 1;
+                                    }
+                                    super::Axis::XNegZNeg => {
+                                        cx -= 1;
+                                        cz -= 1;
+                                    }
+                                    super::Axis::YPosZPos => {
+                                        cy += 1;
+                                        cz += 1;
+                                    }
+                                    super::Axis::YPosZNeg => {
+                                        cy += 1;
+                                        cz -= 1;
+                                    }
+                                    super::Axis::YNegZPos => {
+                                        cy -= 1;
+                                        cz += 1;
+                                    }
+                                    super::Axis::YNegZNeg => {
+                                        cy -= 1;
+                                        cz -= 1;
+                                    }
+                                }
+
+                                let (cx, cy, cz) = (wrap(cx), wrap(cy), wrap(cz));
+                                let nn = check.n as usize;
+                                if state[nn][cx][cy][cz] {
+                                    neighbours += 1;
+                                }
+                            }
+
+                            // same-xyz neighbours (all other five tetras)
+                            for m in 0..6 {
+                                if m != ni && state[m][x][y][z] {
+                                    neighbours += 1;
+                                }
+                            }
+
+                            let alive = state[ni][x][y][z];
+                            out[ni][x][y][z] = if alive {
+                                neighbours == 2 || neighbours == 3
+                            } else {
+                                neighbours == 3
+                            };
+                        }
+                    }
+                }
+            }
+            out
+        }
+
+        fn key(state: &State) -> Vec<u8> {
+            let mut k = Vec::with_capacity(6 * 27);
+            for n in 0..6 {
+                for x in 0..3 {
+                    for y in 0..3 {
+                        for z in 0..3 {
+                            k.push(state[n][x][y][z] as u8);
+                        }
+                    }
+                }
+            }
+            k
+        }
+
+        let checks_all: [Vec<super::NeighbourChecks>; 6] = [
+            super::checks(&super::TetraIndex::Zero),
+            super::checks(&super::TetraIndex::One),
+            super::checks(&super::TetraIndex::Two),
+            super::checks(&super::TetraIndex::Three),
+            super::checks(&super::TetraIndex::Four),
+            super::checks(&super::TetraIndex::Five),
+        ];
+
+        let mut found = 0usize;
+
+        // Enumerate all (x,y,z) cells; for each, choose 4-of-6 and 5-of-6 tetra indices at that same cell.
+        for x in 0..3 {
+            for y in 0..3 {
+                for z in 0..3 {
+                    // 4-live seeds at same (x,y,z)
+                    for a in 0..6 {
+                        for b in (a + 1)..6 {
+                            for c in (b + 1)..6 {
+                                for d in (c + 1)..6 {
+                                    let mut st = empty();
+                                    st[a][x][y][z] = true;
+                                    st[b][x][y][z] = true;
+                                    st[c][x][y][z] = true;
+                                    st[d][x][y][z] = true;
+
+                                    let mut seen =
+                                        std::collections::HashMap::<Vec<u8>, usize>::new();
+                                    seen.insert(key(&st), 0);
+
+                                    let mut cur = st;
+                                    for step in 1..=MAX_STEPS {
+                                        cur = next(&cur, &checks_all);
+                                        let k = key(&cur);
+                                        if let Some(prev) = seen.get(&k) {
+                                            let period = step - prev;
+                                            println!(
+                                                "4-live seed at cell ({},{},{}) layers [{},{},{},{}] oscillates period {}",
+                                                x, y, z, a, b, c, d, period
+                                            );
+                                            found += 1;
+                                            break;
+                                        }
+                                        seen.insert(k, step);
+
+                                        let all_dead = (0..6).all(|n| {
+                                            (0..3).all(|xx| {
+                                                (0..3).all(|yy| {
+                                                    (0..3).all(|zz| cur[n][xx][yy][zz] == false)
+                                                })
+                                            })
+                                        });
+                                        if all_dead {
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // 5-live seeds at same (x,y,z)
+                    for a in 0..6 {
+                        for b in (a + 1)..6 {
+                            for c in (b + 1)..6 {
+                                for d in (c + 1)..6 {
+                                    for e in (d + 1)..6 {
+                                        let mut st = empty();
+                                        st[a][x][y][z] = true;
+                                        st[b][x][y][z] = true;
+                                        st[c][x][y][z] = true;
+                                        st[d][x][y][z] = true;
+                                        st[e][x][y][z] = true;
+
+                                        let mut seen =
+                                            std::collections::HashMap::<Vec<u8>, usize>::new();
+                                        seen.insert(key(&st), 0);
+
+                                        let mut cur = st;
+                                        for step in 1..=MAX_STEPS {
+                                            cur = next(&cur, &checks_all);
+                                            let k = key(&cur);
+                                            if let Some(prev) = seen.get(&k) {
+                                                let period = step - prev;
+                                                println!(
+                                                    "5-live seed at cell ({},{},{}) layers [{},{},{},{},{}] oscillates period {}",
+                                                    x, y, z, a, b, c, d, e, period
+                                                );
+                                                found += 1;
+                                                break;
+                                            }
+                                            seen.insert(k, step);
+
+                                            let all_dead = (0..6).all(|n| {
+                                                (0..3).all(|xx| {
+                                                    (0..3).all(|yy| {
+                                                        (0..3).all(|zz| cur[n][xx][yy][zz] == false)
+                                                    })
+                                                })
+                                            });
+                                            if all_dead {
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        println!(
+            "Found {} oscillating 4/5-live seeds (period ≤ {})",
+            found, MAX_STEPS
+        );
+        assert!(true);
+    }
+
+    #[test]
+    #[ignore = "expensive: scans all 3-live seeds; run with --ignored. Writes saves/osc_period{K}.ron on first hit"]
+    fn find_first_period2_3live_and_write_save() {
+        // Search all 3-live seeds anywhere in a 3x3x3 universe and write the first period-2 seed to saves/osc_period2.ron
+        use std::collections::HashMap;
+        use std::fs::{File, create_dir_all};
+        use std::io::Write;
+
+        const SIZE: i32 = 3;
+        const MAX_STEPS: usize = 50;
+
+        type State = [[[[bool; 3]; 3]; 3]; 6];
+
+        fn empty() -> State {
+            [[[[false; 3]; 3]; 3]; 6]
+        }
+
+        fn idx_to_coords(idx: usize) -> (usize, usize, usize, usize) {
+            // 6 layers of 3x3x3 = 162 cells
+            let n = idx / 27;
+            let r = idx % 27;
+            let x = r / 9;
+            let r2 = r % 9;
+            let y = r2 / 3;
+            let z = r2 % 3;
+            (n, x, y, z)
+        }
+
+        fn wrap(a: i32) -> usize {
+            let mut v = a % SIZE;
+            if v < 0 {
+                v += SIZE;
+            }
+            v as usize
+        }
+
+        fn next(state: &State, checks_all: &[Vec<super::NeighbourChecks>; 6]) -> State {
+            let mut out = empty();
+            for (ni, checks_vec) in checks_all.iter().enumerate() {
+                for x in 0..3 {
+                    for y in 0..3 {
+                        for z in 0..3 {
+                            let mut neighbours: usize = 0;
+
+                            for check in checks_vec.iter() {
+                                let (mut cx, mut cy, mut cz) = (x as i32, y as i32, z as i32);
+                                match check.axis {
+                                    super::Axis::XPos => cx += 1,
+                                    super::Axis::XNeg => cx -= 1,
+                                    super::Axis::YPos => cy += 1,
+                                    super::Axis::YNeg => cy -= 1,
+                                    super::Axis::ZPos => cz += 1,
+                                    super::Axis::ZNeg => cz -= 1,
+                                    super::Axis::XPosYPos => {
+                                        cx += 1;
+                                        cy += 1
+                                    }
+                                    super::Axis::XPosYNeg => {
+                                        cx += 1;
+                                        cy -= 1
+                                    }
+                                    super::Axis::XNegYPos => {
+                                        cx -= 1;
+                                        cy += 1
+                                    }
+                                    super::Axis::XNegYNeg => {
+                                        cx -= 1;
+                                        cy -= 1
+                                    }
+                                    super::Axis::XPosZPos => {
+                                        cx += 1;
+                                        cz += 1
+                                    }
+                                    super::Axis::XPosZNeg => {
+                                        cx += 1;
+                                        cz -= 1
+                                    }
+                                    super::Axis::XNegZPos => {
+                                        cx -= 1;
+                                        cz += 1
+                                    }
+                                    super::Axis::XNegZNeg => {
+                                        cx -= 1;
+                                        cz -= 1
+                                    }
+                                    super::Axis::YPosZPos => {
+                                        cy += 1;
+                                        cz += 1
+                                    }
+                                    super::Axis::YPosZNeg => {
+                                        cy += 1;
+                                        cz -= 1
+                                    }
+                                    super::Axis::YNegZPos => {
+                                        cy -= 1;
+                                        cz += 1
+                                    }
+                                    super::Axis::YNegZNeg => {
+                                        cy -= 1;
+                                        cz -= 1
+                                    }
+                                }
+
+                                let (cx, cy, cz) = (wrap(cx), wrap(cy), wrap(cz));
+                                let nn = check.n as usize;
+                                if state[nn][cx][cy][cz] {
+                                    neighbours += 1;
+                                }
+                            }
+
+                            // same-xyz neighbours (all other five tetras)
+                            for m in 0..6 {
+                                if m != ni && state[m][x][y][z] {
+                                    neighbours += 1;
+                                }
+                            }
+
+                            let alive = state[ni][x][y][z];
+                            out[ni][x][y][z] = if alive {
+                                neighbours == 2 || neighbours == 3
+                            } else {
+                                neighbours == 3
+                            };
+                        }
+                    }
+                }
+            }
+            out
+        }
+
+        fn key(state: &State) -> Vec<u8> {
+            let mut k = Vec::with_capacity(6 * 27);
+            for n in 0..6 {
+                for x in 0..3 {
+                    for y in 0..3 {
+                        for z in 0..3 {
+                            k.push(state[n][x][y][z] as u8);
+                        }
+                    }
+                }
+            }
+            k
+        }
+
+        let checks_all: [Vec<super::NeighbourChecks>; 6] = [
+            super::checks(&super::TetraIndex::Zero),
+            super::checks(&super::TetraIndex::One),
+            super::checks(&super::TetraIndex::Two),
+            super::checks(&super::TetraIndex::Three),
+            super::checks(&super::TetraIndex::Four),
+            super::checks(&super::TetraIndex::Five),
+        ];
+
+        let total_cells = 6 * 27;
+
+        // Iterate all 3-live combinations
+        'outer: for i in 0..total_cells {
+            for j in (i + 1)..total_cells {
+                for k_idx in (j + 1)..total_cells {
+                    let mut st = empty();
+                    let (n1, x1, y1, z1) = idx_to_coords(i);
+                    let (n2, x2, y2, z2) = idx_to_coords(j);
+                    let (n3, x3, y3, z3) = idx_to_coords(k_idx);
+                    st[n1][x1][y1][z1] = true;
+                    st[n2][x2][y2][z2] = true;
+                    st[n3][x3][y3][z3] = true;
+                    let seed = st;
+
+                    let mut seen: HashMap<Vec<u8>, usize> = HashMap::new();
+                    seen.insert(key(&seed), 0);
+
+                    let mut cur = seed;
+                    for step in 1..=MAX_STEPS {
+                        cur = next(&cur, &checks_all);
+                        let k = key(&cur);
+                        if let Some(prev) = seen.get(&k) {
+                            let period = step - prev;
+                            if period >= 2 {
+                                // Found a period-K oscillator; write the seed to saves/osc_period{K}.ron
+                                let universe_size = 3usize;
+                                let mut life =
+                                    vec![
+                                        vec![
+                                            vec![vec![0usize; universe_size]; universe_size];
+                                            universe_size
+                                        ];
+                                        6
+                                    ];
+
+                                let mut counter = 0i64;
+                                for n in 0..6 {
+                                    for x in 0..3 {
+                                        for y in 0..3 {
+                                            for z in 0..3 {
+                                                if seed[n][x][y][z] {
+                                                    life[n][x][y][z] = 1usize;
+                                                    counter += 1;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                let save = crate::systems::saves::SaveResource {
+                                    life,
+                                    counter,
+                                    generation: 2,
+                                    universe_size,
+                                };
+
+                                // Ensure saves dir exists and write file
+                                let _ = create_dir_all("saves");
+                                let ron_str =
+                                    ron::to_string(&save).expect("serialize SaveResource");
+                                let filename = format!("saves/osc_period{}.ron", period);
+                                let mut file = File::create(&filename).expect("create osc file");
+                                file.write_all(ron_str.as_bytes()).expect("write osc file");
+                                let _ = file.sync_data();
+
+                                println!(
+                                    "Wrote period-{} seed (i={}, j={}, k={}) to {}",
+                                    period, i, j, k_idx, filename
+                                );
+                                break 'outer;
+                            }
+                            break;
+                        }
+                        seen.insert(k, step);
+
+                        // Early exit if dead (unlikely with 3-live seeds quickly)
+                        let all_dead = (0..6).all(|n| {
+                            (0..3).all(|x| (0..3).all(|y| (0..3).all(|z| cur[n][x][y][z] == false)))
+                        });
+                        if all_dead {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        // This is an exploratory generator; do not fail the test.
+        assert!(true);
+    }
+
+    #[test]
+    #[ignore = "expensive: random scan of 4-live seeds; run with --ignored. Writes saves/osc4_period{K}.ron on first hit"]
+    fn find_random_period_4live_and_write_save() {
+        use rand::Rng;
+        use std::collections::HashSet;
+        use std::fs::{File, create_dir_all};
+        use std::io::Write;
+
+        const SIZE: i32 = 3;
+        const MAX_STEPS: usize = 60;
+        const SAMPLES: usize = 200_000;
+
+        type State = [[[[bool; 3]; 3]; 3]; 6];
+
+        fn empty() -> State {
+            [[[[false; 3]; 3]; 3]; 6]
+        }
+
+        fn idx_to_coords(idx: usize) -> (usize, usize, usize, usize) {
+            let n = idx / 27;
+            let r = idx % 27;
+            let x = r / 9;
+            let r2 = r % 9;
+            let y = r2 / 3;
+            let z = r2 % 3;
+            (n, x, y, z)
+        }
+
+        fn wrap(a: i32) -> usize {
+            let mut v = a % SIZE;
+            if v < 0 {
+                v += SIZE;
+            }
+            v as usize
+        }
+
+        fn next(state: &State, checks_all: &[Vec<super::NeighbourChecks>; 6]) -> State {
+            let mut out = empty();
+            for (ni, checks_vec) in checks_all.iter().enumerate() {
+                for x in 0..3 {
+                    for y in 0..3 {
+                        for z in 0..3 {
+                            let mut neighbours: usize = 0;
+
+                            for check in checks_vec.iter() {
+                                let (mut cx, mut cy, mut cz) = (x as i32, y as i32, z as i32);
+                                match check.axis {
+                                    super::Axis::XPos => cx += 1,
+                                    super::Axis::XNeg => cx -= 1,
+                                    super::Axis::YPos => cy += 1,
+                                    super::Axis::YNeg => cy -= 1,
+                                    super::Axis::ZPos => cz += 1,
+                                    super::Axis::ZNeg => cz -= 1,
+                                    super::Axis::XPosYPos => {
+                                        cx += 1;
+                                        cy += 1
+                                    }
+                                    super::Axis::XPosYNeg => {
+                                        cx += 1;
+                                        cy -= 1
+                                    }
+                                    super::Axis::XNegYPos => {
+                                        cx -= 1;
+                                        cy += 1
+                                    }
+                                    super::Axis::XNegYNeg => {
+                                        cx -= 1;
+                                        cy -= 1
+                                    }
+                                    super::Axis::XPosZPos => {
+                                        cx += 1;
+                                        cz += 1
+                                    }
+                                    super::Axis::XPosZNeg => {
+                                        cx += 1;
+                                        cz -= 1
+                                    }
+                                    super::Axis::XNegZPos => {
+                                        cx -= 1;
+                                        cz += 1
+                                    }
+                                    super::Axis::XNegZNeg => {
+                                        cx -= 1;
+                                        cz -= 1
+                                    }
+                                    super::Axis::YPosZPos => {
+                                        cy += 1;
+                                        cz += 1
+                                    }
+                                    super::Axis::YPosZNeg => {
+                                        cy += 1;
+                                        cz -= 1
+                                    }
+                                    super::Axis::YNegZPos => {
+                                        cy -= 1;
+                                        cz += 1
+                                    }
+                                    super::Axis::YNegZNeg => {
+                                        cy -= 1;
+                                        cz -= 1
+                                    }
+                                }
+
+                                let (cx, cy, cz) = (wrap(cx), wrap(cy), wrap(cz));
+                                let nn = check.n as usize;
+                                if state[nn][cx][cy][cz] {
+                                    neighbours += 1;
+                                }
+                            }
+
+                            // same-xyz neighbours (all other five tetras)
+                            for m in 0..6 {
+                                if m != ni && state[m][x][y][z] {
+                                    neighbours += 1;
+                                }
+                            }
+
+                            let alive = state[ni][x][y][z];
+                            out[ni][x][y][z] = if alive {
+                                neighbours == 2 || neighbours == 3
+                            } else {
+                                neighbours == 3
+                            };
+                        }
+                    }
+                }
+            }
+            out
+        }
+
+        fn key(state: &State) -> Vec<u8> {
+            let mut k = Vec::with_capacity(6 * 27);
+            for n in 0..6 {
+                for x in 0..3 {
+                    for y in 0..3 {
+                        for z in 0..3 {
+                            k.push(state[n][x][y][z] as u8);
+                        }
+                    }
+                }
+            }
+            k
+        }
+
+        let checks_all: [Vec<super::NeighbourChecks>; 6] = [
+            super::checks(&super::TetraIndex::Zero),
+            super::checks(&super::TetraIndex::One),
+            super::checks(&super::TetraIndex::Two),
+            super::checks(&super::TetraIndex::Three),
+            super::checks(&super::TetraIndex::Four),
+            super::checks(&super::TetraIndex::Five),
+        ];
+
+        let total_cells = 6 * 27;
+        let mut tried: HashSet<[usize; 4]> = HashSet::new();
+        let mut rng = rand::thread_rng();
+
+        for _ in 0..SAMPLES {
+            // pick 4 distinct indices
+            let mut picks: [usize; 4] = [
+                rng.gen_range(0..total_cells),
+                rng.gen_range(0..total_cells),
+                rng.gen_range(0..total_cells),
+                rng.gen_range(0..total_cells),
+            ];
+            picks.sort_unstable();
+            if picks[0] == picks[1] || picks[1] == picks[2] || picks[2] == picks[3] {
+                continue;
+            }
+            if !tried.insert(picks) {
+                continue;
+            }
+
+            let mut st = empty();
+            for &idx in &picks {
+                let (n, x, y, z) = idx_to_coords(idx);
+                st[n][x][y][z] = true;
+            }
+            let seed = st;
+
+            use std::collections::HashMap;
+            let mut seen: HashMap<Vec<u8>, usize> = HashMap::new();
+            seen.insert(key(&seed), 0);
+
+            let mut cur = seed;
+            for step in 1..=MAX_STEPS {
+                cur = next(&cur, &checks_all);
+                let k = key(&cur);
+                if let Some(prev) = seen.get(&k) {
+                    let period = step - prev;
+                    if period >= 2 {
+                        // write osc4_period{K}.ron
+                        let universe_size = 3usize;
+                        let mut life = vec![
+                            vec![
+                                vec![vec![0usize; universe_size]; universe_size];
+                                universe_size
+                            ];
+                            6
+                        ];
+                        let mut counter: i64 = 0;
+                        for n in 0..6 {
+                            for x in 0..3 {
+                                for y in 0..3 {
+                                    for z in 0..3 {
+                                        if seed[n][x][y][z] {
+                                            life[n][x][y][z] = 1;
+                                            counter += 1;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        let save = crate::systems::saves::SaveResource {
+                            life,
+                            counter,
+                            generation: 2,
+                            universe_size,
+                        };
+                        let _ = create_dir_all("saves");
+                        let ron_str = ron::to_string(&save).expect("serialize SaveResource");
+                        let filename = format!("saves/osc4_period{}.ron", period);
+                        let mut file = File::create(&filename).expect("create osc file");
+                        file.write_all(ron_str.as_bytes()).expect("write osc file");
+                        let _ = file.sync_data();
+                        println!(
+                            "Wrote 4-live period-{} seed {:?} to {}",
+                            period, picks, filename
+                        );
+                        return;
+                    }
+                    break;
+                }
+                seen.insert(k, step);
+            }
+        }
+        // did not find within SAMPLES
+        println!("Did not find 4-live oscillator within {} samples", SAMPLES);
+        assert!(true);
+    }
 }
